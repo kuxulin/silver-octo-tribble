@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Core.Entities;
+using Infrastructure.ViewModels;
 
-namespace Infrastructure_.Mappings;
-internal class ProjectProfile : Profile
+namespace Infrastructure.Mappings;
+internal class ProjectProfile :Profile
 {
     public ProjectProfile()
     {
-        
+        CreateMap<ProjectCreateViewModel, Project>();
     }
 }
