@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Contexts;
 using Microsoft.EntityFrameworkCore;
-using Web.ViewModels;
+using Infrastructure.ViewModels; 
 using Core.Entities;
+using Persistence.Data.Contexts;
+using AutoMapper;
 
 namespace Web.Controllers;
 [Route("api/[controller]")]
@@ -10,11 +11,14 @@ namespace Web.Controllers;
 public class ProjectController : ControllerBase
 {
     private readonly DatabaseContext _context;
+    private readonly IMapper _mapper;
 
-    public ProjectController(DatabaseContext context)
+    public ProjectController(DatabaseContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
+
     [HttpGet]
     public async Task<IActionResult> GetProjects()
     {
@@ -24,14 +28,13 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProject(ProjectCreateVewModel model)
+    public async Task<IActionResult> CreateProject(ProjectCreateViewModel model)
     {
-        var project = new Project()
-        {
-            Name = model.Name,
-
-        };
-
+        //var project = new Project()
+        //{
+        //    Name = model.Name,
+        //};
+        var project = _mapper.Map<Project>(model);
         _context.Add(project);
         await _context.SaveChangesAsync();
 
