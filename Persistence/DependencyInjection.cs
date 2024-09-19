@@ -1,7 +1,7 @@
-﻿using Contexts;
-using Core.Entities;
+﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Data.Contexts;
 
 namespace Persistence;
 public static class DependencyInjection

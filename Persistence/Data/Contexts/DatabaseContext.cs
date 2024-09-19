@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Contexts;
+namespace Persistence.Data.Contexts;
 
-public class DatabaseContext : IdentityDbContext<User,Role, Guid>
+public class DatabaseContext : IdentityDbContext<User, Role, Guid>
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options)
