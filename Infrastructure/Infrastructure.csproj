@@ -10,8 +10,11 @@
   <ItemGroup>
     <Folder Include="DependencyInjections\" />
     <Folder Include="Loggers\" />
-    <Folder Include="Mappings\" />
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
 </Project>
