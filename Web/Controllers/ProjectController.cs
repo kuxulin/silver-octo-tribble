@@ -1,43 +1,48 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Infrastructure.ViewModels; 
-using Core.Entities;
 using Persistence.Data.Contexts;
-using AutoMapper;
+using Persistence.Repositories;
+using Core.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Core.Interfaces.Repositories;
+using Core.DTOs.Project;
 
 namespace Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class ProjectController : ControllerBase
 {
-    private readonly DatabaseContext _context;
-    private readonly IMapper _mapper;
+    private readonly IProjectRepository _repository;
 
-    public ProjectController(DatabaseContext context, IMapper mapper)
+    public ProjectController(IProjectRepository repository)
     {
-        _context = context;
-        _mapper = mapper;
+        _repository = repository;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetProjects()
     {
-        var projects = await _context.Projects.ToListAsync();
-
+        var projects = await _repository.GetAllAsync();
         return Ok(projects);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProject(ProjectCreateViewModel model)
+    public async Task<IActionResult> CreateProject(ProjectCreateDTO dto)
     {
-        //var project = new Project()
-        //{
-        //    Name = model.Name,
-        //};
-        var project = _mapper.Map<Project>(model);
-        _context.Add(project);
-        await _context.SaveChangesAsync();
+        var result = await _repository.AddAsync(dto);
+        return Ok(result);
+    }
 
-        return Ok(project.Id);
+    [HttpPut]
+    public async Task<IActionResult> UpdateProject(ProjectUpdateDTO dto)
+    {
+        var result = await _repository.UpdateAsync(dto);
+        return Ok(result);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteProject(Guid id)
+    {
+        await _repository.DeleteAsync(id);
+        return Ok();
     }
 }
