@@ -1,8 +1,11 @@
 ﻿namespace Core.Entities;
 
-public partial class Project : BaseEntity
+public class Project : BaseEntity
 {
     public string Name { get; set; }
 
-    public virtual ICollection<Task> Tasks { get; set; }
+    public ICollection<TodoTask> ToDoTasks { get; set; }
+
+    public ICollection<Manager> Managers { get; set; }
+    public ICollection<Employee> Employees { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class Task : BaseEntity
+public class TodoTask : BaseEntity
 { 
     public string Title { get; set; }
 
@@ -8,5 +8,5 @@ public partial class Task : BaseEntity
 
     public Guid ProjectId { get; set; }
 
-    public virtual Project Project { get; set; }
+    public Project Project { get; set; }
 }

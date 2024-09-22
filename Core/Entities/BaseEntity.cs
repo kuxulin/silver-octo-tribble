@@ -1,4 +1,6 @@
-﻿namespace Core.Entities;
+﻿using System;
+
+namespace Core.Entities;
 public class BaseEntity
 {
     public Guid Id { get; set; }
@@ -6,5 +8,8 @@ public class BaseEntity
     public BaseEntity()
     {
         Id = Guid.NewGuid();
+        CreationDate = DateTime.UtcNow;
     }
+
+    public DateTime CreationDate { get; set; }
 }
