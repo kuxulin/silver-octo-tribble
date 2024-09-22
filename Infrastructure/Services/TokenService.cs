@@ -2,6 +2,7 @@
 using Core.Entities;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -69,9 +70,13 @@ internal class TokenService : ITokenService
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.Key));
 
-        var validation = new TokenValidationParameters
+        var validation = new TokenValidationParameters //TODO move validation parameters in some constants place (i use this config in dependency injection while registering jwt auth too)
         {
-            IssuerSigningKey = securityKey
+            IssuerSigningKey = securityKey,
+            ValidIssuer = _configuration.Issuer,
+            ValidAudience = _configuration.Audience,
+            NameClaimType = "Name",
+            RoleClaimType = "Role"
         };
 
         return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);

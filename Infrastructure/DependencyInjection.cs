@@ -40,10 +40,11 @@ public static class DependencyInjection
                 options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Key))
+                    ValidIssuer = configuration.Issuer,
+                    ValidAudience = configuration.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Key)),
+                    NameClaimType = "Name",
+                    RoleClaimType = "Role"
                 };
             });
     }

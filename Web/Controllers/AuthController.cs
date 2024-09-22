@@ -24,28 +24,32 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(AuthDTO dto)
     {
-        var tokens = await _authService.Login(dto);
+        var accessToken = await _authService.Login(dto);
 
-        if (tokens is null)
+        if (accessToken is null)
             return Unauthorized();
 
-        Response.Cookies.Append("refreshToken", tokens.RefreshToken);
-        return Ok(tokens);
+        var refreshToken = _authService.CreateRefreshToken(accessToken.UserName);
+        Response.Cookies.Append("refreshToken", refreshToken);
+        return Ok(accessToken);
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(AuthDTO dto)
     {
-        var tokens = await _authService.Register(dto);
-        Response.Cookies.Append("refreshToken",tokens.RefreshToken);
-        return Ok(tokens);
+        var accessToken = await _authService.Register(dto);
+        var refreshToken = _authService.CreateRefreshToken(accessToken.UserName);
+        Response.Cookies.Append("refreshToken", refreshToken);
+        return Ok(accessToken);
     }
 
     [HttpGet("refresh")]
     public async Task<IActionResult> RefreshTokens()
     {
         string oldRefreshToken = Request.Cookies["refreshToken"];
-        var tokens = await _authService.RefreshTokens(oldRefreshToken);
-        return Ok(tokens);
+        var accessToken = await _authService.RefreshTokens(oldRefreshToken);
+        var refreshToken = _authService.CreateRefreshToken(accessToken.UserName);
+        Response.Cookies.Append("refreshToken", refreshToken);
+        return Ok(accessToken);
     }
 }

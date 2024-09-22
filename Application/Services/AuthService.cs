@@ -1,16 +1,7 @@
-﻿using Core.Constants;
-using Core.DTOs.Auth;
+﻿using Core.DTOs.Auth;
 using Core.Entities;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Application.Services;
 public class AuthService : IAuthService
@@ -61,7 +52,7 @@ public class AuthService : IAuthService
     {
         var principal = _tokenService.GetTokenPrincipal(oldRefreshToken);
 
-        if (principal?.Identity?.Name is null)
+        if (principal.Identity is null)
             throw new Exception("Invalid refresh token");
 
         var user = await _userManager.FindByNameAsync(principal.Identity.Name);
@@ -72,17 +63,20 @@ public class AuthService : IAuthService
         return await GenerateTokensAsync(user);
     }
 
+    public string CreateRefreshToken(string username)
+    {
+        return _tokenService.CreateRefreshToken(username);
+    }
+
     private async Task<TokenDTO> GenerateTokensAsync(User user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
         var accessToken = await _tokenService.CreateAccessTokenAsync(user, userRoles);
-        var refreshToken = _tokenService.CreateRefreshToken(user.UserName);
 
         return new TokenDTO
         {
             Token = accessToken,
-            UserName = user.UserName,
-            RefreshToken = refreshToken,
+            UserName = user.UserName
         };
     }
 }
