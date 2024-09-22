@@ -10,11 +10,10 @@ public class DatabaseContext : IdentityDbContext<User, Role, Guid>
         : base(options)
     {
     }
-
-    public virtual DbSet<Role> Roles { get; set; }
-    public virtual DbSet<User> Users { get; set; }
-    public virtual DbSet<Project> Projects { get; set; }
-    public virtual DbSet<Core.Entities.Task> Tasks { get; set; }
+    public DbSet<Project> Projects { get; set; }
+    public DbSet<TodoTask> ToDoTasks { get; set; }
+    public DbSet<Manager> Managers { get; set; }
+    public DbSet<Employee> Employees { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbAndEntity(builder.Configuration.GetConnectionString("ServerConnection"));
+builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("ServerConnection"));
 builder.Services.AddMappers();
 builder.Services.AddRepositories();
 builder.Services.AddControllers();
