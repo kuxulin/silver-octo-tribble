@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs;
-internal class ProjectDTO
+namespace Core.Interfaces.Services;
+internal interface IManagerService
 {
 }

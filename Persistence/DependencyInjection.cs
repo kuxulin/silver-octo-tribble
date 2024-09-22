@@ -1,12 +1,17 @@
-﻿using Core.Entities;
+﻿using Core.DTOs.Employee;
+using Core.DTOs.Manager;
+using Core.DTOs.TodoTask;
+using Core.Entities;
+using Core.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data.Contexts;
+using Persistence.Repositories;
 
 namespace Persistence;
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDbAndEntity(
+    public static IServiceCollection AddDbAndIdentity(
         this IServiceCollection services,
         string configurationString)
     {
@@ -22,8 +27,18 @@ public static class DependencyInjection
                         options.SignIn.RequireConfirmedEmail = true;
                     })
             .AddRoles<Role>()
-            .AddEntityFrameworkStores<DatabaseContext>();       
+            .AddEntityFrameworkStores<DatabaseContext>();
 
         return services;
     }
+
+    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<IProjectRepository,ProjectRepository>();
+        services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
+        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        services.AddScoped<IManagerRepository, ManagerRepository>();
+        return services;
+    }
+
 }
