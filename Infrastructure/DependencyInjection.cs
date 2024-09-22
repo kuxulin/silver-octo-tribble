@@ -1,4 +1,3 @@
-﻿using AutoMapper;
 using Infrastructure.Mappings;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,13 +6,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddMappers(this IServiceCollection services)
     {
-        var mapperConfig = new MapperConfiguration(mc =>
-        {
-            mc.AddProfile<ProjectProfile>();
-        });
+        services.AddAutoMapper(typeof(ProjectProfile).Assembly);
+        return services;
+    }
 
-        var mapper = mapperConfig.CreateMapper();
-        services.AddSingleton(mapper);
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ITokenService, TokenService>();
         return services;
     }
 }
