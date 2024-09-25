@@ -5,6 +5,6 @@ public interface IAuthService
 {
     Task<TokenDTO> Register(AuthDTO dto);
     Task<TokenDTO> Login(AuthDTO dto);
-    Task<TokenDTO> RefreshTokens(string oldRefreshToken);
-    string CreateRefreshToken(string username);
+    Task<TokenDTO> CreateAccessTokenFromRefresh(string oldRefreshToken);
+    Task<string> CreateRefreshTokenAsync(string username);
 }

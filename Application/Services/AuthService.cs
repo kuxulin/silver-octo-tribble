@@ -24,7 +24,7 @@ public class AuthService : IAuthService
 
         if (await _userManager.CheckPasswordAsync(user, dto.Password))
         {
-            return await GenerateTokensAsync(user);
+            return await GenerateAccessTokenAsync(user);
         }
 
         throw new Exception("Passwords aren`t equal");
@@ -40,35 +40,41 @@ public class AuthService : IAuthService
         User user = new()
         {
             Email = dto.Email,
-            UserName = dto.UserName,
-            CreationDate = DateTime.UtcNow,
+            UserName = dto.UserName
         };
 
         IdentityResult result = await _userManager.CreateAsync(user, dto.Password);
-        return await GenerateTokensAsync(user);
+        return await GenerateAccessTokenAsync(user);
     }
 
-    public async Task<TokenDTO> RefreshTokens(string oldRefreshToken)
+    public async Task<TokenDTO> CreateAccessTokenFromRefresh(string oldRefreshToken)
     {
-        var principal = _tokenService.GetTokenPrincipal(oldRefreshToken);
-
-        if (principal.Identity is null)
+        if(!_tokenService.ValidateToken(oldRefreshToken))
             throw new Exception("Invalid refresh token");
 
-        var user = await _userManager.FindByNameAsync(principal.Identity.Name);
+        string username = _tokenService.GetNameFromToken(oldRefreshToken);
+
+        if (username is null)
+            throw new Exception("Invalid refresh token");
+
+        var user = await _userManager.FindByNameAsync(username);
 
         if (user is null)
             throw new Exception("There is no such user in db");
 
-        return await GenerateTokensAsync(user);
+        return await GenerateAccessTokenAsync(user);
     }
 
-    public string CreateRefreshToken(string username)
+    public async Task<string> CreateRefreshTokenAsync(string username)
     {
-        return _tokenService.CreateRefreshToken(username);
+        var token = _tokenService.CreateRefreshToken(username);
+        var user = _userManager.Users.First(u => u.UserName == username);
+        user.RefreshToken = token;
+        await _userManager.UpdateAsync(user); 
+        return token;
     }
 
-    private async Task<TokenDTO> GenerateTokensAsync(User user)
+    private async Task<TokenDTO> GenerateAccessTokenAsync(User user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
         var accessToken = await _tokenService.CreateAccessTokenAsync(user, userRoles);

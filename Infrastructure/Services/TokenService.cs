@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Infrastructure.Services;
@@ -19,7 +20,7 @@ internal class TokenService : ITokenService
         _configuration = configuration.Value;
     }
 
-    public async Task<string> CreateAccessTokenAsync(User user,IEnumerable<string> userRoles)
+    public async Task<string> CreateAccessTokenAsync(User user, IEnumerable<string> userRoles)
     {
         var authClaims = new List<Claim>
         {
@@ -57,7 +58,7 @@ internal class TokenService : ITokenService
 
         var token = new JwtSecurityToken(
             issuer: _configuration.Issuer,
-            audience: _configuration.Audience,
+            audience: _configuration.Issuer,
             expires: DateTime.UtcNow.AddDays(3),
             claims: authClaims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
@@ -66,7 +67,7 @@ internal class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public ClaimsPrincipal GetTokenPrincipal(string token)
+    public bool ValidateToken(string token)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.Key));
 
@@ -74,11 +75,25 @@ internal class TokenService : ITokenService
         {
             IssuerSigningKey = securityKey,
             ValidIssuer = _configuration.Issuer,
-            ValidAudience = _configuration.Audience,
-            NameClaimType = "Name",
-            RoleClaimType = "Role"
+            ValidAudience = _configuration.Issuer
         };
 
-        return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
+        try
+        {
+            new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
+        }
+        catch
+        { 
+            //logger.log?
+            return false; 
+        }
+
+        return true;
+    }
+
+    public string GetNameFromToken(string token)
+    {
+        var parsedToken = new JwtSecurityToken(token);
+        return parsedToken.Claims.First(c => c.Type=="Name").Value;
     }
 }
