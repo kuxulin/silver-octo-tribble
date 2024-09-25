@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[Employees]
 (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY CLUSTERED ([Id] ASC), 
-    [FullName] NCHAR(40) NOT NULL, 
-    [PhoneNumber] NCHAR(10) NOT NULL, 
+    [FullName] NVARCHAR(100) NOT NULL, 
+    [PhoneNumber] NVARCHAR(15) NOT NULL, 
     [CreationDate] DATETIME NOT NULL
 )
