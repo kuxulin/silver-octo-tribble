@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
         if (accessToken is null)
             return Unauthorized();
 
-        var refreshToken = _authService.CreateRefreshToken(accessToken.UserName);
+        var refreshToken = await _authService.CreateRefreshTokenAsync(accessToken.UserName);
         Response.Cookies.Append("refreshToken", refreshToken);
         return Ok(accessToken);
     }
@@ -38,7 +38,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register(AuthDTO dto)
     {
         var accessToken = await _authService.Register(dto);
-        var refreshToken = _authService.CreateRefreshToken(accessToken.UserName);
+        var refreshToken = await _authService.CreateRefreshTokenAsync(accessToken.UserName);
         Response.Cookies.Append("refreshToken", refreshToken);
         return Ok(accessToken);
     }
@@ -47,8 +47,8 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> RefreshTokens()
     {
         string oldRefreshToken = Request.Cookies["refreshToken"];
-        var accessToken = await _authService.RefreshTokens(oldRefreshToken);
-        var refreshToken = _authService.CreateRefreshToken(accessToken.UserName);
+        var accessToken = await _authService.CreateAccessTokenFromRefresh(oldRefreshToken);
+        var refreshToken = await _authService.CreateRefreshTokenAsync(accessToken.UserName);
         Response.Cookies.Append("refreshToken", refreshToken);
         return Ok(accessToken);
     }
