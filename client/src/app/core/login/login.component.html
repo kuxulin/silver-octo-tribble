@@ -1,0 +1,37 @@
+<div class="login dialog-box">
+  <mat-form-field>
+    <mat-label>Username</mat-label>
+    <input matInput [(ngModel)]="username" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Password</mat-label>
+    <input
+      matInput
+      [type]="hidePassword() ? 'password' : 'text'"
+      [(ngModel)]="password"
+    />
+    <button
+      mat-icon-button
+      matSuffix
+      (click)="onPasswordVisibilityChanged($event)"
+      [attr.aria-label]="'Hide password'"
+      [attr.aria-pressed]="hidePassword()"
+    >
+      <mat-icon>{{
+        hidePassword() ? "visibility_off" : "visibility"
+      }}</mat-icon>
+    </button>
+  </mat-form-field>
+  <div>
+    <button
+      mat-button
+      style="width: 40%"
+      disabled="{{ !areFieldsValid() }}"
+      (click)="onSubmitClick()"
+    >
+      Submit
+    </button>
+  </div>
+  <span>Don`t have an account yet?</span>
+  <button rout mat-button routerLink="/register">Register</button>
+</div>
