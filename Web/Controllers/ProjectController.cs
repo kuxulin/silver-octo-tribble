@@ -5,44 +5,46 @@ using Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Core.Interfaces.Repositories;
 using Core.DTOs.Project;
+using Core.Interfaces.Services;
 
 namespace Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ProjectController : ControllerBase
 {
-    private readonly IProjectRepository _repository;
+    private readonly IProjectService _service;
 
-    public ProjectController(IProjectRepository repository)
+    public ProjectController(IProjectService service)
     {
-        _repository = repository;
+        _service = service;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetProjects()
     {
-        var projects = await _repository.GetAllAsync();
+        var projects = await _service.GetAllAsync();
         return Ok(projects);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateProject(ProjectCreateDTO dto)
     {
-        var result = await _repository.AddAsync(dto);
+        var result = await _service.CreateProjectAsync(dto);
         return Ok(result);
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateProject(ProjectUpdateDTO dto)
     {
-        var result = await _repository.UpdateAsync(dto);
+        var result = await _service.UpdateProjectAsync(dto);
         return Ok(result);
     }
 
     [HttpDelete]
     public async Task<IActionResult> DeleteProject(Guid id)
     {
-        await _repository.DeleteAsync(id);
+        await _service.DeleteProjectAsync(id);
         return Ok();
     }
 }

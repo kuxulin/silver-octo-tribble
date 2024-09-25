@@ -10,7 +10,8 @@ builder.Services.AddAuthenticationConfigurations(builder.Configuration.GetSectio
 builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("ServerConnection"));
 builder.Services.AddMappers();
 builder.Services.AddRepositories();
-builder.Services.AddServices();
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

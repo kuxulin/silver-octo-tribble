@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Core.DTOs.Manager;
 
 namespace Core.Interfaces.Services;
-internal interface IManagerService
+public interface IManagerService
 {
+    Task<IEnumerable<ManagerReadDTO>> GetAllAsync();
+    Task<ManagerReadDTO> GetByIdAsync(Guid id);
+    Task<ManagerReadDTO> GetByNameAsync(string name);
+    Task<Guid> CreateManagerAsync(ManagerCreateDTO dto);
+    Task<Guid> UpdateManagerAsync(ManagerUpdateDTO dto);
+    Task DeleteManagerAsync(Guid id);
 }
