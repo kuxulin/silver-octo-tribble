@@ -13,6 +13,11 @@ internal class TodoTaskRepository : BaseCRUDRepository<TodoTask, TodoTaskReadDTO
 
     }
 
+    protected new IQueryable<TodoTask> GetAll()
+    {
+        return base.GetAll().Include(t=> t.Project);
+    }
+
     public async new Task<Guid> UpdateAsync(TodoTaskUpdateDTO dto)
     {
         var todoTask = await GetAll().Where(t => t.Id == dto.Id).FirstAsync();
