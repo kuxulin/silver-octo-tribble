@@ -12,6 +12,17 @@ builder.Services.AddMappers();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value,
+        policyBuilder =>
+        {
+            policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:LocalPolicy:Origin").Value)
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+        });
+});
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -30,7 +41,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value);
 app.MapControllers();
 
 app.Run();
