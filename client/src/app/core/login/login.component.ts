@@ -41,6 +41,8 @@ export class LoginComponent {
 
     this.authService
       .login(this.username, this.password)
-      .subscribe((res) => console.log(res));
+      .subscribe({error:(err) => {
+        console.log(err)
+      }});
   }
 }
