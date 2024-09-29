@@ -1,6 +1,8 @@
-﻿using Core.DTOs.Auth;
+﻿using Core.Constants;
+using Core.DTOs.Auth;
 using Core.Entities;
 using Core.Interfaces.Services;
+using Core.ResultPattern;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services;
@@ -15,27 +17,27 @@ public class AuthService : IAuthService
         _tokenService = tokenService;
     }
 
-    public async Task<TokenDTO> Login(AuthDTO dto)
+    public async Task<Result<TokenDTO>> Login(AuthDTO dto)
     {
         var user = await _userManager.FindByNameAsync(dto.UserName);
 
         if (user is null)
-            throw new Exception("There is no such user in db");
+            return DefinedError.AbsentElement; 
 
         if (await _userManager.CheckPasswordAsync(user, dto.Password))
         {
             return await GenerateAccessTokenAsync(user);
         }
 
-        throw new Exception("Passwords aren`t equal");
+        return DefinedError.NonEqualPasswords; 
     }
 
-    public async Task<TokenDTO> Register(AuthDTO dto)
+    public async Task<Result<TokenDTO>> Register(AuthDTO dto)
     {
         User? possibleUser = await _userManager.FindByNameAsync(dto.UserName);
 
         if (possibleUser is not null)
-            throw new Exception("There is already such username in db");
+            return DefinedError.DuplicateEntity;
 
         User user = new()
         {
@@ -47,25 +49,25 @@ public class AuthService : IAuthService
         return await GenerateAccessTokenAsync(user);
     }
 
-    public async Task<TokenDTO> CreateAccessTokenFromRefresh(string oldRefreshToken)
+    public async Task<Result<TokenDTO>> CreateAccessTokenFromRefresh(string oldRefreshToken)
     {
         if(!_tokenService.ValidateToken(oldRefreshToken))
-            throw new Exception("Invalid refresh token");
+            return DefinedError.InvalidElement;
 
         string username = _tokenService.GetNameFromToken(oldRefreshToken);
 
         if (username is null)
-            throw new Exception("Invalid refresh token");
+            return DefinedError.InvalidElement;
 
         var user = await _userManager.FindByNameAsync(username);
 
         if (user is null)
-            throw new Exception("There is no such user in db");
+            return DefinedError.AbsentElement; 
 
         return await GenerateAccessTokenAsync(user);
     }
 
-    public async Task<string> CreateRefreshTokenAsync(string username)
+    public async Task<Result<string>> CreateRefreshTokenAsync(string username)
     {
         var token = _tokenService.CreateRefreshToken(username);
         var user = _userManager.Users.First(u => u.UserName == username);

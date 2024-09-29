@@ -24,32 +24,36 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(AuthDTO dto)
     {
-        var accessToken = await _authService.Login(dto);
+        var loginResult = await _authService.Login(dto);
 
-        if (accessToken is null)
-            return Unauthorized();
+        if (!loginResult.IsSuccess)
+            return StatusCode(loginResult.Error.StatusCode, loginResult.Error.Message);
 
-        var refreshToken = await _authService.CreateRefreshTokenAsync(accessToken.UserName);
-        Response.Cookies.Append("refreshToken", refreshToken);
-        return Ok(accessToken);
+        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(loginResult.Value.UserName);
+        Response.Cookies.Append("refreshToken", refreshTokenResult.Value);
+        return Ok(loginResult);
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(AuthDTO dto)
     {
-        var accessToken = await _authService.Register(dto);
-        var refreshToken = await _authService.CreateRefreshTokenAsync(accessToken.UserName);
-        Response.Cookies.Append("refreshToken", refreshToken);
-        return Ok(accessToken);
+        var accessTokenResult = await _authService.Register(dto);
+        
+        if(!accessTokenResult.IsSuccess) 
+            return StatusCode(accessTokenResult.Error.StatusCode, accessTokenResult.Error.Message);
+
+        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(accessTokenResult.Value.UserName);
+        Response.Cookies.Append("refreshToken", refreshTokenResult.Value);
+        return Ok(accessTokenResult);
     }
 
     [HttpGet("refresh")]
     public async Task<IActionResult> RefreshTokens()
     {
         string oldRefreshToken = Request.Cookies["refreshToken"];
-        var accessToken = await _authService.CreateAccessTokenFromRefresh(oldRefreshToken);
-        var refreshToken = await _authService.CreateRefreshTokenAsync(accessToken.UserName);
-        Response.Cookies.Append("refreshToken", refreshToken);
-        return Ok(accessToken);
+        var accessTokenResult = await _authService.CreateAccessTokenFromRefresh(oldRefreshToken);
+        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(accessTokenResult.Value.UserName);
+        Response.Cookies.Append("refreshToken", refreshTokenResult.Value);
+        return Ok(accessTokenResult);
     }
 }
