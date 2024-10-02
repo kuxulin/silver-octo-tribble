@@ -1,7 +1,7 @@
 export default interface User {
-  id: string;
-  fullName: string;
-  username: string;
-  phoneNumber: string;
-  roles: string[];
+  id: string | undefined;
+  fullName: string | undefined;
+  username: string | undefined;
+  phoneNumber: string | undefined;
+  roles: string[] | undefined;
 }
