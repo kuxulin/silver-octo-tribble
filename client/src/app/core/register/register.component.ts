@@ -1,9 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { RouterModule } from '@angular/router';
+import LoginRegisterDTO from '../../shared/models/DTOs/RegisterDTO';
+import { AuthHandlerComponent } from '../../shared/auth-handler/auth-handler.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { isPossiblePhoneNumber, isValidNumber } from 'libphonenumber-js';
+import {
+  ErrorStateMatcher,
+  ShowOnDirtyErrorStateMatcher,
+} from '@angular/material/core';
 
 @Component({
   selector: 'app-register',
@@ -14,8 +22,41 @@ import { RouterModule } from '@angular/router';
     MatIconModule,
     MatInputModule,
     RouterModule,
+    AuthHandlerComponent,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
+  providers: [
+    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher },
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
-export class RegisterComponent {}
+export class RegisterComponent {
+  dto: LoginRegisterDTO = {
+    username: '',
+    password: '',
+    fullName: '',
+    phoneNumber: '',
+  };
+  checkedPassword = '';
+
+  areFieldsValid(): boolean {
+    return (
+      !!this.dto.username &&
+      !!this.dto.password &&
+      !!this.dto.fullName &&
+      !!this.dto.phoneNumber &&
+      this.arePasswordsEqual() &&
+      this.isPhoneValid()
+    );
+  }
+
+  arePasswordsEqual(): boolean {
+    return this.dto.password === this.checkedPassword;
+  }
+
+  isPhoneValid(): boolean {
+    return !this.dto.phoneNumber || isValidNumber(this.dto.phoneNumber);
+  }
+}

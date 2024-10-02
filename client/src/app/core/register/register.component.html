@@ -1,27 +1,38 @@
-<div class="login dialog-box">
+<div class="register dialog-box">
   <mat-form-field>
     <mat-label>Username</mat-label>
-    <input matInput />
+    <input matInput [(ngModel)]="dto.username" required />
   </mat-form-field>
   <mat-form-field>
     <mat-label>Full name</mat-label>
-    <input matInput />
+    <input matInput [(ngModel)]="dto.fullName" required />
   </mat-form-field>
   <mat-form-field>
     <mat-label>Phone number</mat-label>
-    <input matInput />
+    <input
+      matInput
+      type="tel"
+      maxlength="13"
+      [(ngModel)]="dto.phoneNumber"
+      required
+    />
   </mat-form-field>
   <mat-form-field>
     <mat-label>Enter your password</mat-label>
-    <input matInput type="password" />
+    <input matInput type="password" [(ngModel)]="dto.password" required />
   </mat-form-field>
   <mat-form-field>
     <mat-label>Confirm password</mat-label>
-    <input matInput type="password" />
+    <input matInput type="password" [(ngModel)]="checkedPassword" required />
   </mat-form-field>
-  <div>
-    <button mat-button style="width: 40%">Proceed</button>
-  </div>
-  <span>Already have an account?</span>
-  <button mat-button routerLink="/login">Login</button>
+  @if (!arePasswordsEqual()) {
+  <mat-error>Passwords aren`t equal</mat-error>
+  } @if (!isPhoneValid()) {
+  <mat-error>Invalid phone number</mat-error>
+  }
+  <app-auth-handler
+    [dto]="dto"
+    [areFieldsValid]="areFieldsValid()"
+    [isLogin]="false"
+  />
 </div>

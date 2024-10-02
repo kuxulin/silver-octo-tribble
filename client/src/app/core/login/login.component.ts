@@ -4,8 +4,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../shared/services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { AuthHandlerComponent } from '../../shared/auth-handler/auth-handler.component';
+import LoginRegisterDTO from '../../shared/models/DTOs/RegisterDTO';
 
 @Component({
   selector: 'app-login',
@@ -17,16 +18,19 @@ import { FormsModule } from '@angular/forms';
     MatInputModule,
     RouterModule,
     FormsModule,
+    AuthHandlerComponent,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
   hidePassword = signal(true);
-  username = '';
-  password = '';
-
-  constructor(private authService: AuthService) {}
+  dto: LoginRegisterDTO = {
+    username: '',
+    password: '',
+    fullName: '',
+    phoneNumber: '',
+  };
 
   onPasswordVisibilityChanged($event: MouseEvent) {
     this.hidePassword.set(!this.hidePassword());
@@ -34,15 +38,6 @@ export class LoginComponent {
   }
 
   areFieldsValid(): boolean {
-    return !!this.username && !!this.password;
-  }
-  onSubmitClick() {
-    if (!this.areFieldsValid()) return;
-
-    this.authService
-      .login(this.username, this.password)
-      .subscribe({error:(err) => {
-        console.log(err)
-      }});
+    return !!this.dto.username && !!this.dto.password;
   }
 }

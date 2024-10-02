@@ -1,0 +1,18 @@
+<div>
+  <button
+    mat-button
+    style="width: 40%"
+    disabled="{{ !areFieldsValid }}"
+    (click)="onSubmitClick()"
+  >
+    Submit
+  </button>
+  <span class="error-text" @if(errorText)>{{ errorText }}</span>
+  <div class="switch">
+    @if(isLogin) {<span>Don`t have an account yet?</span>
+    <button rout mat-button routerLink="/register">Register</button>} @else {
+    <span>Already have an account?</span>
+    <button mat-button routerLink="/login">Login</button>
+    }
+  </div>
+</div>
