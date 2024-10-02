@@ -5,7 +5,7 @@ import { RegisterComponent } from './core/register/register.component';
 
 export const routes: Routes = [
   { path: 'initial', component: InitialComponent },
-  { path: '', component: InitialComponent },
+  { path: '', redirectTo: '/initial', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
 ];

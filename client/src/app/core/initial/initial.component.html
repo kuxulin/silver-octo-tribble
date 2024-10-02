@@ -1,4 +1,10 @@
 <div class="initial dialog-box">
+  @if (authService.user$ | async; as user) {
+  <div>
+    <span>Username: {{ user.username }} </span>
+    <span>Roles: {{ user.roles?.join(", ") }}</span>
+  </div>
+  } @else {
   <div>
     <p>Looks like you have not entered the system</p>
     <span>Feel free to change it </span>
@@ -7,4 +13,5 @@
     <button mat-button routerLink="/register">Register</button>
     <button mat-button routerLink="/login">Log In</button>
   </div>
+  }
 </div>

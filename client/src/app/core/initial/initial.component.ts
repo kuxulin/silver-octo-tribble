@@ -1,12 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../shared/services/auth.service';
+import { Observable, pipe, take } from 'rxjs';
+import User from '../../shared/models/user';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-initial',
   standalone: true,
-  imports: [MatButtonModule, RouterModule],
+  imports: [MatButtonModule, RouterModule, CommonModule],
   templateUrl: './initial.component.html',
   styleUrl: './initial.component.scss',
 })
-export class InitialComponent {}
+export class InitialComponent {
+  constructor(public authService: AuthService) {}
+}
