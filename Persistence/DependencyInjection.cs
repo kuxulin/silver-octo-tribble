@@ -1,7 +1,4 @@
-﻿using Core.DTOs.Employee;
-using Core.DTOs.Manager;
-using Core.DTOs.TodoTask;
-using Core.Entities;
+﻿using Core.Entities;
 using Core.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +21,6 @@ public static class DependencyInjection
                         options.Password.RequireLowercase = false;
                         options.Password.RequireNonAlphanumeric = false;
                         options.Password.RequireUppercase = false;
-                        options.SignIn.RequireConfirmedEmail = true;
                     })
             .AddRoles<Role>()
             .AddEntityFrameworkStores<DatabaseContext>();
@@ -34,11 +30,10 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped<IProjectRepository,ProjectRepository>();
+        services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IManagerRepository, ManagerRepository>();
         return services;
     }
-
 }

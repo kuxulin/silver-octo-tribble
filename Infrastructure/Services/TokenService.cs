@@ -15,7 +15,7 @@ internal class TokenService : ITokenService
 {
     private readonly JwtConfiguration _configuration;
 
-    public TokenService(UserManager<User> userManager, IOptions<JwtConfiguration> configuration)
+    public TokenService(IOptions<JwtConfiguration> configuration)
     {
         _configuration = configuration.Value;
     }
@@ -26,7 +26,6 @@ internal class TokenService : ITokenService
         {
             new Claim("Id",user.Id.ToString()),
             new Claim("Name", user.UserName),
-            new Claim("Email", user.Email),
         };
 
         foreach (var userRole in userRoles)

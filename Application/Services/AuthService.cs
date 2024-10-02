@@ -17,7 +17,7 @@ public class AuthService : IAuthService
         _tokenService = tokenService;
     }
 
-    public async Task<Result<TokenDTO>> Login(AuthDTO dto)
+    public async Task<Result<TokenDTO>> Login(LoginDTO dto)
     {
         var user = await _userManager.FindByNameAsync(dto.UserName);
 
@@ -32,7 +32,7 @@ public class AuthService : IAuthService
         return DefinedError.NonEqualPasswords; 
     }
 
-    public async Task<Result<TokenDTO>> Register(AuthDTO dto)
+    public async Task<Result<TokenDTO>> Register(RegisterDTO dto)
     {
         User? possibleUser = await _userManager.FindByNameAsync(dto.UserName);
 
@@ -41,8 +41,9 @@ public class AuthService : IAuthService
 
         User user = new()
         {
-            Email = dto.Email,
-            UserName = dto.UserName
+            PhoneNumber = dto.PhoneNumber,
+            UserName = dto.UserName,
+            FullName = dto.FullName,
         };
 
         IdentityResult result = await _userManager.CreateAsync(user, dto.Password);
@@ -64,6 +65,9 @@ public class AuthService : IAuthService
         if (user is null)
             return DefinedError.AbsentElement; 
 
+        if(user.RefreshToken != oldRefreshToken)
+            return DefinedError.InvalidElement;
+
         return await GenerateAccessTokenAsync(user);
     }
 
@@ -80,11 +84,13 @@ public class AuthService : IAuthService
     {
         var userRoles = await _userManager.GetRolesAsync(user);
         var accessToken = await _tokenService.CreateAccessTokenAsync(user, userRoles);
+        var roles = await _userManager.GetRolesAsync(user);
 
         return new TokenDTO
         {
             Token = accessToken,
-            UserName = user.UserName
+            UserName = user.UserName,
+            Roles = roles.ToArray(),
         };
     }
 }
