@@ -2,6 +2,7 @@ using Persistence;
 using Infrastructure;
 using Core.Constants;
 using Application;
+using Persistence.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,6 +13,7 @@ builder.Services.AddMappers();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value,
@@ -39,7 +41,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
 app.UseAuthentication();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await services.SeedAdmin();
+}
+
 app.UseAuthorization();
 app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value);
 app.MapControllers();
