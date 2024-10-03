@@ -2,7 +2,7 @@
   @if (authService.user$ | async; as user) {
   <div>
     <span>Username: {{ user.username }} </span>
-    <span>Roles: {{ user.roles?.join(", ") }}</span>
+    <span>Roles: {{ user.roles.join(", ") }}</span>
   </div>
   } @else {
   <div>
