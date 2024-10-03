@@ -9,6 +9,8 @@ public partial class User : IdentityUser<Guid>
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public bool IsBlocked { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; } 
+
     public User()
     {
         CreationDate = DateTime.UtcNow;
