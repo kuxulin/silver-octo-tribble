@@ -16,7 +16,9 @@
     [LockoutEnabled]       BIT                NOT NULL,
     [AccessFailedCount]    INT                NOT NULL,
     [RefreshToken]         NVARCHAR(MAX)      NULL,
-    [FullName] NVARCHAR(100) NULL, 
+    [FirstName] NVARCHAR(100) NULL, 
+    [LastName] NVARCHAR(100) NULL, 
+    [IsBlocked] BIT NOT NULL, 
     CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

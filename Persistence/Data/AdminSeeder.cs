@@ -23,10 +23,10 @@ public static class AdminSeeder
 
         var user = new User
         {
-            FullName = "Maksym Moroz",
+            FirstName = "Maksym",
+            LastName = "Moroz",
             UserName = "maks",
-            PhoneNumber = "1234567890",
-
+            PhoneNumber = "+380953867137",
         };
 
         await usersManager.CreateAsync(user, "string");
