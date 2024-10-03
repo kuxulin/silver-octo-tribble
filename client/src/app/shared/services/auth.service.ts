@@ -6,13 +6,14 @@ import AuthDTO from '../models/DTOs/AuthDTO';
 import { SESSION_STORAGE } from '../../consts';
 import LoginRegisterDTO from '../models/DTOs/RegisterDTO';
 import User from '../models/user';
+import UserAuthDTO from '../models/DTOs/UserAuthDTO';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = environment.api + '/auth';
-  private subject = new BehaviorSubject<User | null>(null);
+  private subject = new BehaviorSubject<UserAuthDTO | null>(null);
   user$ = this.subject.asObservable();
 
   constructor(private httpClient: HttpClient) {}
@@ -34,19 +35,21 @@ export class AuthService {
   }
 
   register(dto: LoginRegisterDTO) {
-    return this.httpClient.post<AuthDTO>(this.apiUrl + '/register', {
-      ...dto,
-    });
+    return this.httpClient
+      .post<AuthDTO>(this.apiUrl + '/register', {
+        ...dto,
+      })
+      .pipe(
+        tap((res) => this.setSession(res)),
+        shareReplay()
+      );
   }
 
   private setSession(result: AuthDTO) {
     sessionStorage.setItem(SESSION_STORAGE.TOKEN, result.token);
-    let user: User = {
+    let user: UserAuthDTO = {
       username: result.userName,
       roles: result.roles,
-      id: undefined,
-      fullName: undefined,
-      phoneNumber: undefined,
     };
     this.subject.next(user);
   }
