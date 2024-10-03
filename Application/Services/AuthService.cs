@@ -43,7 +43,8 @@ public class AuthService : IAuthService
         {
             PhoneNumber = dto.PhoneNumber,
             UserName = dto.UserName,
-            FullName = dto.FullName,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
         };
 
         IdentityResult result = await _userManager.CreateAsync(user, dto.Password);
