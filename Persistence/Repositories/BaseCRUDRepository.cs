@@ -5,6 +5,7 @@ using Core.Entities;
 using Core.DTOs;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Core.DTOs.Base;
+using Microsoft.AspNetCore.Identity;
 
 namespace Persistence.Repositories;
 
@@ -14,7 +15,17 @@ public abstract class BaseCRUDRepository<TEntity, TReadDto,TCreateDto,TUpdateDto
     where TReadDto : BaseReadDTO
     where TCreateDto : BaseCreateDTO
     where TUpdateDto : BaseUpdateDTO
-    where TContext : IdentityDbContext<User, Role, Guid>
+    where TContext : IdentityDbContext
+                                        <
+                                        User,
+                                        Role,
+                                        Guid,
+                                        IdentityUserClaim<Guid>,
+                                        UserRole,
+                                        IdentityUserLogin<Guid>,
+                                        IdentityRoleClaim<Guid>,
+                                        IdentityUserToken<Guid>
+                                        >
 {
     protected readonly TContext _context;
     protected readonly IMapper _mapper;

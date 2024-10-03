@@ -1,10 +1,21 @@
 ﻿using Core.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Data.Contexts;
 
-public class DatabaseContext : IdentityDbContext<User, Role, Guid>
+public class DatabaseContext : IdentityDbContext
+<
+User,
+Role,
+Guid, 
+IdentityUserClaim<Guid>,
+UserRole,
+IdentityUserLogin<Guid>,
+IdentityRoleClaim<Guid>,
+IdentityUserToken<Guid>
+>
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options)
@@ -18,8 +29,8 @@ public class DatabaseContext : IdentityDbContext<User, Role, Guid>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<UserRole>()
-            .ToTable("AspNetUserRoles")
             .HasOne(ur => ur.User)
             .WithMany(u => u.UserRoles)
             .HasForeignKey(ur => ur.UserId);
