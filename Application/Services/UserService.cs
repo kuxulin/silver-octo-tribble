@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Core;
+using Core.Constants;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces.Repositories;
@@ -23,70 +24,53 @@ class UserService : IUserService
 
     public async Task<Result<IEnumerable<UserDTO>>> GetUsers(UserQueryOptions options)
     {
-        var query = _repository.GetAll();
-
-        if (options.FilterRoles.Any())
-        {
-            var roles = _context.Roles.Where(role => options.FilterRoles.Contains(role.Name));
-
-            query = query
-                .Join(_context.UserRoles,
-                      user => user.Id,
-                      userRole => userRole.UserId,
-                      (user, userRole) => new { user, userRole })
-                .Where(uur => roles.Any(role => role.Id == uur.userRole.RoleId))
-                .Select(uur => uur.user);
-        }
-
-        query = !options.PartialUserName.IsNullOrEmpty() ? query.Where(u => u.UserName.Contains(options.PartialUserName)) : query;
-
-        query = options.IsBlocked.HasValue ? query.Where(u => u.IsBlocked == options.IsBlocked) : query;
-
-        query = options.StartDate.HasValue ? query.Where(u => u.CreationDate >= options.StartDate.Value.ToUniversalTime()) : query;
-
-        query = options.EndDate.HasValue ? query.Where(u => u.CreationDate <= options.EndDate.Value.ToUniversalTime()) : query;
+        var usersQuery = _repository.GetAll();
 
         if (!options.SortField.IsNullOrEmpty())
         {
-            var sort = (User u) =>
+            var sortFunction = (User u) =>
             {
                 var property = u.GetType().GetProperty(options.SortField).GetValue(u);
                 return property;
             };
 
-            query = options.SortByDescending ? query.OrderByDescending(sort).AsQueryable() : query.OrderBy(sort).AsQueryable();
+            usersQuery = options.SortByDescending ? usersQuery.OrderByDescending(sortFunction).AsQueryable() : usersQuery.OrderBy(sortFunction).AsQueryable();
         }
 
-        var usersWithRolesQuery = query
-            .Join(_context.UserRoles,
-                    user => user.Id,
-                    userRole => userRole.UserId,
-                    (user, userRole) => new { user, userRole })
-            .Join(_context.Roles,
-                    uur => uur.userRole.RoleId,
-                    role => role.Id,
-                    (userUserRole, role) => new
-                    {
-                        User = userUserRole.user,
-                        Role = role.Name
-                    })
-            .GroupBy(ur => ur.User)
-            .Select(group => new
+        var query = usersQuery
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .Select(ur => new
             {
-                User = group.Key,
-                Roles = group.Select(r => r.Role).ToList()
+                User = ur,
+                Roles = ur.UserRoles.Select(ur => ur.Role.Name).ToArray()
             });
 
-        var usersWithRoles = await usersWithRolesQuery
+        if (options.FilterRoles.Any())
+            query = query.Where(u => u.Roles.Intersect(options.FilterRoles).Any());
+
+        if (!options.PartialUserName.IsNullOrEmpty())
+            query = query.Where(ur => ur.User.UserName.Contains(options.PartialUserName));
+
+        if (options.IsBlocked.HasValue)
+            query = query.Where(ur => ur.User.IsBlocked == options.IsBlocked);
+
+        if (options.StartDate.HasValue)
+            query = query.Where(ur => ur.User.CreationDate >= options.StartDate.Value.ToUniversalTime());
+
+        if (options.EndDate.HasValue)
+            query = query.Where(ur => ur.User.CreationDate <= options.EndDate.Value.ToUniversalTime());      
+
+        var usersWithRoles = await query
             .Skip(options.GetStartIndex())
             .Take(options.PageSize)
             .ToListAsync();
 
         var userDtos = _mapper.Map<List<UserDTO>>(usersWithRoles.Select(ur => ur.User));
-        
+
         for (int i = 0; i < userDtos.Count; i++)
         {
-            userDtos[i].Roles = usersWithRoles[i].Roles?.ToArray() ?? [];
+            userDtos[i].Roles = usersWithRoles[i].Roles ?? [];
         }
 
         return userDtos;
