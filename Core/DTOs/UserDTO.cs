@@ -9,4 +9,5 @@ public class UserDTO
     public string PhoneNumber { get; set; }
     public string[] Roles { get; set; }
     public DateTime CreationDate { get; set; }
+    public bool IsBloked { get; set; }
 }
