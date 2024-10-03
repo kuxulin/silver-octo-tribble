@@ -12,6 +12,7 @@ public static class DependencyInjection
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<IManagerService, ManagerService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
+        services.AddScoped<IUserService, UserService>();
         return services;
     }
 }

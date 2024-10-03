@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IManagerRepository, ManagerRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
 }
