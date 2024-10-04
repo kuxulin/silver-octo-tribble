@@ -24,14 +24,14 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 })
 export class AdminPanelComponent implements OnInit {
   displayedColumns = [
-    'Username',
-    'First name',
-    'Last name',
-    'Phone number',
-    'Registration date',
-    'Roles',
-    'Is Blocked',
-    'Actions',
+    'username',
+    'firstName',
+    'lastName',
+    'phoneNumber',
+    'registrationDate',
+    'roles',
+    'blocked',
+    'actions',
   ];
   date = new Date();
   users$!: Observable<User[]>;

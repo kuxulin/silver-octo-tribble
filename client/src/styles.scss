@@ -12,6 +12,11 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+app-root {
+  display: block;
+  height: 100%;
+}
+
 .dialog-box {
   display: flex;
   flex-direction: column;
