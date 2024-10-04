@@ -6,5 +6,5 @@ export default interface User {
   phoneNumber: string | undefined;
   roles: string[] | undefined;
   creationDate: Date;
-  isBloked: boolean;
+  isBlocked: boolean;
 }

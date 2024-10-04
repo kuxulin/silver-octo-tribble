@@ -33,7 +33,7 @@ export class AdminPanelComponent implements OnInit {
     'Is Blocked',
     'Actions',
   ];
-
+  date = new Date();
   users$!: Observable<User[]>;
   constructor(private userService: UserService) {}
 
