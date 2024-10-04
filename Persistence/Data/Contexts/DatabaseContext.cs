@@ -7,14 +7,14 @@ namespace Persistence.Data.Contexts;
 
 public class DatabaseContext : IdentityDbContext
 <
-User,
-Role,
-Guid, 
-IdentityUserClaim<Guid>,
-UserRole,
-IdentityUserLogin<Guid>,
-IdentityRoleClaim<Guid>,
-IdentityUserToken<Guid>
+    User,
+    Role,
+    Guid,
+    IdentityUserClaim<Guid>,
+    UserRole,
+    IdentityUserLogin<Guid>,
+    IdentityRoleClaim<Guid>,
+    IdentityUserToken<Guid>
 >
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
