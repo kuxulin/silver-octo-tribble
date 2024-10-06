@@ -2,192 +2,11 @@
   <div style="height: 90%">
     <mat-table
       [fixedLayout]="true"
-      [dataSource]="
-        (users$ | async) || [
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'username1',
-            firstName: 'firstname1',
-            lastName: 'lastName1',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          },
-          {
-            id: '',
-            username: 'userna2',
-            firstName: 'string',
-            lastName: 'string',
-            phoneNumber: 'phonenumber',
-            creationDate: date,
-            isBlocked: false,
-            roles: []
-          }
-        ]
-      "
+      [dataSource]="(result$ | async)?.items || []"
+      matSort
+      (matSortChange)="onSortChange($event)"
     >
-      <ng-container matColumnDef="username">
+      <ng-container matColumnDef="userName">
         <th mat-header-cell mat-sort-header *matHeaderCellDef>Username</th>
         <td mat-cell *matCellDef="let element">{{ element.userName }}</td>
       </ng-container>
@@ -207,7 +26,7 @@
         <td mat-cell *matCellDef="let element">{{ element.phoneNumber }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="registrationDate">
+      <ng-container matColumnDef="creationDate">
         <th mat-header-cell mat-sort-header *matHeaderCellDef>
           Registration date
         </th>
@@ -223,7 +42,7 @@
 
       <ng-container matColumnDef="blocked">
         <th mat-header-cell *matHeaderCellDef>Blocked</th>
-        <td mat-cell *matCellDef="let element">{{ element.isBloked }}</td>
+        <td mat-cell *matCellDef="let element">{{ element.isBlocked }}</td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
@@ -236,12 +55,17 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </mat-table>
-
     <mat-paginator
+      [length]="(result$ | async)?.totalCount"
+      [pageSize]="options.pageSize"
+      [pageIndex]="options.pageIndex"
       [pageSizeOptions]="[5, 10, 25, 100]"
-      aria-label="Select page of users"
-      class="paginator"
+      aria-label="Select page"
+      (page)="
+        updateQuery({ pageSize: $event.pageSize, pageIndex: $event.pageIndex })
+      "
     ></mat-paginator>
   </div>
+
   <div></div>
 </div>

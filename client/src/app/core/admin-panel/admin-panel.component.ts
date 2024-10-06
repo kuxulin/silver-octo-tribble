@@ -1,13 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatTableModule } from '@angular/material/table';
 import { UserService } from '../../shared/services/user.service';
 import { CommonModule } from '@angular/common';
-import { DataSource } from '@angular/cdk/collections';
-import User from '../../shared/models/user';
-import { Observable } from 'rxjs';
+import User from '../../shared/models/User';
+import {
+  BehaviorSubject,
+  Observable,
+  shareReplay,
+  Subject,
+  takeUntil,
+} from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import userQueryOptions from '../../shared/models/QueryOptions/UserQueryOptions';
+import pagedResult from '../../shared/models/PagedResult';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-admin-panel',
@@ -18,26 +26,73 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatButtonModule,
     MatIconModule,
     MatPaginatorModule,
+    MatSortModule,
   ],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss',
 })
-export class AdminPanelComponent implements OnInit {
+export class AdminPanelComponent implements OnInit, OnDestroy {
+  @ViewChild(MatSort) sort!: MatSort;
   displayedColumns = [
-    'username',
+    'userName',
     'firstName',
     'lastName',
     'phoneNumber',
-    'registrationDate',
+    'creationDate',
     'roles',
     'blocked',
     'actions',
   ];
-  date = new Date();
-  users$!: Observable<User[]>;
+  result$!: Observable<pagedResult<User>>;
+  private _destroy$ = new Subject<boolean>();
+
+  options: userQueryOptions = {
+    partialUsername: undefined,
+    filterRoles: undefined,
+    isBlocked: undefined,
+    startDate: undefined,
+    endDate: undefined,
+    pageSize: 5,
+    pageIndex: 0,
+    sortField: undefined,
+    sortByDescending: undefined,
+  };
+
+  private _optionsSubject = new BehaviorSubject<userQueryOptions>(this.options);
+
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.users$ = this.userService.getAllUsers();
+    this._optionsSubject.pipe(takeUntil(this._destroy$)).subscribe((value) => {
+      this.options = value;
+
+      if (this.sort) {
+        this.sort.active = this.options.sortField || '';
+        this.sort.direction = this.options.sortByDescending ? 'desc' : 'asc';
+      }
+
+      this.result$ = this.userService.getAllUsers(value).pipe(shareReplay());
+    });
+  }
+
+  onSortChange(sort: Sort) {
+    if (sort.active && !sort.direction) {
+      this.updateQuery({ sortField: undefined, sortByDescending: undefined });
+      return;
+    }
+
+    this.updateQuery({
+      sortField: sort.active,
+      sortByDescending: sort.direction === 'desc',
+    });
+  }
+
+  updateQuery(newOptions: Partial<userQueryOptions>) {
+    this._optionsSubject.next({ ...this._optionsSubject.value, ...newOptions });
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next(true);
+    this._destroy$.complete();
   }
 }
