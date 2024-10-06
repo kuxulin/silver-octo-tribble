@@ -1,10 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import User from '../models/User';
 import { environment } from '../../environments/environment';
 import UserQueryOptions from '../models/QueryOptions/UserQueryOptions';
 import pagedResult from '../models/PagedResult';
+import User from '../models/User';
 
 @Injectable({
   providedIn: 'root',
