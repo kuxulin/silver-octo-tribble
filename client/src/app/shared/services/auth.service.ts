@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, shareReplay, take, tap } from 'rxjs';
+import { BehaviorSubject, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import AuthDTO from '../models/DTOs/AuthDTO';
 import { SESSION_STORAGE } from '../../consts';
 import LoginRegisterDTO from '../models/DTOs/RegisterDTO';
-import User from '../models/user';
 import UserAuthDTO from '../models/DTOs/UserAuthDTO';
 
 @Injectable({
