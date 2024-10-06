@@ -18,7 +18,7 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetUsers([FromQuery] UserQueryOptions options)
     {
-        var result = await _userService.GetUsers(options);
+        var result = await _userService.GetUsersAsync(options);
         return Ok(result.Value);
     }
 }

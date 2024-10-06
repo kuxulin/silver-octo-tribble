@@ -5,7 +5,7 @@ namespace Core.Interfaces.Services;
 
 public interface IUserService
 {
-    Task<Result<IEnumerable<UserDTO>>> GetUsers(UserQueryOptions options);
+    Task<Result<PagedResult<UserDTO>>> GetUsersAsync(UserQueryOptions options);
 }
 
 

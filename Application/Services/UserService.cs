@@ -6,6 +6,7 @@ using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.ResultPattern;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 namespace Application.Services;
@@ -21,7 +22,7 @@ class UserService : IUserService
         _mapper = mapper;
     }
 
-    public async Task<Result<IEnumerable<UserDTO>>> GetUsers(UserQueryOptions options)
+    public async Task<Result<PagedResult<UserDTO>>> GetUsersAsync(UserQueryOptions options)
     {
         var usersQuery = _repository.GetAll();
 
@@ -60,6 +61,8 @@ class UserService : IUserService
             .Take(options.PageSize)
             .ToListAsync();
 
+        var usersAmount = await query.CountAsync();
+
         var userDtos = _mapper.Map<List<UserDTO>>(usersWithRoles.Select(ur => ur.User));
 
         for (int i = 0; i < userDtos.Count; i++)
@@ -67,7 +70,7 @@ class UserService : IUserService
             userDtos[i].Roles = usersWithRoles[i].Roles ?? [];
         }
 
-        return userDtos;
+        return new PagedResult<UserDTO>(userDtos, usersAmount);
     }
 }
 
