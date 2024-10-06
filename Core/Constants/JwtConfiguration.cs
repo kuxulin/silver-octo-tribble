@@ -1,5 +1,5 @@
 ﻿namespace Core.Constants;
-public class JwtConfiguration
+public sealed class JwtConfiguration
 {
     public string Key { get; set; }
     public string Issuer { get; set; }

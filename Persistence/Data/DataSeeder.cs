@@ -28,7 +28,7 @@ public static class DataSeeder
             PhoneNumber = "+380953867137",
         };
 
-        await usersManager.CreateAsync(user, "string");
+        await usersManager.CreateAsync(user, "string"); // TODO perhaps transactionc can be user here
         await usersManager.AddToRoleAsync(user, roles[0].Name);
         return provider;
     }
