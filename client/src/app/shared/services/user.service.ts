@@ -68,4 +68,8 @@ export class UserService {
 
     return params;
   }
+
+  deleteUser(id:string){
+    return this.httpClient.delete(this.apiUrl + '/' + id);
+  }
 }

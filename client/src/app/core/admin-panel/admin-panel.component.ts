@@ -30,6 +30,7 @@ import {
 } from '@angular/material/datepicker';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { AppDateAdapter, APP_DATE_FORMATS } from '../../shared/AppDateAdapter';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-admin-panel',
@@ -40,6 +41,7 @@ import { AppDateAdapter, APP_DATE_FORMATS } from '../../shared/AppDateAdapter';
     MatButtonModule,
     MatIconModule,
     MatPaginatorModule,
+    MatSlideToggleModule,
     MatSortModule,
     MatFormFieldModule,
     MatInputModule,
@@ -104,10 +106,12 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       this.result$ = this.userService.getAllUsers(value).pipe(shareReplay());
     });
   }
+
   clearPartialUsername() {
     this.updateQuery({ partialUserName: undefined });
     this.partialUserNameInput = '';
   }
+
   onSortChange(sort: Sort) {
     if (sort.active && !sort.direction) {
       this.updateQuery({ sortField: undefined, sortByDescending: undefined });
@@ -132,5 +136,11 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._destroy$.next(true);
     this._destroy$.complete();
+  }
+
+  deleteUser(id: string) {
+    this.userService.deleteUser(id).subscribe(() => {
+      console.log('deleted');
+    }); //update users
   }
 }
