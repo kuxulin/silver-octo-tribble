@@ -22,4 +22,8 @@ export class UserService {
       })
     );
   }
+
+  deleteUser(id:string){
+    return this.httpClient.delete(this.apiUrl + '/' + id);
+  }
 }

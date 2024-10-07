@@ -8,6 +8,8 @@ import { Observable } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+
 
 @Component({
   selector: 'app-admin-panel',
@@ -18,6 +20,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatButtonModule,
     MatIconModule,
     MatPaginatorModule,
+    MatSlideToggleModule
   ],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss',
@@ -39,5 +42,11 @@ export class AdminPanelComponent implements OnInit {
 
   ngOnInit(): void {
     this.users$ = this.userService.getAllUsers();
+  }
+
+  
+
+  deleteUser(id:string) {
+    this.userService.deleteUser(id).subscribe(() =>{console.log('deleted')}); //update users
   }
 }
