@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { UserService } from '../../shared/services/user.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import User from '../../shared/models/User';
 import {
   BehaviorSubject,
@@ -16,6 +16,20 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import userQueryOptions from '../../shared/models/QueryOptions/UserQueryOptions';
 import pagedResult from '../../shared/models/PagedResult';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import {
+  FormGroup,
+  FormControl,
+  ReactiveFormsModule,
+  FormsModule,
+} from '@angular/forms';
+import {
+  MatDatepickerInputEvent,
+  MatDatepickerModule,
+} from '@angular/material/datepicker';
+import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { AppDateAdapter, APP_DATE_FORMATS } from '../../shared/AppDateAdapter';
 
 @Component({
   selector: 'app-admin-panel',
@@ -27,12 +41,27 @@ import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
     MatIconModule,
     MatPaginatorModule,
     MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    ReactiveFormsModule,
+    FormsModule,
+  ],
+  providers: [
+    { provide: DateAdapter, useClass: AppDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS },
   ],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss',
 })
 export class AdminPanelComponent implements OnInit, OnDestroy {
+  private _destroy$ = new Subject<boolean>();
   @ViewChild(MatSort) sort!: MatSort;
+  readonly range = new FormGroup({
+    start: new FormControl<Date | null>(null),
+    end: new FormControl<Date | null>(null),
+  });
+
   displayedColumns = [
     'userName',
     'firstName',
@@ -43,11 +72,9 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     'blocked',
     'actions',
   ];
-  result$!: Observable<pagedResult<User>>;
-  private _destroy$ = new Subject<boolean>();
 
   options: userQueryOptions = {
-    partialUsername: undefined,
+    partialUserName: undefined,
     filterRoles: undefined,
     isBlocked: undefined,
     startDate: undefined,
@@ -58,7 +85,10 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     sortByDescending: undefined,
   };
 
+  partialUserNameInput: string = '';
+  filterRolesInput: string[] = ['', '', '', '', '', ''];
   private _optionsSubject = new BehaviorSubject<userQueryOptions>(this.options);
+  result$!: Observable<pagedResult<User>>;
 
   constructor(private userService: UserService) {}
 
@@ -74,7 +104,10 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       this.result$ = this.userService.getAllUsers(value).pipe(shareReplay());
     });
   }
-
+  clearPartialUsername() {
+    this.updateQuery({ partialUserName: undefined });
+    this.partialUserNameInput = '';
+  }
   onSortChange(sort: Sort) {
     if (sort.active && !sort.direction) {
       this.updateQuery({ sortField: undefined, sortByDescending: undefined });
@@ -85,6 +118,11 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       sortField: sort.active,
       sortByDescending: sort.direction === 'desc',
     });
+  }
+
+  clearDate() {
+    this.updateQuery({ startDate: undefined, endDate: undefined });
+    this.range.reset();
   }
 
   updateQuery(newOptions: Partial<userQueryOptions>) {
