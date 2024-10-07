@@ -29,7 +29,7 @@ export class AuthHandlerComponent {
     if (!this.areFieldsValid) return;
 
     let methodToExecute$ = this.isLogin
-      ? this.authService.login(this.dto.username, this.dto.password)
+      ? this.authService.login(this.dto.userName, this.dto.password)
       : this.authService.register(this.dto);
 
     methodToExecute$.pipe(takeUntil(this._destroy$)).subscribe({

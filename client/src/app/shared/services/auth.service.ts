@@ -17,12 +17,12 @@ export class AuthService {
 
   constructor(private httpClient: HttpClient) {}
 
-  login(username: string, password: string) {
+  login(userName: string, password: string) {
     return this.httpClient
       .post<AuthDTO>(
         this.apiUrl + '/login',
         {
-          username,
+          userName,
           password,
         },
         { withCredentials: true }
@@ -47,7 +47,7 @@ export class AuthService {
   private setSession(result: AuthDTO) {
     sessionStorage.setItem(SESSION_STORAGE.TOKEN, result.token);
     let user: UserAuthDTO = {
-      username: result.userName,
+      userName: result.userName,
       roles: result.roles,
     };
     this.subject.next(user);

@@ -34,7 +34,7 @@ import {
 })
 export class RegisterComponent {
   dto: LoginRegisterDTO = {
-    username: '',
+    userName: '',
     password: '',
     fullName: '',
     phoneNumber: '',
@@ -43,7 +43,7 @@ export class RegisterComponent {
 
   areFieldsValid(): boolean {
     return (
-      !!this.dto.username &&
+      !!this.dto.userName &&
       !!this.dto.password &&
       !!this.dto.fullName &&
       !!this.dto.phoneNumber &&

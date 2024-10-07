@@ -26,7 +26,7 @@ import LoginRegisterDTO from '../../shared/models/DTOs/RegisterDTO';
 export class LoginComponent {
   hidePassword = signal(true);
   dto: LoginRegisterDTO = {
-    username: '',
+    userName: '',
     password: '',
     fullName: '',
     phoneNumber: '',
@@ -38,6 +38,6 @@ export class LoginComponent {
   }
 
   areFieldsValid(): boolean {
-    return !!this.dto.username && !!this.dto.password;
+    return !!this.dto.userName && !!this.dto.password;
   }
 }

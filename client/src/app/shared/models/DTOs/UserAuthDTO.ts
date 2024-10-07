@@ -1,4 +1,4 @@
 export default interface UserAuthDTO {
-  username: string;
+  userName: string;
   roles: string[];
 }

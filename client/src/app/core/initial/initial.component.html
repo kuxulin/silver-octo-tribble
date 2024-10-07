@@ -1,7 +1,7 @@
 <div class="initial dialog-box">
   @if (authService.user$ | async; as user) {
   <div>
-    <span>Username: {{ user.username }} </span>
+    <span>UserName: {{ user.userName }} </span>
     <span>Roles: {{ user.roles.join(", ") }}</span>
   </div>
   } @else {

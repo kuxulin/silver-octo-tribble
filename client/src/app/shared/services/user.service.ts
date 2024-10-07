@@ -48,8 +48,8 @@ export class UserService {
         options.sortByDescending.toString()
       );
 
-    if (options.partialUsername !== undefined)
-      params = params.set('partialUsername', options.partialUsername);
+    if (options.partialUserName !== undefined)
+      params = params.set('partialUserName', options.partialUserName);
 
     if (options.filterRoles !== undefined) {
       options.filterRoles.forEach((role) => {
