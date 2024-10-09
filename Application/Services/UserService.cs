@@ -3,6 +3,7 @@ using AutoMapper;
 using Core;
 using Core.DTOs;
 using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.ResultPattern;
@@ -67,7 +68,7 @@ class UserService : IUserService
 
         for (int i = 0; i < userDtos.Count; i++)
         {
-            userDtos[i].Roles = usersWithRoles[i].Roles ?? [];
+            userDtos[i].Roles = usersWithRoles[i].Roles.Select(r => (AvailableUserRole)Enum.Parse(typeof(AvailableUserRole), r)).ToArray();
         }
 
         return new PagedResult<UserDTO>(userDtos, usersAmount);

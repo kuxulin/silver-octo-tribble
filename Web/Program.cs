@@ -25,6 +25,7 @@ builder.Services.AddCors(options =>
                    .AllowCredentials();
         });
 });
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

@@ -1,4 +1,6 @@
-﻿namespace Core.DTOs;
+﻿using Core.Enums;
+
+namespace Core.DTOs;
 
 public class UserDTO
 {
@@ -7,7 +9,7 @@ public class UserDTO
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string PhoneNumber { get; set; }
-    public string[] Roles { get; set; }
+    public AvailableUserRole[] Roles { get; set; }
     public DateTime CreationDate { get; set; }
     public bool IsBlocked { get; set; }
 }

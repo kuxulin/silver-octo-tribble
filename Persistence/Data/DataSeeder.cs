@@ -1,4 +1,5 @@
 using Core.Entities;
+using Core.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +14,7 @@ public static class DataSeeder
         if (usersManager.Users.Any(u => u.UserName == "maks"))
             return provider;
 
-        Role[] roles = { new() { Name = "Admin" }, new() { Name = "Employee" }, new() { Name = "Manager" } };
+        Role[] roles = { new() { Name = AvailableUserRole.Admin.ToString() }, new() { Name = AvailableUserRole.Employee.ToString() }, new() { Name = AvailableUserRole.Manager.ToString() } };
 
         foreach (var role in roles)
         {
@@ -83,12 +84,19 @@ public static class DataSeeder
             },
         };
 
-        var roles = new[] { "Manager", "Manager", "Employee", "Employee", "Employee" };
-
-        foreach (var user in users)
+        var roles = new[]
         {
-            await usersManager.CreateAsync(user, "string");
-            await usersManager.AddToRoleAsync(user, roles[0]);
+            AvailableUserRole.Manager.ToString(),
+            AvailableUserRole.Manager.ToString(),
+            AvailableUserRole.Employee.ToString(),
+            AvailableUserRole.Employee.ToString(),
+            AvailableUserRole.Employee.ToString()
+        };
+
+        for (int i = 0; i < users.Count; i++)
+        {
+            await usersManager.CreateAsync(users[i], "string");
+            await usersManager.AddToRoleAsync(users[i], roles[i]);
         }
 
         return provider;
