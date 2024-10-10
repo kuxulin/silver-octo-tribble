@@ -69,7 +69,11 @@ export class UserService {
     return params;
   }
 
-  deleteUser(id:string){
-    return this.httpClient.delete(this.apiUrl + '/' + id);
+  deleteUsers(ids: string[]) {
+    return this.httpClient
+      .delete(this._apiUrl, {
+        body: ids,
+      })
+      .pipe(take(1));
   }
 }
