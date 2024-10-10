@@ -33,6 +33,7 @@ import {
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { RolesAssignDialogComponent } from '../../shared/roles-assign-dialog/roles-assign-dialog.component';
 import AvailableUserRole from '../../shared/models/enums/AvailableUserRole';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -65,6 +66,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 export class AdminPanelComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject<boolean>();
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   showButton = false;
   readonly range = new FormGroup({
     start: new FormControl<Date | null>(null),
@@ -85,7 +87,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     'actions',
   ];
 
-  options: userQueryOptions = {
   options: UserQueryOptions = {
     partialUserName: undefined,
     filterRoles: undefined,
@@ -133,6 +134,9 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   displayButton(marker: boolean) {
     this.showButton = marker;
   }
+
+  showRoleNames(codes: number[]) {
+    return codes.map((code) => AvailableUserRole[code].toString());
   }
 
   clearPartialUsername() {
@@ -157,7 +161,18 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     this.range.reset();
   }
 
-  updateQuery(newOptions: Partial<userQueryOptions>) {
+  changeBlockStatus(id: string, isBlocked: boolean) {
+    let users = this.selection.selected;
+    let ids = users.map((u) => u.id!);
+
+    if (!ids.includes(id)) ids.push(id);
+
+    this._userService
+      .changeBlockStatus(ids, isBlocked)
+      .subscribe(() => this._metricsChangedSubject.next(true));
+    users.forEach((u) => (u.isBlocked = isBlocked));
+  }
+
   searchRoles() {
     if (!this.filterRolesInput.some((r) => r.length > 0)) {
       this.updateQuery({ filterRoles: undefined });
@@ -176,12 +191,38 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
     this.updateQuery({ filterRoles: enumRoles });
   }
+
+  updateQuery(newOptions: Partial<UserQueryOptions>) {
     this._optionsSubject.next({ ...this._optionsSubject.value, ...newOptions });
   }
 
-  ngOnDestroy(): void {
-    this._destroy$.next(true);
-    this._destroy$.complete();
+  triggerRolesUpdateDialog(
+    userName: string,
+    userRoles: AvailableUserRole[],
+    id: string
+  ) {
+    let dialogRef = this.dialog.open(RolesAssignDialogComponent, {
+      width: '30%',
+      minHeight: '20%',
+      data: {
+        userName,
+        userRoles,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.flag) {
+        this.updateUserRoles(id, result.newRoles);
+      }
+    });
+  }
+
+  updateUserRoles(id: string, newRoles: AvailableUserRole[]) {
+    this._userService.modifyUserRoles(id, newRoles).subscribe(() => {
+      this.updateQuery(this.options);
+      this._metricsChangedSubject.next(true);
+    });
+  }
 
   triggerDeleteDialog(id: string) {
     let dialogRef = this.dialog.open(ConfirmDialogComponent, {

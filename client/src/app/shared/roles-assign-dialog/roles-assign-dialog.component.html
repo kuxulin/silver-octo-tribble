@@ -1,0 +1,19 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>Modify {{ data.userName }} roles</h2>
+  <mat-dialog-content>
+    <section>
+      @for (role of (availableUserRoles); track $index) {
+      <mat-checkbox
+        [checked]="isAssigned(availableUserRoles.indexOf(role) + 1)"
+        (change)="changeRolePeek(availableUserRoles.indexOf(role) + 1)"
+      >
+        {{ role }}
+      </mat-checkbox>
+      }
+    </section>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button (click)="onClose(false)">No</button>
+    <button mat-button (click)="onClose(true)">Yes</button>
+  </mat-dialog-actions>
+</div>

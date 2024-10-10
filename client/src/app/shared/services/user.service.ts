@@ -1,9 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, take } from 'rxjs';
 import { environment } from '../../environments/environment';
 import UserQueryOptions from '../models/QueryOptions/UserQueryOptions';
-import pagedResult from '../models/PagedResult';
+import PagedResult from '../models/PagedResult';
 import User from '../models/User';
 
 @Injectable({
@@ -14,16 +14,17 @@ export class UserService {
 
   constructor(private httpClient: HttpClient) {}
 
-  getAllUsers(options: UserQueryOptions): Observable<pagedResult<User>> {
+  getAllUsers(options: UserQueryOptions): Observable<PagedResult<User>> {
     let params = this.createHttpParams(options);
     return this.httpClient
-      .get<pagedResult<User>>(this._apiUrl, {
+      .get<PagedResult<User>>(this._apiUrl, {
         params: params,
       })
       .pipe(
         map((result) => {
-          result.items.forEach((user: User) => {
+          result.items.forEach((user: any) => {
             user.creationDate = new Date(user.creationDate.toString() + 'Z');
+            user.roles = user.roleIds;
           });
           return result;
         })
@@ -74,6 +75,22 @@ export class UserService {
       .delete(this._apiUrl, {
         body: ids,
       })
+      .pipe(take(1));
+  }
+
+  changeBlockStatus(ids: string[], isBlocked: boolean) {
+    return this.httpClient
+      .patch(this._apiUrl, ids, {
+        params: {
+          isBlocked: isBlocked,
+        },
+      })
+      .pipe(take(1));
+  }
+
+  modifyUserRoles(id: string, newRoles: AvailableUserRole[]) {
+    return this.httpClient
+      .patch(`${this._apiUrl}/${id}/roles`, newRoles)
       .pipe(take(1));
   }
 }
