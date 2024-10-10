@@ -53,7 +53,7 @@ export class UserService {
 
     if (options.filterRoles !== undefined) {
       options.filterRoles.forEach((role) => {
-        params = params.append('filterRole', role);
+        params = params.append('filterRoleIds', role);
       });
     }
 

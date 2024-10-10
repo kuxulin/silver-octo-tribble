@@ -30,7 +30,12 @@ import {
 } from '@angular/material/datepicker';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { AppDateAdapter, APP_DATE_FORMATS } from '../../shared/AppDateAdapter';
+import {
+  AppDateAdapter,
+  APP_DATE_FORMATS,
+} from '../../shared/adapters/AppDateAdapter';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import AvailableUserRole from '../../shared/models/enums/AvailableUserRole';
 
 @Component({
   selector: 'app-admin-panel',
@@ -59,6 +64,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 export class AdminPanelComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject<boolean>();
   @ViewChild(MatSort) sort!: MatSort;
+  showButton = false;
   readonly range = new FormGroup({
     start: new FormControl<Date | null>(null),
     end: new FormControl<Date | null>(null),
@@ -88,11 +94,11 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   };
 
   partialUserNameInput: string = '';
-  filterRolesInput: string[] = ['', '', '', '', '', ''];
   private _optionsSubject = new BehaviorSubject<userQueryOptions>(this.options);
   result$!: Observable<pagedResult<User>>;
 
   constructor(private userService: UserService) {}
+  filterRolesInput: string[] = [''];
 
   ngOnInit(): void {
     this._optionsSubject.pipe(takeUntil(this._destroy$)).subscribe((value) => {
@@ -105,6 +111,9 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
       this.result$ = this.userService.getAllUsers(value).pipe(shareReplay());
     });
+  displayButton(marker: boolean) {
+    this.showButton = marker;
+  }
   }
 
   clearPartialUsername() {
@@ -130,6 +139,24 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   }
 
   updateQuery(newOptions: Partial<userQueryOptions>) {
+  searchRoles() {
+    if (!this.filterRolesInput.some((r) => r.length > 0)) {
+      this.updateQuery({ filterRoles: undefined });
+      return;
+    }
+
+    let enumRoles = this.filterRolesInput.map(
+      (role) =>
+        AvailableUserRole[
+          (role.charAt(0).toUpperCase() +
+            role.slice(1).toLowerCase()) as keyof typeof AvailableUserRole
+        ]
+    );
+
+    enumRoles = enumRoles.filter((en) => !!en);
+
+    this.updateQuery({ filterRoles: enumRoles });
+  }
     this._optionsSubject.next({ ...this._optionsSubject.value, ...newOptions });
   }
 

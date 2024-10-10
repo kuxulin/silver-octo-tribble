@@ -33,7 +33,7 @@
             matEndDate
             placeholder="End date"
             readonly
-            (dateChange)="updateQuery({ endDate: range.value.start! })"
+            (dateChange)="updateQuery({ endDate: range.value.end! })"
           />
         </mat-date-range-input>
         <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
@@ -48,18 +48,49 @@
         ></mat-datepicker-toggle>
         <mat-date-range-picker #picker></mat-date-range-picker>
       </mat-form-field>
-      <div class="roles-fields">
-        <mat-form-field appearance="outline">
-          <mat-label>Roles</mat-label>
-          <input matInput />
-          <button mat-icon-button matSuffix><mat-icon>close</mat-icon></button>
-        </mat-form-field>
-        @for (role of filterRolesInput; track $index) {
-        <mat-form-field appearance="outline" class="additional-role-input">
-          <input matInput />
-          <button mat-icon-button matSuffix><mat-icon>close</mat-icon></button>
-        </mat-form-field>
-        }
+      <div
+        class="roles-fields"
+        (mouseover)="showButton = true"
+        (mouseout)="showButton = false"
+      >
+        <div class="form-fields">
+          <mat-form-field appearance="outline">
+            <mat-label>Roles</mat-label>
+            <input matInput [(ngModel)]="filterRolesInput[0]" />
+            <button
+              mat-icon-button
+              matSuffix
+              (click)="filterRolesInput[0] = ''; searchRoles()"
+              [hidden]="filterRolesInput[0].length == 0"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+          @for (role of filterRolesInput.slice(1); track $index) {
+          <mat-form-field appearance="outline" class="additional-role-input">
+            <input matInput [(ngModel)]="filterRolesInput[$index + 1]" />
+            <button
+              mat-icon-button
+              matSuffix
+              (click)="filterRolesInput.splice($index + 1, 1); searchRoles()"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+          }
+        </div>
+        <div style="display: flex; flex-direction: column">
+          <button mat-icon-button (click)="searchRoles()">
+            <mat-icon>search</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            [hidden]="!showButton"
+            (click)="filterRolesInput.push('')"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
       </div>
     </div>
     <mat-table

@@ -10,11 +10,18 @@
     .date-range-picker {
       min-width: 20%;
     }
+      .date-range-picker {
+        min-width: 20%;
+      }
 
-    .roles-fields {
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
+      .roles-fields {
+        display: flex;
+        .form-fields {
+          display: flex;
+          flex-direction: column;
+          overflow: auto;
+          overflow-x: hidden;
+        }
     }
   }
   .mat-mdc-table {
