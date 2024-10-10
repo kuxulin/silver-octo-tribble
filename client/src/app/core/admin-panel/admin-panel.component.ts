@@ -37,6 +37,8 @@ import { RolesAssignDialogComponent } from '../../shared/roles-assign-dialog/rol
 import AvailableUserRole from '../../shared/models/enums/AvailableUserRole';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
+import UsersMetrics from '../../shared/models/UserMetrics';
 
 @Component({
   selector: 'app-admin-panel',
@@ -55,6 +57,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     ReactiveFormsModule,
     FormsModule,
     MatCheckboxModule,
+    MatCardModule,
   ],
   providers: [
     { provide: DateAdapter, useClass: AppDateAdapter },
@@ -103,6 +106,8 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   filterRolesInput: string[] = [''];
   private _optionsSubject = new BehaviorSubject<UserQueryOptions>(this.options);
   result$!: Observable<PagedResult<User>>;
+  private _metricsChangedSubject = new BehaviorSubject(true);
+  metrics$ = new Observable<UsersMetrics>();
   constructor(private _userService: UserService) {}
 
   ngOnInit(): void {
@@ -116,6 +121,14 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
       this.result$ = this._userService.getAllUsers(value).pipe(shareReplay());
     });
+
+    this._metricsChangedSubject
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(() => {
+        this.metrics$ = this._userService.getUsersMetrics();
+      });
+  }
+
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.paginator.pageSize;
@@ -249,5 +262,9 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       this._metricsChangedSubject.next(true);
     });
   }
+
+  ngOnDestroy(): void {
+    this._destroy$.next(true);
+    this._destroy$.complete();
   }
 }

@@ -5,6 +5,8 @@ import { environment } from '../../environments/environment';
 import UserQueryOptions from '../models/QueryOptions/UserQueryOptions';
 import PagedResult from '../models/PagedResult';
 import User from '../models/User';
+import AvailableUserRole from '../models/enums/AvailableUserRole';
+import UsersMetrics from '../models/UserMetrics';
 
 @Injectable({
   providedIn: 'root',
@@ -92,5 +94,9 @@ export class UserService {
     return this.httpClient
       .patch(`${this._apiUrl}/${id}/roles`, newRoles)
       .pipe(take(1));
+  }
+
+  getUsersMetrics() {
+    return this.httpClient.get<UsersMetrics>(this._apiUrl + '/metrics');
   }
 }
