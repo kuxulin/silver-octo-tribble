@@ -1,20 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
-
 html,
 body {
   height: 100%;
   margin: 0;
+  top: 0;
+  position: fixed;
 }
 
 body {
   margin-left: 5%;
   margin-right: 5%;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
-app-root {
-  display: block;
-  height: 100%;
 }
 
 .dialog-box {
