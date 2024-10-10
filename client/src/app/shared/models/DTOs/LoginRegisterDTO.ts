@@ -1,6 +1,7 @@
 export default interface LoginRegisterDTO {
   userName: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   phoneNumber: string;
   password: string;
 }
