@@ -4,7 +4,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { RouterModule } from '@angular/router';
-import LoginRegisterDTO from '../../shared/models/DTOs/RegisterDTO';
+import LoginRegisterDTO from '../../shared/models/DTOs/LoginRegisterDTO';
 import { AuthHandlerComponent } from '../../shared/auth-handler/auth-handler.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { isPossiblePhoneNumber, isValidNumber } from 'libphonenumber-js';
@@ -36,7 +36,8 @@ export class RegisterComponent {
   dto: LoginRegisterDTO = {
     userName: '',
     password: '',
-    fullName: '',
+    firstName: '',
+    lastName: '',
     phoneNumber: '',
   };
   checkedPassword = '';
@@ -45,7 +46,8 @@ export class RegisterComponent {
     return (
       !!this.dto.userName &&
       !!this.dto.password &&
-      !!this.dto.fullName &&
+      !!this.dto.firstName &&
+      !!this.dto.lastName &&
       !!this.dto.phoneNumber &&
       this.arePasswordsEqual() &&
       this.isPhoneValid()

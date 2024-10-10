@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthHandlerComponent } from '../../shared/auth-handler/auth-handler.component';
-import LoginRegisterDTO from '../../shared/models/DTOs/RegisterDTO';
+import LoginRegisterDTO from '../../shared/models/DTOs/LoginRegisterDTO';
 
 @Component({
   selector: 'app-login',
@@ -28,7 +28,8 @@ export class LoginComponent {
   dto: LoginRegisterDTO = {
     userName: '',
     password: '',
-    fullName: '',
+    firstName: '',
+    lastName: '',
     phoneNumber: '',
   };
 

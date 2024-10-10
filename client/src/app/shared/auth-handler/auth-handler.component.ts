@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import LoginRegisterDTO from '../models/DTOs/RegisterDTO';
+import LoginRegisterDTO from '../models/DTOs/LoginRegisterDTO';
 import { AuthService } from '../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
@@ -23,14 +23,14 @@ export class AuthHandlerComponent {
   private _destroy$ = new Subject<boolean>();
   errorText = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private _authService: AuthService, private router: Router) {}
 
   onSubmitClick() {
     if (!this.areFieldsValid) return;
 
     let methodToExecute$ = this.isLogin
-      ? this.authService.login(this.dto.userName, this.dto.password)
-      : this.authService.register(this.dto);
+      ? this._authService.login(this.dto.userName, this.dto.password)
+      : this._authService.register(this.dto);
 
     methodToExecute$.pipe(takeUntil(this._destroy$)).subscribe({
       next: () => {

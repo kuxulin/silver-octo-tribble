@@ -4,7 +4,7 @@ import { BehaviorSubject, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import AuthDTO from '../models/DTOs/AuthDTO';
 import { SESSION_STORAGE } from '../../consts';
-import LoginRegisterDTO from '../models/DTOs/RegisterDTO';
+import LoginRegisterDTO from '../models/DTOs/LoginRegisterDTO';
 import UserAuthDTO from '../models/DTOs/UserAuthDTO';
 
 @Injectable({
