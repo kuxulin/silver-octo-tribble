@@ -2,7 +2,7 @@
 
 namespace Core.Entities;
 
-public partial class User : IdentityUser<Guid>
+public partial class User : IdentityUser<int>
 {
     public DateTime CreationDate { get; set; }
     public string? RefreshToken { get; set; }

@@ -9,12 +9,12 @@ public class DatabaseContext : IdentityDbContext
 <
     User,
     Role,
-    Guid,
-    IdentityUserClaim<Guid>,
-    UserRole,
-    IdentityUserLogin<Guid>,
-    IdentityRoleClaim<Guid>,
-    IdentityUserToken<Guid>
+    int,
+    IdentityUserClaim<int>,
+    UserRole,   
+    IdentityUserLogin<int>,
+    IdentityRoleClaim<int>,
+    IdentityUserToken<int>
 >
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
@@ -25,6 +25,7 @@ public class DatabaseContext : IdentityDbContext
     public DbSet<TodoTask> ToDoTasks { get; set; }
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Employee> Employees { get; set; }
+    public DbSet<ApplicationImage> Images { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,5 +40,8 @@ public class DatabaseContext : IdentityDbContext
             .HasOne(ur => ur.Role)
             .WithMany(r => r.UserRoles)
             .HasForeignKey(ur => ur.RoleId);
+
+        modelBuilder.Entity<ApplicationImage>()
+            .ToTable("Images");
     }
 }

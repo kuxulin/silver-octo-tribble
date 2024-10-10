@@ -2,7 +2,7 @@
 
 public enum AvailableUserRole
 {
-    Admin,
+    Admin = 1,
     Manager,
     Employee
 }

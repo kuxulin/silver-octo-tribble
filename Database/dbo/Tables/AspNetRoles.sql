@@ -1,5 +1,5 @@
 ﻿CREATE TABLE [dbo].[AspNetRoles] (
-    [Id]               UNIQUEIDENTIFIER NOT NULL,
+    [Id]               INT           NOT NULL    IDENTITY,
     [Name]             NVARCHAR (256)   NULL,
     [NormalizedName]   NVARCHAR (256)   NULL,
     [ConcurrencyStamp] NVARCHAR (MAX)   NULL,

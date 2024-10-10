@@ -19,12 +19,12 @@ public abstract class BaseCRUDRepository<TEntity, TReadDto,TCreateDto,TUpdateDto
     <
         User,
         Role,
-        Guid,
-        IdentityUserClaim<Guid>,
+        int,
+        IdentityUserClaim<int>,
         UserRole,
-        IdentityUserLogin<Guid>,
-        IdentityRoleClaim<Guid>,
-        IdentityUserToken<Guid>
+        IdentityUserLogin<int>,
+        IdentityRoleClaim<int>,
+        IdentityUserToken<int>
     >
 {
     protected readonly TContext _context;

@@ -1,6 +1,7 @@
 ﻿using Application.Expressions;
 using AutoMapper;
 using Core;
+using Core.Constants;
 using Core.DTOs;
 using Core.Entities;
 using Core.Enums;
@@ -33,17 +34,14 @@ class UserService : IUserService
             usersQuery = options.SortByDescending ? usersQuery.OrderByDescending(sortFunction) : usersQuery.OrderBy(sortFunction);
         }
 
-        var query = usersQuery
-            .Include(u => u.UserRoles)
-            .ThenInclude(ur => ur.Role)
-            .Select(ur => new
-            {
-                User = ur,
-                Roles = ur.UserRoles.Select(ur => ur.Role.Name).ToArray()
-            });
+        var query = usersQuery.Include(u => u.UserRoles).Select(ur => new
+        {
+            User = ur,
+            ur.UserRoles,
+        });
 
-        if (options.FilterRoles.Any())
-            query = query.Where(u => u.Roles.Intersect(options.FilterRoles).Any());
+        if (options.FilterRoleIds.Any())
+            query = query.Where(ur => ur.UserRoles.Select(ur => ur.RoleId).Intersect(options.FilterRoleIds).Any());
 
         if (!options.PartialUserName.IsNullOrEmpty())
             query = query.Where(ur => ur.User.UserName.Contains(options.PartialUserName));
@@ -66,9 +64,9 @@ class UserService : IUserService
 
         var userDtos = _mapper.Map<List<UserDTO>>(usersWithRoles.Select(ur => ur.User));
 
-        for (int i = 0; i < userDtos.Count; i++)
+        for (int i = 0; i < userDtos.Count(); i++)
         {
-            userDtos[i].Roles = usersWithRoles[i].Roles.Select(r => (AvailableUserRole)Enum.Parse(typeof(AvailableUserRole), r)).ToArray();
+            userDtos[i].RoleIds = usersWithRoles[i].UserRoles.Select(r => r.RoleId);
         }
 
         return new PagedResult<UserDTO>(userDtos, usersAmount);
