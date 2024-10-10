@@ -7,8 +7,8 @@ using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Core.Metrics;
 using Core.ResultPattern;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 namespace Application.Services;
@@ -70,6 +70,75 @@ class UserService : IUserService
         }
 
         return new PagedResult<UserDTO>(userDtos, usersAmount);
+    }
+
+    public async Task<Result<bool>> DeleteUsersAsync(IEnumerable<int> ids)
+    {
+        var users = await _repository.GetAll().Where(u => ids.Contains(u.Id)).ToListAsync();
+
+        if (users is null || users.Count < ids.Count())
+            return DefinedError.AbsentElement;
+
+        await _repository.DeleteUsersAsync(users);
+        return true;
+    }
+
+    public async Task<Result<bool>> ChangeUsersStatusAsync(IEnumerable<int> ids, bool isBlocked)
+    {
+        var users = await _repository.GetAll().Where(u => ids.Contains(u.Id)).ToListAsync();
+
+        if (users == null || users.Count < ids.Count())
+            return DefinedError.AbsentElement;
+
+        await _repository.ChangeUsersStatusAsync(users, isBlocked);
+        return true;
+    }
+
+    private async Task<User> GetUserById(int id)
+    {
+        return await _repository.GetAll().FirstOrDefaultAsync(u => u.Id == id);
+    }
+
+    public async Task<Result<bool>> ChangeUserRolesAsync(int id, IEnumerable<AvailableUserRole> roles)
+    {
+        foreach (var role in roles)
+        {
+            if (!Enum.IsDefined(typeof(AvailableUserRole), role))
+            {
+                return DefinedError.InvalidElement;
+            }
+        }
+
+        var user = await GetUserById(id);
+
+        if (user == null)
+            return DefinedError.AbsentElement;
+
+        await _repository.ChangeUserRolesAsync(user, roles.Select(r => r.ToString()).ToArray());
+
+        return true;
+    }
+
+    public async Task<Result<UsersMetrics>> GetUsersMetricsAsync()
+    {
+        var query = _repository.GetAll();
+
+        var adminQuery = query.Include(u => u.UserRoles)
+            .Where(u => u.UserRoles.Select(ur => ur.RoleId).Contains(((int)AvailableUserRole.Admin)));
+
+        var blockedQuery = query.Where(u => u.IsBlocked);
+
+        var totalCount = await query.CountAsync();
+        var adminCount = await adminQuery.CountAsync();
+        var blockedCount = await blockedQuery.CountAsync();
+
+
+        return new UsersMetrics()
+        {
+            TotalCount = totalCount,
+            AdminCount = adminCount,
+            BlockedCount = blockedCount
+        };
     }
 }
 
