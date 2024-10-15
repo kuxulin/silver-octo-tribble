@@ -1,6 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, shareReplay, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  ReplaySubject,
+  shareReplay,
+  Subject,
+  take,
+  tap,
+} from 'rxjs';
 import { environment } from '../../environments/environment';
 import AuthDTO from '../models/DTOs/AuthDTO';
 import { SESSION_STORAGE } from '../../consts';
@@ -11,16 +19,16 @@ import UserAuthDTO from '../models/DTOs/UserAuthDTO';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = environment.api + '/auth';
-  private subject = new BehaviorSubject<UserAuthDTO | null>(null);
-  user$ = this.subject.asObservable();
+  private _apiUrl = environment.api + '/auth';
+  private _subject = new ReplaySubject<Object>();
+  user$ = this._subject.asObservable() as Observable<UserAuthDTO>;
 
   constructor(private httpClient: HttpClient) {}
 
   login(userName: string, password: string) {
     return this.httpClient
       .post<AuthDTO>(
-        this.apiUrl + '/login',
+        this._apiUrl + '/login',
         {
           userName,
           password,
@@ -35,7 +43,7 @@ export class AuthService {
 
   register(dto: LoginRegisterDTO) {
     return this.httpClient
-      .post<AuthDTO>(this.apiUrl + '/register', {
+      .post<AuthDTO>(this._apiUrl + '/register', {
         ...dto,
       })
       .pipe(
@@ -49,12 +57,27 @@ export class AuthService {
     let user: UserAuthDTO = {
       userName: result.userName,
       roles: result.roles,
+      id: result.id,
     };
-    this.subject.next(user);
+    this._subject.next(user);
+  }
+
+  refreshTokens() {
+    return this.httpClient
+      .get<AuthDTO>(this._apiUrl + '/refresh', { withCredentials: true })
+      .pipe(
+        take(1),
+        tap((res) => this.setSession(res)),
+        shareReplay()
+      );
+  }
+
+  getAuthToken() {
+    return sessionStorage.getItem(SESSION_STORAGE.TOKEN);
   }
 
   logOut() {
     sessionStorage.removeItem(SESSION_STORAGE.TOKEN);
-    this.subject.next(null);
+    this._subject.next(0);
   }
 }

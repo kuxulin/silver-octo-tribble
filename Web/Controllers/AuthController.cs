@@ -52,6 +52,12 @@ public class AuthController : ControllerBase
     {
         string oldRefreshToken = Request.Cookies["refreshToken"];
         var accessTokenResult = await _authService.CreateAccessTokenFromRefresh(oldRefreshToken);
+
+        if (!accessTokenResult.IsSuccess)
+        {
+            return StatusCode(accessTokenResult.Error.StatusCode, accessTokenResult.Error);
+        }
+
         var refreshTokenResult = await _authService.CreateRefreshTokenAsync(accessTokenResult.Value.UserName);
         AppendCookies(refreshTokenResult.Value);
         return Ok(accessTokenResult.Value);

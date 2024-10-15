@@ -3,6 +3,7 @@ using Infrastructure;
 using Core.Constants;
 using Application;
 using Persistence.Data;
+using Core.Enums;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -25,6 +26,8 @@ builder.Services.AddCors(options =>
                    .AllowCredentials();
         });
 });
+
+builder.Services.AddAuthorization(options => options.AddPolicy(Policies.AdminPolicy, policy => policy.RequireRole(AvailableUserRole.Admin.ToString())));
 
 builder.Services.AddControllers();
 

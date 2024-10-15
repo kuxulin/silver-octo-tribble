@@ -35,14 +35,13 @@ public static class DependencyInjection
             .AddJwtBearer(options =>
             {
                 options.SaveToken = true;
-                //options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = new TokenValidationParameters() //TODO move validation parameters in some constants place (i use this config in dependency injection while registering jwt auth too) ask chatgpt
                 {
                     ValidIssuer = configuration.Issuer,
                     ValidAudience = configuration.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Key)), //TODO create asymetric secret
                     NameClaimType = "Name",
-                    RoleClaimType = "Role"
+                    RoleClaimType = "Role",
                 };
             });
     }
