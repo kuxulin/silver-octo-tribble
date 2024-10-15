@@ -1,0 +1,18 @@
+<mat-toolbar class="menu">
+  <span>Todo List</span>
+  @if (currentUser$|async; as user;) { @if(isManager(user)){
+  <button mat-button routerLink="/dashboard">Dashboard</button>
+  } }
+  <span class="spacer"></span>
+  <button mat-icon-button>
+    <mat-icon>settings</mat-icon>
+  </button>
+
+  @if (currentUser$|async; as user) {
+  <button mat-flat-button [routerLink]="['/user', user.id]">
+    {{ user.userName }}
+  </button>
+  } @else {
+  <button mat-flat-button routerLink="/login">LogIn</button>
+  }
+</mat-toolbar>
