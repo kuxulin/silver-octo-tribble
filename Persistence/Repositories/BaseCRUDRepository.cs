@@ -9,12 +9,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Persistence.Repositories;
 
-public abstract class BaseCRUDRepository<TEntity, TReadDto,TCreateDto,TUpdateDto, TContext> 
-    : ICRUDRepository<TReadDto, TCreateDto, TUpdateDto> 
-    where TEntity : BaseEntity 
-    where TReadDto : BaseReadDTO
-    where TCreateDto : BaseCreateDTO
-    where TUpdateDto : BaseUpdateDTO
+public abstract class BaseCRUDRepository<TEntity, TContext>
+    : ICRUDRepository<TEntity>
+    where TEntity : BaseEntity
     where TContext : IdentityDbContext
     <
         User,
@@ -36,34 +33,28 @@ public abstract class BaseCRUDRepository<TEntity, TReadDto,TCreateDto,TUpdateDto
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<TReadDto>> GetAllAsync()
-    {
-        var entities = await GetAll().ToListAsync();
-        return _mapper.Map<IEnumerable<TReadDto>>(entities);
-    }
-
-    protected IQueryable<TEntity> GetAll()
+    public virtual IQueryable<TEntity> GetAll()
     {
         return _context.Set<TEntity>();
     }
 
-    public async Task<Guid> AddAsync(TCreateDto dto)
+    public async virtual Task<TEntity> AddAsync(TEntity dto)
     {
         var entity = _mapper.Map<TEntity>(dto);
         _context.Set<TEntity>().Add(entity);
         await _context.SaveChangesAsync();
-        return entity.Id;
+        return entity;
     }
 
-    public async Task<Guid> UpdateAsync(TUpdateDto dto)
+    public async virtual Task<TEntity> UpdateAsync(TEntity dto)
     {
         var entity = _mapper.Map<TEntity>(dto);
         _context.Set<TEntity>().Update(entity);
         await _context.SaveChangesAsync();
-        return entity.Id;
+        return entity;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async virtual Task DeleteAsync(Guid id)
     {
         var entity = await GetAll().FirstAsync(e => e.Id == id);
         _context.Set<TEntity>().Remove(entity);

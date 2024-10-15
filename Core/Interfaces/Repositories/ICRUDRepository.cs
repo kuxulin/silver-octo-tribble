@@ -1,8 +1,8 @@
 ﻿namespace Core.Interfaces.Repositories;
-public interface ICRUDRepository<TReadDto, TCreateDto, TUpdateDto> where TReadDto : class where TCreateDto : class where TUpdateDto : class
+public interface ICRUDRepository<TEntity>
 {
-    Task<IEnumerable<TReadDto>> GetAllAsync();
-    Task<Guid> AddAsync(TCreateDto dto);
-    Task<Guid> UpdateAsync(TUpdateDto dto);
+    IQueryable<TEntity> GetAll();
+    Task<TEntity> AddAsync(TEntity dto);
+    Task<TEntity> UpdateAsync(TEntity dto);
     Task DeleteAsync(Guid id);
 }
