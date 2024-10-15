@@ -1,100 +1,114 @@
 <div class="panel container">
   <div class="table">
-    <div class="filters-container">
-      <mat-form-field appearance="outline">
-        <mat-label>UserName filter</mat-label>
-        <input matInput [(ngModel)]="partialUserNameInput" />
-        @if (partialUserNameInput) {
-        <button matSuffix mat-icon-button (click)="clearPartialUsername()">
-          <mat-icon>close</mat-icon>
-        </button>
-        }
-        <button
-          matSuffix
-          mat-icon-button
-          (click)="updateQuery({ partialUserName: partialUserNameInput })"
-        >
-          <mat-icon>search</mat-icon>
-        </button>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="date-range-picker">
-        <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input [rangePicker]="picker" [formGroup]="range">
-          <input
-            formControlName="start"
-            matStartDate
-            placeholder="Start date"
-            readonly
-            (dateChange)="updateQuery({ startDate: range.value.start! })"
-          />
-          <input
-            formControlName="end"
-            matEndDate
-            placeholder="End date"
-            readonly
-            (dateChange)="updateQuery({ endDate: range.value.end! })"
-          />
-        </mat-date-range-input>
-        <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
-        @if (options.startDate || options.endDate) {
-        <button matIconSuffix mat-icon-button (click)="clearDate()">
-          <mat-icon>close</mat-icon>
-        </button>
-        }
-        <mat-datepicker-toggle
-          matIconSuffix
-          [for]="picker"
-        ></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
-      </mat-form-field>
-      <div
-        class="roles-fields"
-        (mouseover)="showButton = true"
-        (mouseout)="showButton = false"
-      >
-        <div class="form-fields">
-          <mat-form-field appearance="outline">
-            <mat-label>Roles</mat-label>
-            <input matInput [(ngModel)]="filterRolesInput[0]" />
-            <button
-              mat-icon-button
-              matSuffix
-              (click)="filterRolesInput[0] = ''; searchRoles()"
-              [hidden]="filterRolesInput[0].length == 0"
-            >
-              <mat-icon>close</mat-icon>
-            </button>
-          </mat-form-field>
-          @for (role of filterRolesInput.slice(1); track $index) {
-          <mat-form-field appearance="outline" class="additional-role-input">
-            <input matInput [(ngModel)]="filterRolesInput[$index + 1]" />
-            <button
-              mat-icon-button
-              matSuffix
-              (click)="filterRolesInput.splice($index + 1, 1); searchRoles()"
-            >
-              <mat-icon>close</mat-icon>
-            </button>
-          </mat-form-field>
+    <div>
+      <div class="filters-container">
+        <mat-form-field appearance="outline">
+          <mat-label>UserName filter</mat-label>
+          <input matInput [(ngModel)]="partialUserNameInput" />
+          @if (partialUserNameInput) {
+          <button matSuffix mat-icon-button (click)="clearPartialUsername()">
+            <mat-icon>close</mat-icon>
+          </button>
           }
-        </div>
-        <div style="display: flex; flex-direction: column">
-          <button mat-icon-button (click)="searchRoles()">
+          <button
+            matSuffix
+            mat-icon-button
+            (click)="updateQuery({ partialUserName: partialUserNameInput })"
+          >
             <mat-icon>search</mat-icon>
           </button>
-          <button
-            mat-icon-button
-            [hidden]="!showButton"
-            (click)="filterRolesInput.push('')"
-          >
-            <mat-icon>add</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="date-range-picker">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input [rangePicker]="picker" [formGroup]="range">
+            <input
+              formControlName="start"
+              matStartDate
+              placeholder="Start date"
+              readonly
+              (dateChange)="updateQuery({ startDate: range.value.start! })"
+            />
+            <input
+              formControlName="end"
+              matEndDate
+              placeholder="End date"
+              readonly
+              (dateChange)="updateQuery({ endDate: range.value.end! })"
+            />
+          </mat-date-range-input>
+          <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+          @if (options.startDate || options.endDate) {
+          <button matIconSuffix mat-icon-button (click)="clearDate()">
+            <mat-icon>close</mat-icon>
           </button>
+          }
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+        <div
+          class="roles-fields"
+          (mouseover)="showButton = true"
+          (mouseout)="showButton = false"
+        >
+          <div class="form-fields">
+            <mat-form-field appearance="outline">
+              <mat-label>Roles</mat-label>
+              <input matInput [(ngModel)]="filterRolesInput[0]" />
+              <button
+                mat-icon-button
+                matSuffix
+                (click)="filterRolesInput[0] = ''; searchRoles()"
+                [hidden]="filterRolesInput[0].length == 0"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
+            @for (role of filterRolesInput.slice(1); track $index) {
+            <mat-form-field appearance="outline" class="additional-role-input">
+              <input matInput [(ngModel)]="filterRolesInput[$index + 1]" />
+              <button
+                mat-icon-button
+                matSuffix
+                (click)="filterRolesInput.splice($index + 1, 1); searchRoles()"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
+            }
+          </div>
+          <div style="display: flex; flex-direction: column">
+            <button mat-icon-button (click)="searchRoles()">
+              <mat-icon>search</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              [hidden]="!showButton"
+              (click)="filterRolesInput.push('')"
+            >
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
         </div>
+      </div>
+      <div class="metrics">
+        @if (metrics$ | async; as metrics) {
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title> Metrics</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            Admins: {{ metrics.adminCount }} Blocked:
+            {{ metrics.blockedCount }} Total: {{ metrics.totalCount }}
+          </mat-card-content>
+        </mat-card>
+        }
       </div>
     </div>
     <mat-table
-      [fixedLayout]="true"
       [dataSource]="(result$ | async)?.items || []"
       matSort
       (matSortChange)="onSortChange($event)"
@@ -119,7 +133,16 @@
           </mat-checkbox>
         </td>
       </ng-container>
-
+      <ng-container matColumnDef="avatar">
+        <th mat-header-cell *matHeaderCellDef>Photo</th>
+        <td mat-cell *matCellDef="let element">
+          <img
+            [src]="'data:image/jpeg;base64,' + element.image.content"
+            [width]="40"
+            [alt]="element.image.name"
+          />
+        </td>
+      </ng-container>
       <ng-container matColumnDef="userName">
         <th mat-header-cell mat-sort-header *matHeaderCellDef>UserName</th>
         <td mat-cell *matCellDef="let element">{{ element.userName }}</td>
@@ -174,7 +197,7 @@
         <td mat-cell *matCellDef="let element">
           <button
             mat-mini-fab
-            style="margin: 6px"
+            style="margin: 2px"
             (click)="
               triggerRolesUpdateDialog(
                 element.userName,
@@ -192,7 +215,11 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="navigateToUser(row)"
+      ></tr>
     </mat-table>
     <mat-paginator
       [length]="(result$ | async)?.totalCount"
@@ -207,20 +234,5 @@
         })
       "
     ></mat-paginator>
-  </div>
-
-  <div class="metrics">
-    @if (metrics$ | async; as metrics) {
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title> Metrics</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div>Admins: {{ metrics.adminCount }}</div>
-        <div>Blocked: {{ metrics.blockedCount }}</div>
-        <div>Total: {{ metrics.totalCount }}</div>
-      </mat-card-content>
-    </mat-card>
-    }
   </div>
 </div>

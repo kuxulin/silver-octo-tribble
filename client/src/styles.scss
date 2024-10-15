@@ -3,20 +3,20 @@ html,
 body {
   height: 100%;
   margin: 0;
-  top: 0;
-  position: fixed;
+  overflow-x: auto;
 }
 
 body {
-  margin-left: 5%;
-  margin-right: 5%;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 .dialog-box {
+  position: absolute;
   display: flex;
   flex-direction: column;
-  padding-left: 35%;
-  padding-top: 10%;
-  width: 30%;
+  left: 35%;
+  top: 10%;
+  max-width: 30%;
+  min-width: 25%;
+  height: 60%;
 }

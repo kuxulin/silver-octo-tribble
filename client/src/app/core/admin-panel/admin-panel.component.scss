@@ -1,13 +1,6 @@
 .panel {
-  margin-top: 4%;
-  height: 95%;
-  display: grid;
-  grid-template-columns: 80fr 20fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr;
-  column-gap: 5px;
+  height: 90%;
   .table {
-    grid-row-start: 1;
-    grid-row-end: 4;
     height: 100%;
     .filters-container {
       margin: 4px 0 0 6px;
@@ -34,6 +27,7 @@
       }
     }
     .mat-mdc-table {
+      // margin-top: 8px;
       width: 100%;
       height: 70%;
       overflow: auto;
@@ -55,8 +49,5 @@
     .paginator {
       height: 10%;
     }
-  }
-  .metrics {
-    grid-row-start: 2;
   }
 }

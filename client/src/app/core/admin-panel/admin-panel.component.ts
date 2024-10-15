@@ -13,7 +13,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import UserQueryOptions from '../../shared/models/QueryOptions/UserQueryOptions';
+import UserQueryOptions from '../../shared/models/queryOptions/UserQueryOptions';
 import PagedResult from '../../shared/models/PagedResult';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -39,6 +39,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import UsersMetrics from '../../shared/models/UserMetrics';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-panel',
@@ -80,6 +81,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
 
   displayedColumns = [
     'select',
+    'avatar',
     'userName',
     'firstName',
     'lastName',
@@ -108,7 +110,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   result$!: Observable<PagedResult<User>>;
   private _metricsChangedSubject = new BehaviorSubject(true);
   metrics$ = new Observable<UsersMetrics>();
-  constructor(private _userService: UserService) {}
+  constructor(private _userService: UserService, private _router: Router) {}
 
   ngOnInit(): void {
     this._optionsSubject.pipe(takeUntil(this._destroy$)).subscribe((value) => {
@@ -127,6 +129,10 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.metrics$ = this._userService.getUsersMetrics();
       });
+  }
+
+  navigateToUser(user: User) {
+    this._router.navigate(['user/', user.id]);
   }
 
   isAllSelected() {
@@ -174,7 +180,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     this.range.reset();
   }
 
-  changeBlockStatus(id: string, isBlocked: boolean) {
+  changeBlockStatus(id: number, isBlocked: boolean) {
     let users = this.selection.selected;
     let ids = users.map((u) => u.id!);
 
@@ -237,7 +243,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     });
   }
 
-  triggerDeleteDialog(id: string) {
+  triggerDeleteDialog(id: number) {
     let dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         action: 'delete',
@@ -252,7 +258,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteUser(id: string) {
+  deleteUser(id: number) {
     let ids = this.selection.selected.map((u) => u.id!);
 
     if (!ids.includes(id)) ids.push(id);
