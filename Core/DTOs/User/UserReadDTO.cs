@@ -1,8 +1,9 @@
-﻿using Core.Enums;
+﻿using Core.DTOs.ApplicationImage;
+using Core.Enums;
 
-namespace Core.DTOs;
+namespace Core.DTOs.User;
 
-public class UserDTO
+public class UserReadDTO
 {
     public int Id { get; set; }
     public string UserName { get; set; }
@@ -12,4 +13,5 @@ public class UserDTO
     public IEnumerable<int> RoleIds { get; set; }
     public DateTime CreationDate { get; set; }
     public bool IsBlocked { get; set; }
+    public ApplicationImageReadDTO Image { get; set; }
 }

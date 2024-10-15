@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using Core.DTOs.User;
+using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -30,7 +31,7 @@ class UserRepository : IUserRepository
 
     public async Task ChangeUsersStatusAsync(IEnumerable<User> users, bool status)
     {
-        foreach (var user in users) 
+        foreach (var user in users)
             user.IsBlocked = status;
 
         _context.Users.UpdateRange(users);
@@ -42,6 +43,12 @@ class UserRepository : IUserRepository
         var currentRoles = await _userManager.GetRolesAsync(user);
         await _userManager.RemoveFromRolesAsync(user, currentRoles);
         await _userManager.AddToRolesAsync(user, newUserRoles);
+    }
+
+    public async Task<User> UpdateUserAsync(User user)
+    {
+        await _userManager.UpdateAsync(user);
+        return user;
     }
 }
 
