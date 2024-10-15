@@ -2,11 +2,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable, take } from 'rxjs';
 import { environment } from '../../environments/environment';
-import UserQueryOptions from '../models/QueryOptions/UserQueryOptions';
+import UserQueryOptions from '../models/queryOptions/UserQueryOptions';
 import PagedResult from '../models/PagedResult';
 import User from '../models/User';
 import AvailableUserRole from '../models/enums/AvailableUserRole';
 import UsersMetrics from '../models/UserMetrics';
+import UserUpdateDTO from '../models/DTOs/UserUpdateDTO';
 
 @Injectable({
   providedIn: 'root',
@@ -14,11 +15,15 @@ import UsersMetrics from '../models/UserMetrics';
 export class UserService {
   private _apiUrl = environment.api + '/User';
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private _httpClient: HttpClient) {}
+
+  getUserById(id: number): Observable<User> {
+    return this._httpClient.get<User>(this._apiUrl + '/' + id);
+  }
 
   getAllUsers(options: UserQueryOptions): Observable<PagedResult<User>> {
     let params = this.createHttpParams(options);
-    return this.httpClient
+    return this._httpClient
       .get<PagedResult<User>>(this._apiUrl, {
         params: params,
       })
@@ -72,16 +77,16 @@ export class UserService {
     return params;
   }
 
-  deleteUsers(ids: string[]) {
-    return this.httpClient
+  deleteUsers(ids: number[]) {
+    return this._httpClient
       .delete(this._apiUrl, {
         body: ids,
       })
       .pipe(take(1));
   }
 
-  changeBlockStatus(ids: string[], isBlocked: boolean) {
-    return this.httpClient
+  changeBlockStatus(ids: number[], isBlocked: boolean) {
+    return this._httpClient
       .patch(this._apiUrl, ids, {
         params: {
           isBlocked: isBlocked,
@@ -91,12 +96,16 @@ export class UserService {
   }
 
   modifyUserRoles(id: string, newRoles: AvailableUserRole[]) {
-    return this.httpClient
+    return this._httpClient
       .patch(`${this._apiUrl}/${id}/roles`, newRoles)
       .pipe(take(1));
   }
 
   getUsersMetrics() {
-    return this.httpClient.get<UsersMetrics>(this._apiUrl + '/metrics');
+    return this._httpClient.get<UsersMetrics>(this._apiUrl + '/metrics');
+  }
+
+  updateUser(user: UserUpdateDTO) {
+    return this._httpClient.put<User>(this._apiUrl, user).pipe(take(1));
   }
 }

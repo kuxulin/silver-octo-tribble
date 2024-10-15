@@ -1,12 +1,14 @@
 import AvailableUserRole from './enums/AvailableUserRole';
+import Image from './Image';
 
 export default interface User {
-  id: string | undefined;
+  id: number;
   firstName: string | undefined;
   lastName: string | undefined;
   userName: string | undefined;
   phoneNumber: string | undefined;
-  roles: AvailableUserRole[] | undefined;
+  roleIds: AvailableUserRole[] | undefined;
   creationDate: Date;
   isBlocked: boolean;
+  image: Image;
 }
