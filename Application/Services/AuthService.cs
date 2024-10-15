@@ -4,6 +4,7 @@ using Core.Entities;
 using Core.Interfaces.Services;
 using Core.ResultPattern;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 public class AuthService : IAuthService
@@ -75,7 +76,7 @@ public class AuthService : IAuthService
     public async Task<Result<string>> CreateRefreshTokenAsync(string username)
     {
         var token = _tokenService.CreateRefreshToken(username);
-        var user = _userManager.Users.First(u => u.UserName == username);
+        var user = await _userManager.Users.FirstAsync(u => u.UserName == username);
         user.RefreshToken = token;
         await _userManager.UpdateAsync(user); 
         return token;
@@ -92,6 +93,7 @@ public class AuthService : IAuthService
             Token = accessToken,
             UserName = user.UserName,
             Roles = roles.ToArray(),
+            Id = user.Id
         };
     }
 }

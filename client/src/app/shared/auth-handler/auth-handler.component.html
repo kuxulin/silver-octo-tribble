@@ -7,7 +7,9 @@
   >
     Submit
   </button>
-  <span class="error-text" @if(errorText)>{{ errorText }}</span>
+  @if(errorText) {
+  <span class="error-text">{{ errorText }}</span>
+  }
   <div class="switch">
     @if(isLogin) {<span>Don`t have an account yet?</span>
     <button rout mat-button routerLink="/register">Register</button>} @else {
