@@ -11,7 +11,7 @@ public class DatabaseContext : IdentityDbContext
     Role,
     int,
     IdentityUserClaim<int>,
-    UserRole,   
+    UserRole,
     IdentityUserLogin<int>,
     IdentityRoleClaim<int>,
     IdentityUserToken<int>
@@ -43,5 +43,10 @@ public class DatabaseContext : IdentityDbContext
 
         modelBuilder.Entity<ApplicationImage>()
             .ToTable("Images");
+
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Image)
+            .WithMany()
+            .HasForeignKey(u => u.ImageId);
     }
 }

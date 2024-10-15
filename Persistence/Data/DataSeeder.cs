@@ -2,6 +2,7 @@ using Core.Entities;
 using Core.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Data.Contexts;
 
 namespace Persistence.Data;
 public static class DataSeeder
@@ -10,7 +11,11 @@ public static class DataSeeder
     {
         var usersManager = provider.GetRequiredService<UserManager<User>>();
         var rolesManager = provider.GetRequiredService<RoleManager<Role>>();
-        
+        var context = provider.GetRequiredService<DatabaseContext>();
+
+        //context.Database.EnsureDeleted();   
+        //context.Database.EnsureCreated();
+
         if (usersManager.Users.Any(u => u.UserName == "maks"))
             return provider;
 
@@ -21,14 +26,21 @@ public static class DataSeeder
             await rolesManager.CreateAsync(role);
         }
 
+        var image = new ApplicationImage()
+        {
+            Name = "User.png",
+            Content = GetImageString("User.png"),
+        };
+
         var user = new User
         {
             FirstName = "Maksym",
             LastName = "Moroz",
             UserName = "maks",
             PhoneNumber = "+380953867137",
+            Image = image,
         };
-
+        
         await usersManager.CreateAsync(user, "string");
         await usersManager.AddToRoleAsync(user, roles[0].Name);
         return provider;
@@ -41,6 +53,8 @@ public static class DataSeeder
         if (usersManager.Users.Count() > 1)
             return provider;
 
+        var name = "User.png";
+        var content = GetImageString("User.png");
         var managers = new List<User>()
         {
             new ()
@@ -65,7 +79,7 @@ public static class DataSeeder
                 LastName = "Shalak",
                 UserName = "ajeoss",
                 PhoneNumber = "+380923857117",
-                CreationDate = DateTime.UtcNow.AddDays(-12),
+                CreationDate = DateTime.UtcNow.AddDays(-12)
             },
             new ()
             {
@@ -83,13 +97,6 @@ public static class DataSeeder
                 PhoneNumber = "+380927157197",
             },
         };
-
-
-        foreach(var user in managers)
-        {
-            await usersManager.CreateAsync(user, "string");
-            await usersManager.AddToRoleAsync(user, AvailableUserRole.Manager.ToString());
-        }
 
         var employees = new List<User>()
         {
@@ -132,14 +139,48 @@ public static class DataSeeder
                 UserName = "writer",
                 PhoneNumber = "+380927857197",
             },
-        };
+        };   
+
+        foreach (var user in managers)
+        {
+            user.Image = new ApplicationImage()
+            {
+                Name = name,
+                Content = content,
+            };
+            await usersManager.CreateAsync(user, "string");
+            await usersManager.AddToRoleAsync(user, AvailableUserRole.Manager.ToString());
+        }
 
         foreach (var user in employees)
         {
+            user.Image = new ApplicationImage()
+            {
+                Name = name,
+                Content = content,
+            };
             await usersManager.CreateAsync(user, "string");
             await usersManager.AddToRoleAsync(user, AvailableUserRole.Employee.ToString());
         }
 
         return provider;
+    }
+
+    private static string GetImageString(string imageName)
+    {
+        string solutionDirectory = GetSolutionDirectoryInfo().FullName;
+        string imagePath = Path.Combine(solutionDirectory, imageName);
+        byte[] imageBytes = File.ReadAllBytes(imagePath);
+        return Convert.ToBase64String(imageBytes);
+    }
+
+    private static DirectoryInfo GetSolutionDirectoryInfo()
+    {
+        var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (directory != null && !directory.GetFiles("*.sln").Any())
+        {
+            directory = directory.Parent;
+        }
+        return directory;
     }
 }
