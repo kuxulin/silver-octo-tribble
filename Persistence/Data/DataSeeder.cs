@@ -11,10 +11,6 @@ public static class DataSeeder
     {
         var usersManager = provider.GetRequiredService<UserManager<User>>();
         var rolesManager = provider.GetRequiredService<RoleManager<Role>>();
-        var context = provider.GetRequiredService<DatabaseContext>();
-
-        //context.Database.EnsureDeleted();   
-        //context.Database.EnsureCreated();
 
         if (usersManager.Users.Any(u => u.UserName == "maks"))
             return provider;
@@ -148,6 +144,7 @@ public static class DataSeeder
                 Name = name,
                 Content = content,
             };
+            user.Manager = new Manager();
             await usersManager.CreateAsync(user, "string");
             await usersManager.AddToRoleAsync(user, AvailableUserRole.Manager.ToString());
         }
@@ -159,6 +156,7 @@ public static class DataSeeder
                 Name = name,
                 Content = content,
             };
+            user.Employee = new Employee();
             await usersManager.CreateAsync(user, "string");
             await usersManager.AddToRoleAsync(user, AvailableUserRole.Employee.ToString());
         }

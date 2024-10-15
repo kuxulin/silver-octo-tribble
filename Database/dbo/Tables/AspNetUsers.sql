@@ -9,6 +9,8 @@
     [NormalizedEmail]      NVARCHAR (256)     NULL,
     [IsBlocked]            BIT                NOT NULL,
     [ImageId]              uniqueidentifier   null,
+    [ManagerId]            uniqueidentifier null,
+    [EmployeeId]           uniqueidentifier null,
     [EmailConfirmed]       BIT                NOT NULL,
     [PasswordHash]         NVARCHAR (MAX)     NULL,
     [SecurityStamp]        NVARCHAR (MAX)     NULL,
@@ -21,6 +23,8 @@
     [AccessFailedCount]    INT                NOT NULL,
     [RefreshToken]         NVARCHAR(MAX)      NULL, 
     CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED ([Id] ASC), 
-    CONSTRAINT [FK_Users_Images] FOREIGN KEY ([ImageId]) REFERENCES [dbo].[Images] ([Id]) ON DELETE SET NULL
+    CONSTRAINT [FK_Users_Images] FOREIGN KEY ([ImageId]) REFERENCES [dbo].[Images] ([Id]) ON DELETE SET NULL,
+    CONSTRAINT [FK_Users_Managers] FOREIGN KEY ([ManagerId]) REFERENCES [dbo].[Managers] ([Id]) ON DELETE SET NULL,
+    CONSTRAINT [FK_Users_Employees] FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employees] ([Id]) ON DELETE SET NULL
 );
 

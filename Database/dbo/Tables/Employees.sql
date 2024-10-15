@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [dbo].[Employees]
 (
 	[Id] UNIQUEIDENTIFIER NOT NULL, 
-    [FullName] NVARCHAR(100) NOT NULL, 
-    [PhoneNumber] NVARCHAR(15) NOT NULL, 
-    [CreationDate] DATETIME NOT NULL,
-    CONSTRAINT [PK_Employees] PRIMARY KEY CLUSTERED ([Id] ASC),
+    [CreationDate] DATETIME2(7) NOT NULL,
+    [UserId]       int not null
 
+    CONSTRAINT [PK_Employees] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_Employees_Users] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id])
 )

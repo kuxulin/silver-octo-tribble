@@ -12,6 +12,10 @@ public class User : IdentityUser<int>
     public Guid? ImageId { get; set; }
     public ApplicationImage? Image { get; set; }
     public ICollection<UserRole> UserRoles { get; set; } 
+    public Guid? ManagerId { get; set; }
+    public Manager? Manager { get; set; }
+    public Guid? EmployeeId { get; set; }
+    public Employee? Employee { get; set; }
 
     public User()
     {

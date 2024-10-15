@@ -42,11 +42,25 @@ public class DatabaseContext : IdentityDbContext
             .HasForeignKey(ur => ur.RoleId);
 
         modelBuilder.Entity<ApplicationImage>()
-            .ToTable("Images");
+         .ToTable("Images");
 
         modelBuilder.Entity<User>()
             .HasOne(u => u.Image)
-            .WithMany()
-            .HasForeignKey(u => u.ImageId);
+            .WithOne(i => i.User)
+            .HasForeignKey<ApplicationImage>(u => u.UserId)
+            .IsRequired(false);
+
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Manager)
+            .WithOne(m => m.User)
+            .HasForeignKey<Manager>(m => m.UserId)
+            .IsRequired(false);
+
+        modelBuilder.Entity<User>()
+           .HasOne(u => u.Employee)
+           .WithOne(e => e.User)
+           .HasForeignKey<Employee>(e => e.UserId)
+           .IsRequired(false);
+
     }
 }
