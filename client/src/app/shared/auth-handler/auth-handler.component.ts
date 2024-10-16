@@ -6,7 +6,6 @@ import { Subject, takeUntil } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-auth-handler',

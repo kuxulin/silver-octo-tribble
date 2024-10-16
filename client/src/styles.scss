@@ -11,12 +11,7 @@ body {
 }
 
 .dialog-box {
-  position: absolute;
   display: flex;
   flex-direction: column;
-  left: 35%;
-  top: 10%;
-  max-width: 30%;
-  min-width: 25%;
-  height: 60%;
+  width: 30%;
 }

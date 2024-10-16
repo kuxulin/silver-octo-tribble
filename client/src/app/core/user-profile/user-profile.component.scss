@@ -1,9 +1,18 @@
-.names {
+.profile {
+  height: 90%;
   display: flex;
-  justify-content: space-between;
-}
-.mat-mdc-card-image {
-  width: 100%;
-  padding-bottom: 6px;
-  max-height: 50%;
+  justify-content: center;
+  mat-card {
+    height: 100%;
+    overflow: auto;
+    .names {
+      display: flex;
+      justify-content: space-between;
+    }
+    .mat-mdc-card-image {
+      width: 100%;
+      padding-bottom: 6px;
+      height: 50%;
+    }
+  }
 }

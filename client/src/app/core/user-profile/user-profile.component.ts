@@ -12,7 +12,6 @@ import { CommonModule } from '@angular/common';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import User from '../../shared/models/User';
 import UserAuthDTO from '../../shared/models/DTOs/UserAuthDTO';
-import { DataService } from '../../shared/services/data.service';
 import { UserService } from '../../shared/services/user.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
@@ -26,7 +25,6 @@ import {
 } from '@angular/forms';
 import PhoneNumberValidator from '../../shared/validators/PhoneNumberValidator';
 import AvailableUserRole from '../../shared/models/enums/AvailableUserRole';
-import Image from '../../shared/models/Image';
 
 @Component({
   selector: 'app-user-profile',
@@ -58,6 +56,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     phoneNumber: new FormControl('', PhoneNumberValidator()),
     roles: new FormControl({ value: '', disabled: true }),
   });
+
   constructor(
     private _authService: AuthService,
     private _userService: UserService,

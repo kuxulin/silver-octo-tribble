@@ -1,42 +1,44 @@
-<div class="register dialog-box">
-  <mat-form-field>
-    <mat-label>UserName</mat-label>
-    <input matInput [(ngModel)]="dto.userName" required />
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>First name</mat-label>
-    <input matInput [(ngModel)]="dto.firstName" required />
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Last name</mat-label>
-    <input matInput [(ngModel)]="dto.lastName" required />
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Phone number</mat-label>
-    <input
-      matInput
-      type="tel"
-      maxlength="13"
-      [(ngModel)]="dto.phoneNumber"
-      required
+<div class="register">
+  <div class="dialog-box">
+    <mat-form-field>
+      <mat-label>UserName</mat-label>
+      <input matInput [(ngModel)]="dto.userName" required />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>First name</mat-label>
+      <input matInput [(ngModel)]="dto.firstName" required />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Last name</mat-label>
+      <input matInput [(ngModel)]="dto.lastName" required />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Phone number</mat-label>
+      <input
+        matInput
+        type="tel"
+        maxlength="13"
+        [(ngModel)]="dto.phoneNumber"
+        required
+      />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Enter your password</mat-label>
+      <input matInput type="password" [(ngModel)]="dto.password" required />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Confirm password</mat-label>
+      <input matInput type="password" [(ngModel)]="checkedPassword" required />
+    </mat-form-field>
+    @if (!arePasswordsEqual()) {
+    <mat-error>Passwords aren`t equal</mat-error>
+    } @if (!isPhoneValid()) {
+    <mat-error>Invalid phone number</mat-error>
+    }
+    <app-auth-handler
+      [dto]="dto"
+      [areFieldsValid]="areFieldsValid()"
+      [isLogin]="false"
     />
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Enter your password</mat-label>
-    <input matInput type="password" [(ngModel)]="dto.password" required />
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Confirm password</mat-label>
-    <input matInput type="password" [(ngModel)]="checkedPassword" required />
-  </mat-form-field>
-  @if (!arePasswordsEqual()) {
-  <mat-error>Passwords aren`t equal</mat-error>
-  } @if (!isPhoneValid()) {
-  <mat-error>Invalid phone number</mat-error>
-  }
-  <app-auth-handler
-    [dto]="dto"
-    [areFieldsValid]="areFieldsValid()"
-    [isLogin]="false"
-  />
+  </div>
 </div>

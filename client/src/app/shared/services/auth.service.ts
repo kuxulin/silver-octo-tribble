@@ -1,19 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  BehaviorSubject,
-  Observable,
-  ReplaySubject,
-  shareReplay,
-  Subject,
-  take,
-  tap,
-} from 'rxjs';
+import { Observable, ReplaySubject, shareReplay, take, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import AuthDTO from '../models/DTOs/AuthDTO';
 import { SESSION_STORAGE } from '../../consts';
 import LoginRegisterDTO from '../models/DTOs/LoginRegisterDTO';
 import UserAuthDTO from '../models/DTOs/UserAuthDTO';
+import AvailableUserRole from '../models/enums/AvailableUserRole';
 
 @Injectable({
   providedIn: 'root',
@@ -23,10 +16,10 @@ export class AuthService {
   private _subject = new ReplaySubject<Object>();
   user$ = this._subject.asObservable() as Observable<UserAuthDTO>;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private _httpClient: HttpClient) {}
 
   login(userName: string, password: string) {
-    return this.httpClient
+    return this._httpClient
       .post<AuthDTO>(
         this._apiUrl + '/login',
         {
@@ -42,7 +35,7 @@ export class AuthService {
   }
 
   register(dto: LoginRegisterDTO) {
-    return this.httpClient
+    return this._httpClient
       .post<AuthDTO>(this._apiUrl + '/register', {
         ...dto,
       })
@@ -63,7 +56,7 @@ export class AuthService {
   }
 
   refreshTokens() {
-    return this.httpClient
+    return this._httpClient
       .get<AuthDTO>(this._apiUrl + '/refresh', { withCredentials: true })
       .pipe(
         take(1),
@@ -76,8 +69,31 @@ export class AuthService {
     return sessionStorage.getItem(SESSION_STORAGE.TOKEN);
   }
 
+  isEmployee(user: UserAuthDTO) {
+    return user.roles.some(
+      (role) => role === AvailableUserRole[AvailableUserRole.Employee]
+    );
+  }
+
+  isManager(user: UserAuthDTO) {
+    return user.roles.some(
+      (role) => role === AvailableUserRole[AvailableUserRole.Manager]
+    );
+  }
+
+  isAdmin(user: UserAuthDTO) {
+    return user.roles.some(
+      (role) => role === AvailableUserRole[AvailableUserRole.Admin]
+    );
+  }
+
   logOut() {
     sessionStorage.removeItem(SESSION_STORAGE.TOKEN);
-    this._subject.next(0);
+    return this._httpClient
+      .delete(this._apiUrl + '/logout', { withCredentials: true })
+      .pipe(
+        take(1),
+        tap(() => this._subject.next(0))
+      );
   }
 }

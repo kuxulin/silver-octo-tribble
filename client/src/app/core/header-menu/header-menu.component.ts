@@ -29,12 +29,24 @@ export class HeaderMenuComponent implements OnInit {
   constructor(private _authService: AuthService) {}
 
   ngOnInit(): void {
+    this.fetchUser();
+  }
+  fetchUser() {
     this.currentUser$ = this._authService.user$;
+  }
+  isEmployee(user: UserAuthDTO) {
+    return this._authService.isEmployee(user);
   }
 
   isManager(user: UserAuthDTO) {
-    return user.roles.some(
-      (role) => role === AvailableUserRole[AvailableUserRole.Manager]
-    );
+    return this._authService.isManager(user);
+  }
+
+  isAdmin(user: UserAuthDTO) {
+    return this._authService.isAdmin(user);
+  }
+
+  logOut() {
+    this._authService.logOut().subscribe(() => this.fetchUser());
   }
 }
