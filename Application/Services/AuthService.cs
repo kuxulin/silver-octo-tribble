@@ -82,6 +82,15 @@ public class AuthService : IAuthService
         return token;
     }
 
+    public async Task<Result<bool>> DeleteRefreshTokenAsync(string token)
+    {
+        var username = _tokenService.GetNameFromToken(token);
+        var user = await _userManager.Users.FirstAsync(u => u.UserName == username);
+        user.RefreshToken = null;
+        await _userManager.UpdateAsync(user);
+        return true;
+    }
+
     private async Task<TokenDTO> GenerateAccessTokenAsync(User user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);

@@ -12,12 +12,10 @@ namespace Web.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<User> _userManager;
     private readonly IAuthService _authService;
 
-    public AuthController(UserManager<User> userManager, IAuthService tokenService)
+    public AuthController(IAuthService tokenService)
     {
-        _userManager = userManager;
         _authService = tokenService;
     }
 
@@ -50,7 +48,7 @@ public class AuthController : ControllerBase
     [HttpGet("refresh")]
     public async Task<IActionResult> RefreshTokens()
     {
-        string oldRefreshToken = Request.Cookies["refreshToken"];
+        string oldRefreshToken = GetRefreshToken();
         var accessTokenResult = await _authService.CreateAccessTokenFromRefresh(oldRefreshToken);
 
         if (!accessTokenResult.IsSuccess)
@@ -61,6 +59,20 @@ public class AuthController : ControllerBase
         var refreshTokenResult = await _authService.CreateRefreshTokenAsync(accessTokenResult.Value.UserName);
         AppendCookies(refreshTokenResult.Value);
         return Ok(accessTokenResult.Value);
+    }
+
+    [HttpDelete("logout")]
+    public async Task<IActionResult> LogOut()
+    {
+        var refreshToken = GetRefreshToken();
+        await _authService.DeleteRefreshTokenAsync(refreshToken);
+        Response.Cookies.Delete("refreshToken");
+        return Ok();
+    }
+
+    private string GetRefreshToken()
+    {
+        return Request.Cookies["refreshToken"];
     }
 
     private void AppendCookies(string token)
