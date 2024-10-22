@@ -18,7 +18,7 @@ export class AuthHandlerComponent {
   @Input({ required: true })
   areFieldsValid = false;
   @Input({ required: true })
-  dto!: LoginRegisterDTO;
+  dto!: Partial<LoginRegisterDTO>;
   @Input({ required: true })
   isLogin = true;
   private _destroy$ = new Subject<boolean>();
@@ -30,8 +30,8 @@ export class AuthHandlerComponent {
     if (!this.areFieldsValid) return;
 
     let methodToExecute$ = this.isLogin
-      ? this._authService.login(this.dto.userName, this.dto.password)
-      : this._authService.register(this.dto);
+      ? this._authService.login(this.dto.userName!, this.dto.password!)
+      : this._authService.register(this.dto as LoginRegisterDTO);
 
     methodToExecute$.pipe(takeUntil(this._destroy$)).subscribe({
       next: (res) => {

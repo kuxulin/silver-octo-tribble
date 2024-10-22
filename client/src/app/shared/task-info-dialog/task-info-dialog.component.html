@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Task</h2>
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Textarea</mat-label>
+      <textarea matInput formControlName="text"></textarea>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        @for (status of showAvailableTaskStatuses(); track $index) {
+        <mat-option [value]="status">{{ status }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <fieldset [disabled]="!isManager">
+      <app-select-list
+        [userRole]="employee"
+        [initialUsers]="!!data?.user ? [data!.user] : []"
+        [single]="true"
+        [enabledUsers]="data?.employees || []"
+        [isManager]="isManager"
+        (selectedUsersOutput)="onUserChanged($event[0])"
+      ></app-select-list>
+    </fieldset>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onClose(false)">Cancel</button>
+  <button
+    mat-button
+    [disabled]="!isSomethingChanged() || !isEverythingOk()"
+    (click)="onClose(true)"
+  >
+    Submit
+  </button>
+</mat-dialog-actions>

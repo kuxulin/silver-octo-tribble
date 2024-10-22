@@ -1,0 +1,27 @@
+<mat-form-field appearance="outline">
+  <mat-label>{{ labelText }}</mat-label>
+  <input matInput [(ngModel)]="partialUserName" (ngModelChange)="getUsers()" />
+  @if(partialUserName){
+  <button matSuffix mat-icon-button (click)="clearSelectionSearch()">
+    <mat-icon>close</mat-icon>
+  </button>
+  }
+</mat-form-field>
+<mat-selection-list
+  [ngModel]="selectedUsers"
+  (ngModelChange)="addUserToSelection($event)"
+>
+  @for(user of users$ | async; track user){
+  <mat-list-option [value]="user">{{ user.userName }}</mat-list-option>
+  }
+</mat-selection-list>
+<mat-chip-set>
+  @for(selectedUser of selectedUsers; track selectedUser ) {
+  <mat-chip-row (removed)="removeUserFromSelection(selectedUser)">
+    {{ selectedUser.userName }}
+    <button matChipRemove>
+      <mat-icon>cancel</mat-icon>
+    </button>
+  </mat-chip-row>
+  }
+</mat-chip-set>

@@ -1,5 +1,18 @@
 <div class="register">
   <div class="dialog-box">
+    <img
+      mat-card-image
+      [src]="'data:image/jpeg;base64,' + dto.image.content"
+      alt="Provide image"
+      (click)="onImageClick()"
+    />
+    <input
+      type="file"
+      #fileInput
+      accept="image/*"
+      style="display: none"
+      (change)="onFileSelected($event)"
+    />
     <mat-form-field>
       <mat-label>UserName</mat-label>
       <input matInput [(ngModel)]="dto.userName" required />

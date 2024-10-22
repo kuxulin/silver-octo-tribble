@@ -1,0 +1,14 @@
+<div class="container">
+  <mat-dialog-content
+    ><app-select-list
+      [initialUsers]="data.initialUsers"
+      [userRole]="data.userRole"
+      [isManager]="true"
+      (selectedUsersOutput)="onOutputUpdate($event)"
+    />
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-flat-button (click)="onClose(true)">Submit</button>
+    <button mat-flat-button (click)="onClose(false)">Cancel</button>
+  </mat-dialog-actions>
+</div>

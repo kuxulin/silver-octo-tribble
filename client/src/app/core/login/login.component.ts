@@ -25,12 +25,9 @@ import LoginRegisterDTO from '../../shared/models/DTOs/LoginRegisterDTO';
 })
 export class LoginComponent {
   hidePassword = signal(true);
-  dto: LoginRegisterDTO = {
+  dto = {
     userName: '',
     password: '',
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
   };
 
   onPasswordVisibilityChanged($event: MouseEvent) {

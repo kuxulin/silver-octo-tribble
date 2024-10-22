@@ -1,0 +1,20 @@
+.tab {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  row-gap: 8px;
+  .members-cards {
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: space-around;
+    .mat-mdc-list-item-title {
+      margin: 0;
+    }
+  }
+  .mat-mdc-list {
+    border: solid darkgray;
+  }
+}

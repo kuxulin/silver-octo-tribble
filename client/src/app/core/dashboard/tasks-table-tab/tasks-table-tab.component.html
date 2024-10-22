@@ -1,0 +1,44 @@
+<div class="tab">
+  <h2 (mouseover)="showButton = true" (mouseout)="showButton = false">
+    Tasks
+    <button
+      mat-icon-button
+      matTextSuffix
+      (click)="onTaskCreated.emit()"
+      [hidden]="!showButton || !isManager"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </h2>
+  <table class="tasks-table" mat-table [dataSource]="todoTasks">
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef>Title</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.title }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="employee">
+      <th mat-header-cell *matHeaderCellDef>Employee</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.employee?.user.userName || "" }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let element">
+        {{ getValueFromTaskStatusCode(element.status) }}
+      </td>
+    </ng-container>
+    <tr
+      mat-header-row
+      *matHeaderRowDef="['title', 'employee', 'status']; sticky: true"
+    ></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: ['title', 'employee', 'status']; let cell"
+      (click)="onTaskOpened.emit(row)"
+      style="cursor: pointer"
+    ></tr>
+  </table>
+</div>

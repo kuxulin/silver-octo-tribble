@@ -1,8 +1,6 @@
 <div class="profile">
   <div class="dialog-box">
-    @if (userAuth$ | async; as userAuth) { @if(user.isBlocked){
-    <span>Your account is blocked. Please, contact administrator</span>
-    } @else {
+    @if (userAuth$ | async; as userAuth) { @if(!userAuth.isBlocked){
     <mat-card>
       <img
         mat-card-image
@@ -65,13 +63,17 @@
       <mat-card-actions>
         <button
           mat-flat-button
-          [disabled]="form.invalid"
+          [disabled]="!areActionsAllowed()"
           (click)="updateUser()"
         >
           Submit
         </button>
       </mat-card-actions>
     </mat-card>
+    } @else {
+    <span
+      >It seems your account is blocked. Please, contact administrator.</span
+    >
     } }
   </div>
 </div>

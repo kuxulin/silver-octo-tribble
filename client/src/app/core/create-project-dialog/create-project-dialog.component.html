@@ -1,0 +1,42 @@
+<div class="container">
+  <h2 mat-dialog-title>Creating project</h2>
+  <mat-dialog-content class="content">
+    <form [formGroup]="form">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description"></textarea>
+      </mat-form-field>
+    </form>
+
+    @if(creator$ | async; as creator){
+    <app-select-list
+      [userRole]="managerCode"
+      [constantUsers]="[creator]"
+      (selectedUsersOutput)="changeManagers($event)"
+    />
+    }
+
+    <app-select-list
+      [userRole]="employeeCode"
+      (selectedUsersOutput)="changeEmployees($event)"
+    />
+
+    @if(errorText){
+    <mat-error>{{ errorText }}</mat-error>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button
+      mat-flat-button
+      (click)="createProject()"
+      [disabled]="isAnyFieldEmpty()"
+    >
+      Submit
+    </button>
+    <button mat-flat-button (click)="onClose(false)">Cancel</button>
+  </mat-dialog-actions>
+</div>

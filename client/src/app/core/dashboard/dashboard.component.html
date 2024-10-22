@@ -1,1 +1,62 @@
-<p>dashboard works!</p>
+<div class="dashboard container">
+  @if(currentUser$ | async; as userAuth){
+  <div class="instruments">
+    @if(projects$ | async; as projects) {
+    <mat-form-field appearance="outline">
+      <mat-label>Projects</mat-label>
+      <mat-select>
+        <mat-select-trigger> Projects </mat-select-trigger>
+        @for(project of projects; track project) {
+        <mat-option
+          [value]="project"
+          (onSelectionChange)="changeCurrentProject($event)"
+          >{{ project.name }}</mat-option
+        >
+        }
+      </mat-select>
+    </mat-form-field>
+    } @if (isManager) {
+    <button mat-fab (click)="triggerCreateProjectDialog(currentUserId)">
+      <mat-icon>add</mat-icon>
+    </button>
+    }
+  </div>
+
+  <mat-tab-group>
+    @if(currentProject$ | async; as currentProject){
+    <mat-tab label="Details">
+      <div class="tab">
+        <dashboard-project-details-tab
+          [currentProject]="currentProject"
+          [isManager]="isManager"
+          (projectChanged)="fetchCurrentProject()"
+        />
+      </div>
+    </mat-tab>
+    <mat-tab label="Tasks">
+      <dashboard-tasks-table-tab
+        [isManager]="isManager"
+        [todoTasks]="(todoTasks$ | async) || []"
+        (onTaskOpened)="
+          triggerOpenTaskInfoDialog($event, currentProject.employees)
+        "
+        (onTaskCreated)="triggerCreateTaskDialog()"
+      />
+    </mat-tab>
+    <mat-tab label="Dashboard">
+      <dashboard-tasks-board-tab
+        [isManager]="isManager"
+        [todo]="(todo$ | async) || []"
+        [inProgress]="(inProgress$ | async) || []"
+        [onReview]="(onReview$ | async) || []"
+        [completed]="(completed$ | async) || []"
+        (onTaskChanged)="fetchTasks()"
+        (onTaskOpened)="
+          triggerOpenTaskInfoDialog($event, currentProject.employees)
+        "
+      />
+    </mat-tab>
+    }
+  </mat-tab-group>
+  }
+</div>

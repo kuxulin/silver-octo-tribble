@@ -1,0 +1,24 @@
+<div class="task-groups">
+  @for(status of taskStatuses; track $index) { @if(status !== 4 || isManager) {
+  <div class="task-group">
+    <h3>{{ getValueFromTaskStatusCode(status) }}</h3>
+    <div
+      cdkDropList
+      [cdkDropListConnectedTo]="['1', '2', '3', '4']"
+      [cdkDropListData]="getAppropriateTaskGroup(status)"
+      class="task-list"
+      [ngClass]="getValueFromTaskStatusCode(status).toLocaleLowerCase()"
+      [id]="status.toString()"
+      (cdkDropListDropped)="dropTaskToNewStatus($event, status)"
+    >
+      @for(task of getAppropriateTaskGroup(status); track $index) {
+      <div cdkDrag class="task-item" (click)="onTaskOpened.emit(task)">
+        <mat-card>
+          <mat-card-content>{{ task.title }}</mat-card-content>
+        </mat-card>
+      </div>
+      }
+    </div>
+  </div>
+  } }
+</div>

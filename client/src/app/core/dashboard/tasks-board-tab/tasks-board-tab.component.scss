@@ -1,0 +1,39 @@
+.task-groups {
+  display: flex;
+  justify-content: space-around;
+
+  .task-group {
+    flex: 1;
+    margin: 10px;
+    .task-list-container {
+      height: 80%;
+    }
+    .task-list {
+      min-height: 200px;
+      border-radius: 20px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 4px;
+      .task-item {
+        width: 40%;
+        cursor: pointer;
+      }
+    }
+    .task-list.todo {
+      background-color: cyan;
+    }
+
+    .task-list.inprogress {
+      background-color: goldenrod;
+    }
+
+    .task-list.onreview {
+      background-color: blue;
+    }
+
+    .task-list.completed {
+      background-color: green;
+    }
+  }
+}

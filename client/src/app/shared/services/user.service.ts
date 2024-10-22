@@ -38,7 +38,7 @@ export class UserService {
       );
   }
 
-  private createHttpParams(options: UserQueryOptions): HttpParams {
+  private createHttpParams(options: Partial<UserQueryOptions>): HttpParams {
     let params = new HttpParams();
 
     if (options.pageIndex !== undefined)
@@ -75,6 +75,19 @@ export class UserService {
       params = params.set('endDate', options.endDate.toISOString());
 
     return params;
+  }
+
+  getUsersInRoleWithName(role: AvailableUserRole, partialName: string) {
+    let params = this.createHttpParams({
+      filterRoles: [role],
+      partialUserName: partialName,
+    });
+
+    return this._httpClient
+      .get<PagedResult<User>>(this._apiUrl, {
+        params: params,
+      })
+      .pipe(map((res) => res.items));
   }
 
   deleteUsers(ids: number[]) {

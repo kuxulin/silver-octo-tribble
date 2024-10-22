@@ -48,7 +48,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   user$!: Observable<User>;
   user!: User;
   private _destroy$ = new Subject<boolean>();
-
+  isTheSameUserMarker = false;
   form = new FormGroup({
     userName: new FormControl('', Validators.minLength(3)),
     firstName: new FormControl('', Validators.minLength(3)),
@@ -86,11 +86,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   isUserTheSame(authenticatedUserId: number, viewedUserId: number) {
-    return authenticatedUserId === viewedUserId;
+    this.isTheSameUserMarker = authenticatedUserId === viewedUserId;
+    return this.isTheSameUserMarker;
   }
 
   onImageClick() {
-    this.fileInput.nativeElement.click();
+    if (this.isTheSameUserMarker) this.fileInput.nativeElement.click();
   }
 
   onFileSelected(event: Event) {
@@ -113,7 +114,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   updateUser() {
-    if (this.form.invalid) return;
+    if (this.form.invalid || !this.isTheSameUserMarker) return;
 
     this._userService
       .updateUser({
@@ -122,6 +123,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         imageDto: this.user.image,
       })
       .subscribe((res) => (this.user = res));
+  }
+
+  areActionsAllowed() {
+    return this.isTheSameUserMarker && !this.form.invalid;
   }
 
   ngOnDestroy(): void {
