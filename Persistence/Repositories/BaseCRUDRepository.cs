@@ -38,26 +38,37 @@ public abstract class BaseCRUDRepository<TEntity, TContext>
         return _context.Set<TEntity>();
     }
 
-    public async virtual Task<TEntity> AddAsync(TEntity dto)
+    public async virtual Task<TEntity> AddAsync(TEntity entity, bool isSaved = true)
     {
-        var entity = _mapper.Map<TEntity>(dto);
         _context.Set<TEntity>().Add(entity);
-        await _context.SaveChangesAsync();
+
+        if (isSaved)
+            await _context.SaveChangesAsync();
+
         return entity;
     }
 
-    public async virtual Task<TEntity> UpdateAsync(TEntity dto)
+    public async virtual Task<TEntity> UpdateAsync(TEntity entity, bool isSaved = true)
     {
-        var entity = _mapper.Map<TEntity>(dto);
         _context.Set<TEntity>().Update(entity);
-        await _context.SaveChangesAsync();
+
+        if (isSaved)
+            await _context.SaveChangesAsync();
+
         return entity;
     }
 
-    public async virtual Task DeleteAsync(Guid id)
+    public async virtual Task DeleteAsync(Guid id, bool isSaved = true)
     {
         var entity = await GetAll().FirstAsync(e => e.Id == id);
         _context.Set<TEntity>().Remove(entity);
+
+        if (isSaved)
+            await _context.SaveChangesAsync();
+    }
+
+    public async Task SaveChangesAsync()
+    {
         await _context.SaveChangesAsync();
     }
 }
