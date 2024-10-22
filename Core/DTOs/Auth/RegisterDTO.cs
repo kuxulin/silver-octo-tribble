@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.DTOs.ApplicationImage;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.DTOs.Auth;
 
@@ -10,5 +11,6 @@ public class RegisterDTO
     public string Password { get; set; }
     [RegularExpression(@"^\+\d{8,15}$", ErrorMessage = "Entered phone format is not valid.")]
     public string? PhoneNumber { get; set; }
+    public ApplicationImageCreateDTO Image { get; set; }
 }
 

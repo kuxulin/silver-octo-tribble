@@ -92,14 +92,8 @@ public class UserController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDTO userUpdateDTO)
     {
-        var authHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-        var accessToken = authHeader.Substring("Bearer ".Length).Trim();
-        var username = _tokenService.GetNameFromToken(accessToken);
-
-        if (username != userUpdateDTO.UserName)
-            return StatusCode(405);
-
-
+        var authHeader = HttpContext.Request.Headers.Authorization.FirstOrDefault();
+        userUpdateDTO.AccessToken = authHeader["Bearer ".Length..].Trim();
         var result = await _userService.UpdateUserAsync(userUpdateDTO);
 
         if (!result.IsSuccess)

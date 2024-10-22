@@ -1,5 +1,4 @@
 ﻿using Core.Entities;
-using Core.Enums;
 
 namespace Core.Interfaces.Repositories;
 public interface IUserRepository

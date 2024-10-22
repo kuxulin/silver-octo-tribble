@@ -14,4 +14,6 @@ public class UserReadDTO
     public DateTime CreationDate { get; set; }
     public bool IsBlocked { get; set; }
     public ApplicationImageReadDTO Image { get; set; }
+    public Guid? ManagerId { get; set; }
+    public Guid? EmployeeId { get; set; }
 }
