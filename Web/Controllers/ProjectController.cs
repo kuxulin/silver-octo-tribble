@@ -10,7 +10,7 @@ using Core.Interfaces.Services;
 namespace Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = DefinedPolicy.DefaultPolicy)]
 public class ProjectController : ControllerBase
 {
     private readonly IProjectService _service;

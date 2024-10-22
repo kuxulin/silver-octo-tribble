@@ -27,7 +27,11 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddAuthorization(options => options.AddPolicy(Policies.AdminPolicy, policy => policy.RequireRole(AvailableUserRole.Admin.ToString())));
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(DefinedPolicy.AdminPolicy, policy => policy.RequireRole(AvailableUserRole.Admin.ToString()));
+    options.AddPolicy(DefinedPolicy.DefaultPolicy, policy => policy.RequireClaim(DefinedClaim.IsBlocked,false.ToString()));
+});
 
 builder.Services.AddControllers();
 

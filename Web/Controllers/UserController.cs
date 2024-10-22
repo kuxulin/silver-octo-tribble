@@ -10,7 +10,7 @@ namespace Web.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = DefinedPolicy.DefaultPolicy)]
 
 public class UserController : ControllerBase
 {
@@ -24,8 +24,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = Policies.AdminPolicy)]
-
     public async Task<IActionResult> GetUsers([FromQuery] UserQueryOptions options)
     {
         var result = await _userService.GetUsersAsync(options);
@@ -33,7 +31,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete]
-    [Authorize(Policy = Policies.AdminPolicy)]
+    [Authorize(Policy = DefinedPolicy.AdminPolicy)]
 
     public async Task<IActionResult> DeleteUser([FromBody] IEnumerable<int> ids)
     {
@@ -46,7 +44,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch]
-    [Authorize(Policy = Policies.AdminPolicy)]
+    [Authorize(Policy = DefinedPolicy.AdminPolicy)]
 
     public async Task<IActionResult> ChangeUsersStatus([FromBody] IEnumerable<int> ids, bool isBlocked)
     {
@@ -59,7 +57,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("{id}/roles")]
-    [Authorize(Policy = Policies.AdminPolicy)]
+    [Authorize(Policy = DefinedPolicy.AdminPolicy)]
 
     public async Task<IActionResult> ChangeUserRoles(int id, IEnumerable<AvailableUserRole> newUserRoles)
     {
@@ -72,7 +70,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("metrics")]
-    [Authorize(Policy = Policies.AdminPolicy)]
+    [Authorize(Policy = DefinedPolicy.AdminPolicy)]
 
     public async Task<IActionResult> GetUsersMetrics()
     {

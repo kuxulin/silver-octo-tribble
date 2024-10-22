@@ -11,7 +11,7 @@ using Persistence.Repositories;
 namespace Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = DefinedPolicy.DefaultPolicy)]
 public class ManagerController : ControllerBase
 {
     private readonly IManagerService _service;

@@ -11,7 +11,7 @@ using Persistence.Repositories;
 namespace Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = DefinedPolicy.DefaultPolicy)]
 public class TodoTaskController : ControllerBase
 {
     private readonly ITodoTaskService _service;
