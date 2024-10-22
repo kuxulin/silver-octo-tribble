@@ -1,63 +1,114 @@
-﻿using Core.DTOs.TodoTask;
+﻿using AutoMapper;
+using Core.Constants;
+using Core.DTOs.TodoTask;
+using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Core.ResultPattern;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Application.Services;
 internal class TodoTaskService : ITodoTaskService
 {
-    private readonly ITodoTaskRepository _repository;
+    private readonly ITodoTaskRepository _todoTaskRepository;
+    private readonly IMapper _mapper;
+    private readonly IEmployeeRepository _employeeRepository;
+    private readonly IProjectRepository _projectRepository;
 
-    public TodoTaskService(ITodoTaskRepository repository)
+    public TodoTaskService(ITodoTaskRepository todoTaskRepository, IEmployeeRepository employeeRepository, IProjectRepository projectRepository, IMapper mapper)
     {
-        _repository = repository;
+        _todoTaskRepository = todoTaskRepository;
+        _mapper = mapper;
+        _employeeRepository = employeeRepository;
+        _projectRepository = projectRepository;
     }
 
-    public async Task<IEnumerable<TodoTaskReadDTO>> GetAllAsync()
+    public async Task<Result<IEnumerable<TodoTaskReadDTO>>> GetAllAsync()
     {
-        return await _repository.GetAllAsync();
+        var tasks = await _todoTaskRepository.GetAll().ToListAsync();
+        return _mapper.Map<List<TodoTaskReadDTO>>(tasks);
     }
 
-    public async Task<TodoTaskReadDTO> GetByIdAsync(Guid id)
+    public async Task<Result<TodoTaskReadDTO>> GetByIdAsync(Guid id)
     {
-        var todoTasks = await GetAllAsync();
-        return todoTasks.FirstOrDefault(t => t.Id == id);
+        var task = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Id == id);
+        return _mapper.Map<TodoTaskReadDTO>(task);
     }
 
-    public async Task<TodoTaskReadDTO> GetByTitleAsync(string title)
+    public async Task<Result<IEnumerable<TodoTaskReadDTO>>> GetByProjectIdAsync(Guid projectId)
     {
-        var todoTasks = await GetAllAsync();
-        return todoTasks.FirstOrDefault(t => t.Title == title);
+        var tasks = await _todoTaskRepository.GetAll().Where(t => t.ProjectId == projectId).ToListAsync();
+        return _mapper.Map<List<TodoTaskReadDTO>>(tasks);
     }
 
-    public async Task<Guid> CreateTodoTaskAsync(TodoTaskCreateDTO dto)
+    public async Task<Result<Guid>> CreateTodoTaskAsync(TodoTaskCreateDTO dto)
     {
-        var duplicate = await GetByTitleAsync(dto.Title);
+        var duplicate = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Title == dto.Title);
 
         if (duplicate?.ProjectId == dto.ProjectId)
-            throw new Exception("There is already such tusk in the project.");
+            return DefinedError.DuplicateEntity;
 
-        var result = await _repository.AddAsync(dto);
-        return result;
+        var employee = await _employeeRepository.GetAll().FirstOrDefaultAsync(e => e.Id == dto.EmployeeId);
+        var project = await _projectRepository.GetAll().FirstOrDefaultAsync(e => e.Id == dto.ProjectId);
+
+        if(employee is null || project is null)
+            return DefinedError.AbsentElement;
+
+        var task = _mapper.Map<TodoTask>(dto);
+        task.Employee = employee;
+        task.Project = project;
+        var result = await _todoTaskRepository.AddAsync(task);
+        return result.Id;
     }
 
-    public async Task<Guid> UpdateTodoTaskAsync(TodoTaskUpdateDTO dto)
+    public async Task<Result<Guid>> UpdateTodoTaskAsync(TodoTaskUpdateDTO dto)
     {
-        var task = await GetByIdAsync(dto.Id);
+        var task = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Id == dto.Id);
 
         if (task is null)
-            throw new Exception("There is no such tusk in database.");
+            return DefinedError.AbsentElement;
 
-        var result = await _repository.UpdateAsync(dto);
-        return result;
+        if(dto.EmployeeId is not null)
+        {
+            var employee = await _employeeRepository.GetAll().FirstOrDefaultAsync(e => e.Id == dto.EmployeeId);
+            
+            if(employee is null)
+                return DefinedError.AbsentElement;
+
+            task.Employee = employee;
+        }
+        else 
+            task.Employee = null;
+
+        if (dto.Status is not null)
+        {
+            if (!Enum.IsDefined(typeof(AvailableTaskStatus), dto.Status))
+                return DefinedError.InvalidElement;
+            
+            var status = new TodoTaskStatus() { Id = ((int)dto.Status.Value) };
+            task.Status = status;
+        }
+
+        if (dto.Title is not null)
+            task.Title = dto.Title;
+
+        if (dto.Text is not null)
+            task.Text = dto.Text;
+
+        var result = await _todoTaskRepository.UpdateAsync(task);
+        return result.Id;
     }
 
-    public async Task DeleteTodoTaskAsync(Guid id)
+    public async Task<Result<bool>> DeleteTodoTaskAsync(Guid id)
     {
-        var task = await GetByIdAsync(id);
+        var task = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Id == id);
 
         if (task is null)
-            throw new Exception("There is no such tusk in database.");
+            return DefinedError.AbsentElement;
 
-        await _repository.DeleteAsync(id);
+        await _todoTaskRepository.DeleteAsync(id);
+        return true;
     }
 }

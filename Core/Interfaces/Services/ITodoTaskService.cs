@@ -1,12 +1,13 @@
 ﻿using Core.DTOs.TodoTask;
+using Core.ResultPattern;
 
 namespace Core.Interfaces.Services;
 public interface ITodoTaskService
 {
-    Task<IEnumerable<TodoTaskReadDTO>> GetAllAsync();
-    Task<TodoTaskReadDTO> GetByIdAsync(Guid id);
-    Task<TodoTaskReadDTO> GetByTitleAsync(string title);
-    Task<Guid> CreateTodoTaskAsync(TodoTaskCreateDTO dto);
-    Task<Guid> UpdateTodoTaskAsync(TodoTaskUpdateDTO dto);
-    Task DeleteTodoTaskAsync(Guid id);
+    Task<Result<IEnumerable<TodoTaskReadDTO>>> GetAllAsync();
+    Task<Result<TodoTaskReadDTO>> GetByIdAsync(Guid id);
+    Task<Result<IEnumerable<TodoTaskReadDTO>>> GetByProjectIdAsync(Guid projectId);
+    Task<Result<Guid>> CreateTodoTaskAsync(TodoTaskCreateDTO dto);
+    Task<Result<Guid>> UpdateTodoTaskAsync(TodoTaskUpdateDTO dto);
+    Task<Result<bool>> DeleteTodoTaskAsync(Guid id);
 }

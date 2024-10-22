@@ -6,24 +6,35 @@ using Microsoft.EntityFrameworkCore;
 using Persistence.Data.Contexts;
 
 namespace Persistence.Repositories;
-internal class TodoTaskRepository : BaseCRUDRepository<TodoTask, TodoTaskReadDTO, TodoTaskCreateDTO, TodoTaskUpdateDTO, DatabaseContext>, ITodoTaskRepository
+internal class TodoTaskRepository : BaseCRUDRepository<TodoTask, DatabaseContext>, ITodoTaskRepository
 {
     public TodoTaskRepository(DatabaseContext context, IMapper mapper) : base(context, mapper)
     {
 
     }
 
-    protected new IQueryable<TodoTask> GetAll()
+    public override IQueryable<TodoTask> GetAll()
     {
-        return base.GetAll().Include(t=> t.Project);
+        return base.GetAll()
+            .Include(t => t.Employee)
+            .ThenInclude(e => e.User);
     }
 
-    public async new Task<Guid> UpdateAsync(TodoTaskUpdateDTO dto)
+    public override async Task<TodoTask> AddAsync(TodoTask entity, bool isSaved = true)
     {
-        var todoTask = await GetAll().Where(t => t.Id == dto.Id).FirstAsync();
-        todoTask.Title = dto.Title;
-        todoTask.Text = dto.Text;
-        await _context.SaveChangesAsync();
-        return todoTask.Id;
+        _context.Attach(entity.Project);
+
+        if (entity.Employee is not null)
+            _context.Attach(entity.Employee);
+
+        return await base.AddAsync(entity, isSaved);
+    }
+
+    public override async Task<TodoTask> UpdateAsync(TodoTask entity, bool isSaved = true)
+    {
+        if (entity.Status is not null)
+            _context.Attach(entity.Status);
+        
+        return await base.UpdateAsync(entity, isSaved);
     }
 }

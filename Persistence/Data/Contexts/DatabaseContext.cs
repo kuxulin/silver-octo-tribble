@@ -26,6 +26,7 @@ public class DatabaseContext : IdentityDbContext
     public DbSet<Manager> Managers { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<ApplicationImage> Images { get; set; }
+    public DbSet<TodoTaskStatus> TaskStatuses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

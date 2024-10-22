@@ -9,4 +9,8 @@ public class TodoTask : BaseEntity
     public Guid ProjectId { get; set; }
 
     public Project Project { get; set; }
+    public int StatusId { get; set; }
+    public TodoTaskStatus Status { get; set; }
+    public Guid? EmployeeId { get; set; }
+    public Employee? Employee { get; set; }
 }

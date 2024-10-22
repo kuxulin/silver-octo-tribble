@@ -1,12 +1,9 @@
-﻿using Core.DTOs.TodoTask;
-using Core.Entities;
-using Core.Interfaces.Repositories;
+﻿using Core.Constants;
+using Core.DTOs.TodoTask;
 using Core.Interfaces.Services;
+using Core.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Persistence.Data.Contexts;
-using Persistence.Repositories;
 
 namespace Web.Controllers;
 [Route("api/[controller]")]
@@ -22,30 +19,53 @@ public class TodoTaskController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProjects()
+    public async Task<IActionResult> GetTasks()
     {
-        var todoTasks= await _service.GetAllAsync();
-        return Ok(todoTasks);
+        var result = await _service.GetAllAsync();
+        return Ok(result.Value);
+    }
+
+    [HttpGet("project/{projectId}")]
+    public async Task<IActionResult> GetTasksByProjectId(Guid projectId)
+    {
+        var result = await _service.GetByProjectIdAsync(projectId);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProject(TodoTaskCreateDTO dto)
+    public async Task<IActionResult> CreateTask(TodoTaskCreateDTO dto)
     {
         var result = await _service.CreateTodoTaskAsync(dto);
-        return Ok(result);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateProject(TodoTaskUpdateDTO dto)
+    public async Task<IActionResult> UpdateTask(TodoTaskUpdateDTO dto)
     {
         var result = await _service.UpdateTodoTaskAsync(dto);
-        return Ok(result);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteProject(Guid id)
+    public async Task<IActionResult> DeleteTask(Guid id)
     {
-        await _service.DeleteTodoTaskAsync(id);
+        var result = await _service.DeleteTodoTaskAsync(id);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
         return Ok();
     }
 }

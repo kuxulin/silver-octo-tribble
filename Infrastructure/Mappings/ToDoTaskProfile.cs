@@ -2,6 +2,7 @@
 using Core.DTOs.Manager;
 using Core.DTOs.TodoTask;
 using Core.Entities;
+using Core.Enums;
 
 namespace Infrastructure.Mappings
 {
@@ -9,9 +10,12 @@ namespace Infrastructure.Mappings
     {
         public ToDoTaskProfile()
         {
-            CreateMap<TodoTaskCreateDTO, TodoTask>();
+            CreateMap<TodoTaskCreateDTO, TodoTask>()
+                .ForMember(t => t.StatusId,options => options.MapFrom(dto => AvailableTaskStatus.Todo));
+
             CreateMap<TodoTaskUpdateDTO, TodoTask>();
-            CreateMap<TodoTask, TodoTaskReadDTO>();
+            CreateMap<TodoTask, TodoTaskReadDTO>()
+                .ForMember(dto => dto.Status, options => options.MapFrom(t => t.StatusId));
         }
     }
 }
