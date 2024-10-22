@@ -131,8 +131,8 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
       });
   }
 
-  navigateToUser(user: User) {
-    this._router.navigate(['user/', user.id]);
+  navigateToUser(userId: number) {
+    this._router.navigate(['user/', userId]);
   }
 
   isAllSelected() {

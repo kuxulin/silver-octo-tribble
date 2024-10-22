@@ -2,25 +2,25 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, shareReplay, take, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import AuthDTO from '../models/DTOs/AuthDTO';
 import { SESSION_STORAGE } from '../../consts';
 import LoginRegisterDTO from '../models/DTOs/LoginRegisterDTO';
-import UserAuthDTO from '../models/DTOs/UserAuthDTO';
 import AvailableUserRole from '../models/enums/AvailableUserRole';
+import { Router } from '@angular/router';
+import UserAuthDTO from '../models/DTOs/UserAuthDTO';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private _apiUrl = environment.api + '/auth';
-  private _subject = new ReplaySubject<Object>();
+  private _subject = new ReplaySubject<Object>(1);
   user$ = this._subject.asObservable() as Observable<UserAuthDTO>;
 
-  constructor(private _httpClient: HttpClient) {}
+  constructor(private _httpClient: HttpClient, private _router: Router) {}
 
   login(userName: string, password: string) {
     return this._httpClient
-      .post<AuthDTO>(
+      .post<UserAuthDTO>(
         this._apiUrl + '/login',
         {
           userName,
@@ -36,18 +36,22 @@ export class AuthService {
 
   register(dto: LoginRegisterDTO) {
     return this._httpClient
-      .post<AuthDTO>(this._apiUrl + '/register', {
-        ...dto,
-      })
+      .post<UserAuthDTO>(
+        this._apiUrl + '/register',
+        {
+          ...dto,
+        },
+        { withCredentials: true }
+      )
       .pipe(
         tap((res) => this.setSession(res)),
         shareReplay()
       );
   }
 
-  private setSession(result: AuthDTO) {
+  private setSession(result: UserAuthDTO) {
     sessionStorage.setItem(SESSION_STORAGE.TOKEN, result.token);
-    let user: UserAuthDTO = {
+    let user: Partial<UserAuthDTO> = {
       userName: result.userName,
       roles: result.roles,
       id: result.id,
@@ -57,7 +61,7 @@ export class AuthService {
 
   refreshTokens() {
     return this._httpClient
-      .get<AuthDTO>(this._apiUrl + '/refresh', { withCredentials: true })
+      .get<UserAuthDTO>(this._apiUrl + '/refresh', { withCredentials: true })
       .pipe(
         take(1),
         tap((res) => this.setSession(res)),
@@ -93,7 +97,10 @@ export class AuthService {
       .delete(this._apiUrl + '/logout', { withCredentials: true })
       .pipe(
         take(1),
-        tap(() => this._subject.next(0))
+        tap(() => {
+          this._subject.next(0);
+          this._router.navigate(['login']);
+        })
       );
   }
 }

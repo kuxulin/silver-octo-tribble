@@ -11,4 +11,6 @@ export default interface User {
   creationDate: Date;
   isBlocked: boolean;
   image: Image;
+  managerId: string | undefined;
+  employeeId: string | undefined;
 }
