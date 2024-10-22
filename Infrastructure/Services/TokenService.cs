@@ -24,13 +24,14 @@ internal class TokenService : ITokenService
     {
         var authClaims = new List<Claim>
         {
-            new Claim("Id",user.Id.ToString()),
-            new Claim("Name", user.UserName),
+            new Claim(DefinedClaim.Id,user.Id.ToString()),
+            new Claim(DefinedClaim.Name, user.UserName),
+            new Claim(DefinedClaim.IsBlocked, user.IsBlocked.ToString())
         };
 
         foreach (var userRole in userRoles)
         {
-            authClaims.Add(new Claim("Role", userRole));
+            authClaims.Add(new Claim(DefinedClaim.Role, userRole));
         }
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.Key));
@@ -38,7 +39,7 @@ internal class TokenService : ITokenService
         var token = new JwtSecurityToken(
             issuer: _configuration.Issuer,
             audience: _configuration.Audience,
-            expires: DateTime.UtcNow.AddMinutes(5),
+            expires: DateTime.UtcNow.AddMinutes(10),
             claims: authClaims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         );
@@ -50,7 +51,7 @@ internal class TokenService : ITokenService
     {
         var authClaims = new List<Claim>
         {
-            new Claim("Name", username),
+            new Claim(DefinedClaim.Name, username),
         };
 
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.Key));
@@ -83,7 +84,6 @@ internal class TokenService : ITokenService
         }
         catch
         { 
-            //logger.log?
             return false; 
         }
 

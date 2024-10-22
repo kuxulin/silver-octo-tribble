@@ -40,8 +40,8 @@ public static class DependencyInjection
                     ValidIssuer = configuration.Issuer,
                     ValidAudience = configuration.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Key)), //TODO create asymetric secret
-                    NameClaimType = "Name",
-                    RoleClaimType = "Role",
+                    NameClaimType = DefinedClaim.Name,
+                    RoleClaimType = DefinedClaim.Role,
                 };
             });
     }
