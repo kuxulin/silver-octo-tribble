@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Persistence.Data.Contexts;
-using Persistence.Repositories;
-using Core.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Core.Interfaces.Repositories;
+﻿using Core.Constants;
 using Core.DTOs.Project;
 using Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
 [Route("api/[controller]")]
@@ -23,28 +20,73 @@ public class ProjectController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetProjects()
     {
-        var projects = await _service.GetAllAsync();
-        return Ok(projects);
+        var result = await _service.GetAllAsync();
+        return Ok(result.Value);
+    }
+
+    [HttpGet("manager/{managerId}")]
+    public async Task<IActionResult> GetProjectsByManagerId(int managerId)
+    {
+        var result = await _service.GetProjectsByManagerIdAsync(managerId);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("employee/{employeeId}")]
+    public async Task<IActionResult> GetProjectsByEmployeeId(int employeeId)
+    {
+        var result = await _service.GetProjectsByEmployeeIdAsync(employeeId);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProjectById(Guid id)
+    {
+        var result = await _service.GetByIdAsync(id);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateProject(ProjectCreateDTO dto)
     {
         var result = await _service.CreateProjectAsync(dto);
-        return Ok(result);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateProject(ProjectUpdateDTO dto)
     {
         var result = await _service.UpdateProjectAsync(dto);
-        return Ok(result);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpDelete]
     public async Task<IActionResult> DeleteProject(Guid id)
     {
-        await _service.DeleteProjectAsync(id);
+        var result = await _service.DeleteProjectAsync(id);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
         return Ok();
     }
 }
