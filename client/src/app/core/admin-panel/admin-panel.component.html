@@ -135,46 +135,81 @@
       </ng-container>
       <ng-container matColumnDef="avatar">
         <th mat-header-cell *matHeaderCellDef>Photo</th>
-        <td mat-cell *matCellDef="let element">
+        <td
+          mat-cell
+          *matCellDef="let element"
+          (click)="navigateToUser(element.id)"
+        >
           <img
-            [src]="'data:image/jpeg;base64,' + element.image.content"
+            [src]="'data:image/jpeg;base64,' + element.image?.content || ''"
             [width]="40"
-            [alt]="element.image.name"
           />
         </td>
       </ng-container>
       <ng-container matColumnDef="userName">
         <th mat-header-cell mat-sort-header *matHeaderCellDef>UserName</th>
-        <td mat-cell *matCellDef="let element">{{ element.userName }}</td>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          (click)="navigateToUser(element.id)"
+        >
+          {{ element.userName }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="firstName">
         <th mat-header-cell mat-sort-header *matHeaderCellDef>First name</th>
-        <td mat-cell *matCellDef="let element">{{ element.firstName }}</td>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          (click)="navigateToUser(element.id)"
+        >
+          {{ element.firstName }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="lastName">
         <th mat-header-cell mat-sort-header *matHeaderCellDef>Last name</th>
-        <td mat-cell *matCellDef="let element">{{ element.lastName }}</td>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          (click)="navigateToUser(element.id)"
+        >
+          {{ element.lastName }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="phoneNumber">
         <th mat-header-cell *matHeaderCellDef>Phone number</th>
-        <td mat-cell *matCellDef="let element">{{ element.phoneNumber }}</td>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          (click)="navigateToUser(element.id)"
+        >
+          {{ element.phoneNumber }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell mat-sort-header *matHeaderCellDef>
           Registration date
         </th>
-        <td mat-cell *matCellDef="let element">
+        <td
+          mat-cell
+          *matCellDef="let element"
+          (click)="navigateToUser(element.id)"
+        >
           {{ element.creationDate | date : "d.MM.yyy, H:mm " }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="roles">
         <th mat-header-cell *matHeaderCellDef>Roles</th>
-        <td mat-cell *matCellDef="let element">
+        <td
+          mat-cell
+          *matCellDef="let element"
+          (click)="navigateToUser(element.id)"
+        >
           @for (roleName of showRoleNames(element.roles) ; track $index) {
           <div>{{ roleName }}</div>
           }
@@ -217,8 +252,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr
         mat-row
-        *matRowDef="let row; columns: displayedColumns"
-        (click)="navigateToUser(row)"
+        *matRowDef="let row; columns: displayedColumns; let cell"
       ></tr>
     </mat-table>
     <mat-paginator

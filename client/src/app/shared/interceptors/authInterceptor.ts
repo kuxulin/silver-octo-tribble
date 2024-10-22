@@ -4,9 +4,9 @@ import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
-import AuthDTO from '../models/DTOs/AuthDTO';
+import UserAuthDTO from '../models/DTOs/UserAuthDTO';
 
-let refreshingTokens: Observable<AuthDTO> | null = null;
+let refreshingTokens: Observable<UserAuthDTO> | null = null;
 
 export function authInterceptor(
   req: HttpRequest<unknown>,
