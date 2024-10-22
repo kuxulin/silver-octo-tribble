@@ -1,6 +1,8 @@
-﻿using Core.Constants;
+﻿using AutoMapper;
+using Core.Constants;
 using Core.DTOs.Auth;
 using Core.Entities;
+using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.ResultPattern;
 using Microsoft.AspNetCore.Identity;
@@ -11,11 +13,15 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
+    private readonly IImageRepository _imageRepository;
+    private readonly IMapper _mapper;
 
-    public AuthService(UserManager<User> userManager, ITokenService tokenService)
+    public AuthService(UserManager<User> userManager, ITokenService tokenService, IImageRepository imageRepository, IMapper mapper)
     {
         _userManager = userManager;
         _tokenService = tokenService;
+        _imageRepository = imageRepository;
+        _mapper = mapper;
     }
 
     public async Task<Result<TokenDTO>> Login(LoginDTO dto)
@@ -40,13 +46,7 @@ public class AuthService : IAuthService
         if (possibleUser is not null)
             return DefinedError.DuplicateEntity;
 
-        User user = new()
-        {
-            PhoneNumber = dto.PhoneNumber,
-            UserName = dto.UserName,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-        };
+        var user = _mapper.Map<User>(dto);
 
         IdentityResult result = await _userManager.CreateAsync(user, dto.Password);
         return await GenerateAccessTokenAsync(user);
@@ -102,7 +102,8 @@ public class AuthService : IAuthService
             Token = accessToken,
             UserName = user.UserName,
             Roles = roles.ToArray(),
-            Id = user.Id
+            Id = user.Id,
+            IsBlocked = user.IsBlocked,
         };
     }
 }
