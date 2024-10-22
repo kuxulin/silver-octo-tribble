@@ -1,62 +1,68 @@
-﻿using Core.DTOs.Manager;
+﻿using AutoMapper;
+using Core.Constants;
+using Core.DTOs.Manager;
+using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Core.ResultPattern;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 internal class ManagerService : IManagerService
 {
     private readonly IManagerRepository _repository;
+    private readonly IMapper _mapper;
 
-    public ManagerService(IManagerRepository repository)
+    public ManagerService(IManagerRepository repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
-    public async Task<Guid> CreateManagerAsync(ManagerCreateDTO dto)
+
+    public async Task<Result<IEnumerable<ManagerReadDTO>>> GetAllAsync()
     {
-        var duplicate = await GetByNameAsync(dto.FullName);
+        var managers = await _repository.GetAll().Include(m => m.User).ToListAsync();
+        return _mapper.Map<List<ManagerReadDTO>>(managers);
+    }
+
+    public async Task<Result<IEnumerable<ManagerReadDTO>>> GetManagersInProjectAsync(Guid projectId)
+    {
+        var managers = await _repository.GetAll().Include(m => m.User).Include(m => m.Projects).Where(m => m.Projects.Any(p => p.Id == projectId)).ToListAsync();
+        return _mapper.Map<List<ManagerReadDTO>>(managers);
+    }
+
+    public async Task<Result<Guid>> CreateManagerAsync(ManagerCreateDTO dto)
+    {
+        var duplicate = await _repository.GetAll().FirstOrDefaultAsync(m => m.UserId == dto.UserId);
 
         if (duplicate is not null)
-            throw new Exception("There is already such manager in the project.");
+            return DefinedError.DuplicateEntity;
 
-        var result = await _repository.AddAsync(dto);
-        return result;
+        var manager = _mapper.Map<Manager>(dto);
+        var result = await _repository.AddAsync(manager);
+        return result.Id;
     }
 
-    public async Task DeleteManagerAsync(Guid id)
+    public async Task<Result<bool>> DeleteManagerAsync(Guid id)
     {
-        var manager = await GetByIdAsync(id);
+        var manager = await _repository.GetAll().FirstOrDefaultAsync(m => m.Id == id);
 
         if (manager is null)
-            throw new Exception("There is no such manager in database.");
+            return DefinedError.AbsentElement;
 
         await _repository.DeleteAsync(id);
+        return true;
     }
 
-    public async Task<IEnumerable<ManagerReadDTO>> GetAllAsync()
+    public async Task<Result<Guid>> UpdateManagerAsync(ManagerUpdateDTO dto)
     {
-        return await _repository.GetAllAsync();
-    }
-
-    public async Task<ManagerReadDTO> GetByIdAsync(Guid id)
-    {
-        var managers = await GetAllAsync();
-        return managers.FirstOrDefault(m => m.Id == id);
-    }
-
-    public async Task<ManagerReadDTO> GetByNameAsync(string name)
-    {
-        var managers = await GetAllAsync();
-        return managers.FirstOrDefault(m => m.FullName == name);
-    }
-
-    public async Task<Guid> UpdateManagerAsync(ManagerUpdateDTO dto)
-    {
-        var manager = await GetByIdAsync(dto.Id);
+        var manager = await _repository.GetAll().FirstOrDefaultAsync(m => m.Id == dto.Id);
 
         if (manager is null)
-            throw new Exception("There is no such manager in database.");
+            return DefinedError.AbsentElement;
 
-        var result = await _repository.UpdateAsync(dto);
-        return result;
+        
+        var result = await _repository.UpdateAsync(manager);
+        return manager.Id;
     }
 }

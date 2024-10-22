@@ -1,12 +1,12 @@
 ﻿using Core.DTOs.Manager;
+using Core.ResultPattern;
 
 namespace Core.Interfaces.Services;
 public interface IManagerService
 {
-    Task<IEnumerable<ManagerReadDTO>> GetAllAsync();
-    Task<ManagerReadDTO> GetByIdAsync(Guid id);
-    Task<ManagerReadDTO> GetByNameAsync(string name);
-    Task<Guid> CreateManagerAsync(ManagerCreateDTO dto);
-    Task<Guid> UpdateManagerAsync(ManagerUpdateDTO dto);
-    Task DeleteManagerAsync(Guid id);
+    Task<Result<IEnumerable<ManagerReadDTO>>> GetAllAsync();
+    Task<Result<IEnumerable<ManagerReadDTO>>> GetManagersInProjectAsync(Guid projectId);
+    Task<Result<Guid>> CreateManagerAsync(ManagerCreateDTO dto);
+    Task<Result<Guid>> UpdateManagerAsync(ManagerUpdateDTO dto);
+    Task<Result<bool>> DeleteManagerAsync(Guid id);
 }

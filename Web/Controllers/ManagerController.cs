@@ -1,12 +1,8 @@
-﻿using Core.DTOs.Manager;
-using Core.Entities;
-using Core.Interfaces.Repositories;
+﻿using Core.Constants;
+using Core.DTOs.Manager;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Persistence.Data.Contexts;
-using Persistence.Repositories;
 
 namespace Web.Controllers;
 [Route("api/[controller]")]
@@ -22,30 +18,53 @@ public class ManagerController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProjects()
+    public async Task<IActionResult> GetManagers()
     {
         var todoTasks = await _service.GetAllAsync();
         return Ok(todoTasks);
     }
 
+    [HttpGet("{projectId}")]
+    public async Task<IActionResult> GetManagersInProject(Guid projectId)
+    {
+        var result = await _service.GetManagersInProjectAsync(projectId);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
+    }
+
     [HttpPost]
-    public async Task<IActionResult> CreateProject(ManagerCreateDTO dto)
+    public async Task<IActionResult> CreateManager(ManagerCreateDTO dto)
     {
         var result = await _service.CreateManagerAsync(dto);
-        return Ok(result);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateProject(ManagerUpdateDTO dto)
+    public async Task<IActionResult> UpdateManager(ManagerUpdateDTO dto)
     {
         var result = await _service.UpdateManagerAsync(dto);
-        return Ok(result);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteProject(Guid id)
+    public async Task<IActionResult> DeleteManager(Guid id)
     {
-        await _service.DeleteManagerAsync(id);
+        var result = await _service.DeleteManagerAsync(id);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
         return Ok();
     }
 }

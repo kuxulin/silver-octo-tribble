@@ -69,5 +69,13 @@ public class DatabaseContext : IdentityDbContext
                         "ProjectsEmployees",
                         e => e.HasOne<Project>().WithMany().HasForeignKey("ProjectId"),
                         p => p.HasOne<Employee>().WithMany().HasForeignKey("EmployeeId"));
+
+        modelBuilder.Entity<Manager>()
+            .HasMany(e => e.Projects)
+            .WithMany(p => p.Managers)
+            .UsingEntity<Dictionary<string, object>>(
+                        "ProjectsManagers",
+                        e => e.HasOne<Project>().WithMany().HasForeignKey("ProjectId"),
+                        p => p.HasOne<Manager>().WithMany().HasForeignKey("ManagerId"));
     }
 }
