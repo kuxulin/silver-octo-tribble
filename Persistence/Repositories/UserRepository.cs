@@ -3,6 +3,7 @@ using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Persistence.Data.Contexts;
 
 namespace Persistence.Repositories;
@@ -20,7 +21,11 @@ class UserRepository : IUserRepository
 
     public IQueryable<User> GetAll()
     {
-        return _context.Users;
+        return _context.Users
+            .Include(u => u.Image)
+            .Include(u => u.Manager)
+            .Include(u => u.Employee)
+            .Include(u => u.UserRoles);
     }
 
     public async Task DeleteUsersAsync(IEnumerable<User> users)

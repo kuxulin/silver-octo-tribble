@@ -7,7 +7,7 @@ using Persistence.Data.Contexts;
 
 namespace Persistence.Repositories;
 
-class ImageRepository : BaseCRUDRepository<ApplicationImage, DatabaseContext>,IImageRepository
+class ImageRepository : BaseCRUDRepository<ApplicationImage, DatabaseContext>, IImageRepository
 {
     public ImageRepository(DatabaseContext context, IMapper mapper) : base(context, mapper)
     {
@@ -16,7 +16,9 @@ class ImageRepository : BaseCRUDRepository<ApplicationImage, DatabaseContext>,II
 
     public async Task ReplaceImage(ApplicationImage oldImage, ApplicationImage newImage)
     {
-        _context.Images.Remove(oldImage);
+        if (oldImage is not null)
+            _context.Images.Remove(oldImage);
+
         _context.Images.Add(newImage);
         await _context.SaveChangesAsync();
     }
