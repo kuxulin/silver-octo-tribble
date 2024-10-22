@@ -62,5 +62,12 @@ public class DatabaseContext : IdentityDbContext
            .HasForeignKey<Employee>(e => e.UserId)
            .IsRequired(false);
 
+        modelBuilder.Entity<Employee>()
+            .HasMany(e => e.Projects)
+            .WithMany(p => p.Employees)
+            .UsingEntity<Dictionary<string, object>>(
+                        "ProjectsEmployees",
+                        e => e.HasOne<Project>().WithMany().HasForeignKey("ProjectId"),
+                        p => p.HasOne<Employee>().WithMany().HasForeignKey("EmployeeId"));
     }
 }

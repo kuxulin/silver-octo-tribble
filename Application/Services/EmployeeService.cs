@@ -1,62 +1,69 @@
-﻿using Core.DTOs.Employee;
+﻿using AutoMapper;
+using Core.Constants;
+using Core.DTOs.Employee;
+using Core.DTOs.Manager;
+using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using Core.ResultPattern;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 internal class EmployeeService : IEmployeeService
 {
     private readonly IEmployeeRepository _repository;
+    private readonly IMapper _mapper;
 
-    public EmployeeService(IEmployeeRepository repository)
+    public EmployeeService(IEmployeeRepository repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
-    public async Task<Guid> CreateEmployeeAsync(EmployeeCreateDTO dto)
+    public async Task<Result<IEnumerable<EmployeeReadDTO>>> GetAllAsync()
     {
-        var duplicate = await GetByNameAsync(dto.FullName);
+        var employees = await _repository.GetAll().ToListAsync();
+
+        return _mapper.Map<List<EmployeeReadDTO>>(employees);
+    }
+
+    public async Task<Result<IEnumerable<EmployeeReadDTO>>> GetEmployeesInProjectAsync(Guid projectId)
+    {
+        var employees = await _repository.GetAll().Include(e => e.User).Include(e => e.Projects).Where(e => e.Projects.Any(p => p.Id == projectId)).ToListAsync();
+        return _mapper.Map<List<EmployeeReadDTO>>(employees);
+    }
+
+    public async Task<Result<Guid>> CreateEmployeeAsync(EmployeeCreateDTO dto)
+    {
+        var duplicate = await _repository.GetAll().FirstOrDefaultAsync(e => e.UserId == dto.UserId);
 
         if (duplicate is not null)
-            throw new Exception("There is already such employee in the project.");
-
-        var result = await _repository.AddAsync(dto);
-        return result;
+            return DefinedError.DuplicateEntity;
+        
+        var employee = _mapper.Map<Employee>(dto);
+        var result = await _repository.AddAsync(employee);
+        return employee.Id;
     }
 
-    public async Task DeleteEmployeeAsync(Guid id)
+    public async Task<Result<Guid>> UpdateEmployeeAsync(EmployeeUpdateDTO dto)
     {
-        var manager = await GetByIdAsync(id);
+        var duplicate = await _repository.GetAll().FirstOrDefaultAsync(e => e.Id == dto.Id);
+
+        if (duplicate is null)
+            return DefinedError.AbsentElement;
+
+        var employee = _mapper.Map<Employee>(dto);
+
+        var result = await _repository.UpdateAsync(employee);
+        return result.Id;
+    }
+    public async Task<Result<bool>> DeleteEmployeeAsync(Guid id)
+    {
+        var manager = await _repository.GetAll().FirstOrDefaultAsync(e => e.Id == id);
 
         if (manager is null)
-            throw new Exception("There is no such employee in database.");
+            return DefinedError.AbsentElement;
 
         await _repository.DeleteAsync(id);
-    }
-
-    public async Task<IEnumerable<EmployeeReadDTO>> GetAllAsync()
-    {
-        return await _repository.GetAllAsync();
-    }
-
-    public async Task<EmployeeReadDTO> GetByIdAsync(Guid id)
-    {
-        var employees = await GetAllAsync();
-        return employees.FirstOrDefault(e => e.Id == id);
-    }
-
-    public async Task<EmployeeReadDTO> GetByNameAsync(string name)
-    {
-        var employees = await GetAllAsync();
-        return employees.FirstOrDefault(e => e.FullName == name);
-    }
-
-    public async Task<Guid> UpdateEmployeeAsync(EmployeeUpdateDTO dto)
-    {
-        var employee = await GetByIdAsync(dto.Id);
-
-        if (employee is null)
-            throw new Exception("There is no such employee in database.");
-
-        var result = await _repository.UpdateAsync(dto);
-        return result;
+        return true;
     }
 }

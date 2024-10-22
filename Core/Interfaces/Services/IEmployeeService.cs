@@ -1,12 +1,13 @@
 ﻿using Core.DTOs.Employee;
+using Core.DTOs.Manager;
+using Core.ResultPattern;
 
 namespace Core.Interfaces.Services;
 public interface IEmployeeService
 {
-    Task<IEnumerable<EmployeeReadDTO>> GetAllAsync();
-    Task<EmployeeReadDTO> GetByIdAsync(Guid id);
-    Task<EmployeeReadDTO> GetByNameAsync(string name);
-    Task<Guid> CreateEmployeeAsync(EmployeeCreateDTO dto);
-    Task<Guid> UpdateEmployeeAsync(EmployeeUpdateDTO dto);
-    Task DeleteEmployeeAsync(Guid id);
+    Task<Result<IEnumerable<EmployeeReadDTO>>> GetAllAsync();
+    Task<Result<IEnumerable<EmployeeReadDTO>>> GetEmployeesInProjectAsync(Guid projectId);
+    Task<Result<Guid>> CreateEmployeeAsync(EmployeeCreateDTO dto);
+    Task<Result<Guid>> UpdateEmployeeAsync(EmployeeUpdateDTO dto);
+    Task<Result<bool>> DeleteEmployeeAsync(Guid id);
 }

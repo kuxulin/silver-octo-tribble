@@ -1,20 +1,16 @@
-﻿using Core.DTOs.Employee;
-using Core.Entities;
-using Core.Interfaces.Repositories;
+﻿using Core.Constants;
+using Core.DTOs.Employee;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Persistence.Data.Contexts;
-using Persistence.Repositories;
 
 namespace Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Policy =DefinedPolicy.DefaultPolicy)]
 public class EmployeeController : ControllerBase
 {
-    private readonly IEmployeeService _service; 
+    private readonly IEmployeeService _service;
 
     public EmployeeController(IEmployeeService service)
     {
@@ -28,24 +24,47 @@ public class EmployeeController : ControllerBase
         return Ok(todoTasks);
     }
 
+    [HttpGet("{projectId}")]
+    public async Task<IActionResult> GetEmployeesInProject(Guid projectId)
+    {
+        var result = await _service.GetEmployeesInProjectAsync(projectId);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateProject(EmployeeCreateDTO dto)
     {
         var result = await _service.CreateEmployeeAsync(dto);
-        return Ok(result);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateProject(EmployeeUpdateDTO dto)
     {
         var result = await _service.UpdateEmployeeAsync(dto);
-        return Ok(result);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 
     [HttpDelete]
     public async Task<IActionResult> DeleteProject(Guid id)
     {
-        await _service.DeleteEmployeeAsync(id);
-        return Ok();
+        var result = await _service.DeleteEmployeeAsync(id);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        return Ok(result.Value);
     }
 }
