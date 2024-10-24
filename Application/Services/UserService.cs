@@ -180,7 +180,7 @@ class UserService : IUserService
     public async Task<Result<UserReadDTO>> UpdateUserAsync(UserUpdateDTO userUpdateDTO)
     {
         var user = await GetUserById(userUpdateDTO.Id);
-        var usernameFromToken = _tokenService.GetNameFromToken(userUpdateDTO.AccessToken);
+        var usernameFromToken = _tokenService.GetFieldFromToken(userUpdateDTO.AccessToken, DefinedClaim.Name);
 
         if (user == null)
             return DefinedError.AbsentElement;
