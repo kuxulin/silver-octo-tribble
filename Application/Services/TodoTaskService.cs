@@ -43,7 +43,7 @@ internal class TodoTaskService : ITodoTaskService
         return _mapper.Map<List<TodoTaskReadDTO>>(tasks);
     }
 
-    public async Task<Result<Guid>> CreateTodoTaskAsync(TodoTaskCreateDTO dto)
+    public async Task<Result<TodoTaskReadDTO>> CreateTodoTaskAsync(TodoTaskCreateDTO dto)
     {
         var duplicate = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Title == dto.Title);
 
@@ -53,40 +53,33 @@ internal class TodoTaskService : ITodoTaskService
         var employee = await _employeeRepository.GetAll().FirstOrDefaultAsync(e => e.Id == dto.EmployeeId);
         var project = await _projectRepository.GetAll().FirstOrDefaultAsync(e => e.Id == dto.ProjectId);
 
-        if(employee is null || project is null)
+        if (project is null)
             return DefinedError.AbsentElement;
 
         var task = _mapper.Map<TodoTask>(dto);
         task.Employee = employee;
         task.Project = project;
         var result = await _todoTaskRepository.AddAsync(task);
-        return result.Id;
+        return _mapper.Map<TodoTaskReadDTO>(result);
     }
 
-    public async Task<Result<Guid>> UpdateTodoTaskAsync(TodoTaskUpdateDTO dto)
+    public async Task<Result<TodoTaskReadDTO>> UpdateTodoTaskAsync(TodoTaskUpdateDTO dto)
     {
         var task = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Id == dto.Id);
 
         if (task is null)
             return DefinedError.AbsentElement;
 
-        if(dto.EmployeeId is not null)
-        {
-            var employee = await _employeeRepository.GetAll().FirstOrDefaultAsync(e => e.Id == dto.EmployeeId);
-            
-            if(employee is null)
-                return DefinedError.AbsentElement;
+        var reassignResult = await ReassignTodoTaskAsync(task, dto.EmployeeId);
 
-            task.Employee = employee;
-        }
-        else 
-            task.Employee = null;
+        if (!reassignResult.IsSuccess)
+            return _mapper.Map<TodoTaskReadDTO>(task);
 
         if (dto.Status is not null)
         {
             if (!Enum.IsDefined(typeof(AvailableTaskStatus), dto.Status))
                 return DefinedError.InvalidElement;
-            
+
             var status = new TodoTaskStatus() { Id = ((int)dto.Status.Value) };
             task.Status = status;
         }
@@ -98,10 +91,29 @@ internal class TodoTaskService : ITodoTaskService
             task.Text = dto.Text;
 
         var result = await _todoTaskRepository.UpdateAsync(task);
-        return result.Id;
+        return _mapper.Map<TodoTaskReadDTO>(result);
     }
 
-    public async Task<Result<bool>> DeleteTodoTaskAsync(Guid id)
+    private async Task<Result<TodoTask>> ReassignTodoTaskAsync(TodoTask task, Guid? employeeId)
+    {
+        if (employeeId is not null && task.Employee?.Id != employeeId)
+        {
+            var employee = await _employeeRepository.GetAll().FirstOrDefaultAsync(e => e.Id == employeeId);
+
+            if (employee is null)
+                return DefinedError.AbsentElement;
+
+            task.Employee = employee;
+        }
+        else if (task.Employee is not null && employeeId is null)
+        {
+            task.Employee = null;
+        }
+
+        return task;
+    }
+
+    public async Task<Result<TodoTaskReadDTO>> DeleteTodoTaskAsync(Guid id)
     {
         var task = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Id == id);
 
@@ -109,6 +121,6 @@ internal class TodoTaskService : ITodoTaskService
             return DefinedError.AbsentElement;
 
         await _todoTaskRepository.DeleteAsync(id);
-        return true;
+        return _mapper.Map<TodoTaskReadDTO>(task);
     }
 }
