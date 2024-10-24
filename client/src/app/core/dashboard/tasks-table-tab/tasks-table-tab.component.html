@@ -10,7 +10,7 @@
       <mat-icon>add</mat-icon>
     </button>
   </h2>
-  <table class="tasks-table" mat-table [dataSource]="todoTasks">
+  <mat-table [dataSource]="todoTasks">
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef>Title</th>
       <td mat-cell *matCellDef="let element">
@@ -40,5 +40,5 @@
       (click)="onTaskOpened.emit(row)"
       style="cursor: pointer"
     ></tr>
-  </table>
+  </mat-table>
 </div>
