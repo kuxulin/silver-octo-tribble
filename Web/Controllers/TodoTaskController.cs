@@ -60,6 +60,19 @@ public class TodoTaskController : ControllerBase
         if (!result.IsSuccess)
             return StatusCode(result.Error.StatusCode, result.Error.Message);
 
+        await CreateChange(DefinedAction.Update, result.Value.ProjectId, result.Value.Title, result.Value.Id);
+        return Ok(result.Value);
+    }
+
+    [HttpPatch]
+    public async Task<IActionResult> ChangeTaskEmployee(Guid taskId, Guid? employeeId)
+    {
+        var result = await _taskService.ChangeTaskEmployeeAsync(taskId,employeeId);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        await CreateChange(DefinedAction.Assign, result.Value.ProjectId, result.Value.Title, result.Value.Id);
         return Ok(result.Value);
     }
 

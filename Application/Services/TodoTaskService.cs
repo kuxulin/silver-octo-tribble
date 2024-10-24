@@ -70,11 +70,6 @@ internal class TodoTaskService : ITodoTaskService
         if (task is null)
             return DefinedError.AbsentElement;
 
-        var reassignResult = await ReassignTodoTaskAsync(task, dto.EmployeeId);
-
-        if (!reassignResult.IsSuccess)
-            return _mapper.Map<TodoTaskReadDTO>(task);
-
         if (dto.Status is not null)
         {
             if (!Enum.IsDefined(typeof(AvailableTaskStatus), dto.Status))
@@ -94,8 +89,13 @@ internal class TodoTaskService : ITodoTaskService
         return _mapper.Map<TodoTaskReadDTO>(result);
     }
 
-    private async Task<Result<TodoTask>> ReassignTodoTaskAsync(TodoTask task, Guid? employeeId)
+    public async Task<Result<TodoTaskReadDTO>> ChangeTaskEmployeeAsync(Guid taskId, Guid? employeeId)
     {
+        var task = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Id == taskId);
+
+        if (task is null)
+            return DefinedError.AbsentElement;
+
         if (employeeId is not null && task.Employee?.Id != employeeId)
         {
             var employee = await _employeeRepository.GetAll().FirstOrDefaultAsync(e => e.Id == employeeId);
@@ -110,7 +110,8 @@ internal class TodoTaskService : ITodoTaskService
             task.Employee = null;
         }
 
-        return task;
+        var result = await _todoTaskRepository.UpdateAsync(task);
+        return _mapper.Map<TodoTaskReadDTO>(result);
     }
 
     public async Task<Result<TodoTaskReadDTO>> DeleteTodoTaskAsync(Guid id)
