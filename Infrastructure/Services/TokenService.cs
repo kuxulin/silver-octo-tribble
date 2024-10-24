@@ -1,13 +1,10 @@
 ﻿using Core.Constants;
 using Core.Entities;
 using Core.Interfaces.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Infrastructure.Services;
@@ -83,16 +80,16 @@ internal class TokenService : ITokenService
             new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
         }
         catch
-        { 
-            return false; 
+        {
+            return false;
         }
 
         return true;
     }
 
-    public string GetNameFromToken(string token)
+    public string GetFieldFromToken(string token, string fieldName)
     {
         var parsedToken = new JwtSecurityToken(token);
-        return parsedToken.Claims.First(c => c.Type=="Name").Value;
+        return parsedToken.Claims.First(c => c.Type == fieldName).Value;
     }
 }

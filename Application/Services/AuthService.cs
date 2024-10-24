@@ -57,7 +57,7 @@ public class AuthService : IAuthService
         if(!_tokenService.ValidateToken(oldRefreshToken))
             return DefinedError.InvalidElement;
 
-        string username = _tokenService.GetNameFromToken(oldRefreshToken);
+        string username = _tokenService.GetFieldFromToken(oldRefreshToken,DefinedClaim.Name);
 
         if (username is null)
             return DefinedError.InvalidElement;
@@ -84,7 +84,7 @@ public class AuthService : IAuthService
 
     public async Task<Result<bool>> DeleteRefreshTokenAsync(string token)
     {
-        var username = _tokenService.GetNameFromToken(token);
+        var username = _tokenService.GetFieldFromToken(token, DefinedClaim.Name);
         var user = await _userManager.Users.FirstAsync(u => u.UserName == username);
         user.RefreshToken = null;
         await _userManager.UpdateAsync(user);

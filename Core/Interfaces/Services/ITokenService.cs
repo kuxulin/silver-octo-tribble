@@ -8,6 +8,6 @@ public interface ITokenService
 {
     Task<string> CreateAccessTokenAsync(User user, IEnumerable<string> userRoles);
     string CreateRefreshToken(string username);
-    string GetNameFromToken(string token);
+    string GetFieldFromToken(string token,string fieldName);
     bool ValidateToken(string token);
 }
