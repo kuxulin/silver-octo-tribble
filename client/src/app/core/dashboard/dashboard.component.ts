@@ -211,19 +211,36 @@ export class DashboardComponent implements OnInit {
 
     dialogRef
       .afterClosed()
-      .subscribe((res: { flag: boolean; newTask: Partial<TodoTask> }) => {
+      .subscribe((res: { flag: boolean; newTask: TodoTask }) => {
         if (res && res.flag) {
           let request = this._todoTaskService.deleteTask(task.id);
+
           if (res.newTask)
-            request = this._todoTaskService.updateTask({
-              id: res.newTask.id!,
-              title: res.newTask.title!,
-              text: res.newTask.text!,
-              employeeId: res.newTask.employeeId!,
-              status: res.newTask.status!,
-            });
+            request = this.handlePossibleUpdates(task, res.newTask);
+
           request.subscribe(() => this.fetchTasks());
         }
       });
+  }
+
+  private handlePossibleUpdates(task: TodoTask, newTask: TodoTask) {
+    let request = new Observable<Object>();
+    if (task.employeeId != newTask.employeeId)
+      request = this._todoTaskService.changeTaskEmployee(
+        newTask.id,
+        newTask.employeeId
+      );
+
+    if (
+      task.status != newTask.status ||
+      task.title != newTask.title ||
+      task.text != newTask.text
+    )
+      request = merge(
+        request,
+        this._todoTaskService.updateTask({ ...newTask })
+      );
+
+    return request;
   }
 }

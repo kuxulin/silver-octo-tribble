@@ -64,7 +64,7 @@ export class TaskInfoDialogComponent {
     if (!!this.data && !!this.data.task) {
       this.form.setControl('title', new FormControl(this.data.task.title));
 
-      this.form.setControl('text', new FormControl(this.data.task.title));
+      this.form.setControl('text', new FormControl(this.data.task.text));
 
       this.form.setControl(
         'status',

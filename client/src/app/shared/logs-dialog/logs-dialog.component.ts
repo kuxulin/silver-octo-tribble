@@ -9,11 +9,12 @@ import Change from '../models/Change';
 import { ChangeService } from '../services/change.service';
 import { CommonModule, formatDate } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
+import { SortByDatePipe } from '../pipes/sort-by-date.pipe';
 
 @Component({
   selector: 'app-logs-dialog',
   standalone: true,
-  imports: [CommonModule, MatListModule, MatDialogModule],
+  imports: [CommonModule, MatListModule, MatDialogModule, SortByDatePipe],
   templateUrl: './logs-dialog.component.html',
   styleUrl: './logs-dialog.component.scss',
 })
