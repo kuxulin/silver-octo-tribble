@@ -77,6 +77,7 @@
     <Build Include="dbo\Tables\ProjectsEmployees.sql" />
     <Build Include="dbo\Tables\Images.sql" />
     <Build Include="dbo\Tables\TodoTaskStatuses.sql" />
+    <Build Include="dbo\Tables\Changes.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.refactorlog" />

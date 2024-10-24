@@ -27,6 +27,7 @@ public class DatabaseContext : IdentityDbContext
     public DbSet<Employee> Employees { get; set; }
     public DbSet<ApplicationImage> Images { get; set; }
     public DbSet<TodoTaskStatus> TaskStatuses { get; set; }
+    public DbSet<Change> Changes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -78,5 +79,23 @@ public class DatabaseContext : IdentityDbContext
                         "ProjectsManagers",
                         e => e.HasOne<Project>().WithMany().HasForeignKey("ProjectId"),
                         p => p.HasOne<Manager>().WithMany().HasForeignKey("ManagerId"));
+
+        modelBuilder.Entity<Change>()
+            .HasOne(c => c.Creator)
+            .WithMany()
+            .HasForeignKey(c => c.CreatorId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Change>()
+            .HasOne(c => c.Task)
+            .WithMany()
+            .HasForeignKey(c => c.TaskId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
+
+        modelBuilder.Entity<Change>()
+            .HasOne(c => c.Project)
+            .WithMany()
+            .HasForeignKey(c => c.ProjectId);
     }
 }
