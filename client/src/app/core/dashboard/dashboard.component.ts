@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ProjectService } from '../../shared/services/project.service';
-import { map, merge, Observable, of, shareReplay, take, tap } from 'rxjs';
+import { map, merge, Observable, shareReplay, take, tap } from 'rxjs';
 import Project from '../../shared/models/Project';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,23 +12,15 @@ import { AuthService } from '../../shared/services/auth.service';
 import UserAuthDTO from '../../shared/models/DTOs/UserAuthDTO';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionSelectionChange } from '@angular/material/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatListModule } from '@angular/material/list';
 import TodoTask from '../../shared/models/TodoTask';
 import { TodoTaskService } from '../../shared/services/todo-task.service';
 import { TaskInfoDialogComponent } from '../../shared/task-info-dialog/task-info-dialog.component';
-import { MatTableModule } from '@angular/material/table';
-import {
-  CdkDrag,
-  CdkDragDrop,
-  CdkDropList,
-  transferArrayItem,
-} from '@angular/cdk/drag-drop';
 import AvailableTaskStatus from '../../shared/models/enums/AvailableStatus';
 import { ProjectDetailsTabComponent } from './project-details-tab/project-details-tab.component';
 import { TasksTableTabComponent } from './tasks-table-tab/tasks-table-tab.component';
 import { TasksBoardTabComponent } from './tasks-board-tab/tasks-board-tab.component';
 import Employee from '../../shared/models/Employee';
+import { LogsDialogComponent } from '../../shared/logs-dialog/logs-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,11 +31,6 @@ import Employee from '../../shared/models/Employee';
     MatIconModule,
     MatButtonModule,
     MatSelectModule,
-    MatCardModule,
-    MatListModule,
-    MatTableModule,
-    CdkDropList,
-    CdkDrag,
     ProjectDetailsTabComponent,
     TasksTableTabComponent,
     TasksBoardTabComponent,
@@ -113,6 +100,29 @@ export class DashboardComponent implements OnInit {
     return selectedProject;
   }
 
+  triggerCreateProjectDialog(id: number) {
+    let dialogRef = this.dialog.open(CreateProjectDialogComponent, {
+      data: { managerId: id },
+      width: '25%',
+      height: '70%',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.flag) {
+        this.fetchProjects();
+        this.selectedProjectId = result.id;
+      }
+    });
+  }
+
+  triggerOpenLogsFile(projectId: string) {
+    let dialogRef = this.dialog.open(LogsDialogComponent, {
+      data: { projectId },
+      width: '40%',
+      height: '70%',
+    });
+  }
+
   fetchCurrentProject() {
     this.currentProject$ = this._projectService.getProjectById(
       this.selectedProjectId
@@ -164,25 +174,11 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  triggerCreateProjectDialog(id: number) {
-    let dialogRef = this.dialog.open(CreateProjectDialogComponent, {
-      data: { managerId: id },
-      width: '25%',
-      height: '70%',
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result && result.flag) {
-        this.fetchProjects();
-        this.selectedProjectId = result.id;
-      }
-    });
-  }
-
-  triggerCreateTaskDialog() {
+  triggerCreateTaskDialog(employees: Employee[]) {
     let dialogRef = this.dialog.open(TaskInfoDialogComponent, {
+      data: { employees: employees.map((e) => e.user) },
       width: '25%',
-      height: '70%',
+      height: '55%',
     });
 
     dialogRef
@@ -194,7 +190,7 @@ export class DashboardComponent implements OnInit {
               title: res.newTask.title!,
               text: res.newTask.text!,
               projectId: this.selectedProjectId,
-              employeeId: res.newTask.employee?.id!,
+              employeeId: res.newTask.employeeId!,
             })
             .subscribe(() => this.fetchTasks());
         }
@@ -210,22 +206,23 @@ export class DashboardComponent implements OnInit {
         employees: employees.map((e) => e.user),
       },
       width: '25%',
-      height: '70%',
+      height: '55%',
     });
 
     dialogRef
       .afterClosed()
       .subscribe((res: { flag: boolean; newTask: Partial<TodoTask> }) => {
         if (res && res.flag) {
-          this._todoTaskService
-            .updateTask({
+          let request = this._todoTaskService.deleteTask(task.id);
+          if (res.newTask)
+            request = this._todoTaskService.updateTask({
               id: res.newTask.id!,
               title: res.newTask.title!,
               text: res.newTask.text!,
               employeeId: res.newTask.employeeId!,
               status: res.newTask.status!,
-            })
-            .subscribe(() => this.fetchTasks());
+            });
+          request.subscribe(() => this.fetchTasks());
         }
       });
   }

@@ -1,0 +1,9 @@
+<h3 mat-dialog-title>Project logs</h3>
+<mat-dialog-content>
+  <mat-list>
+    @for(change of (changes$|async); track $index){
+    <mat-list-item>{{ convertChange(change) }}</mat-list-item>
+    <mat-divider></mat-divider>
+    }
+  </mat-list>
+</mat-dialog-content>

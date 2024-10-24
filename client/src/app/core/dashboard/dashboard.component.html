@@ -19,7 +19,11 @@
     <button mat-fab (click)="triggerCreateProjectDialog(currentUserId)">
       <mat-icon>add</mat-icon>
     </button>
-    }
+    @if(currentProject$ | async; as currentProject){
+    <button mat-flat-button (click)="triggerOpenLogsFile(currentProject.id)">
+      Logs
+    </button>
+    } }
   </div>
 
   <mat-tab-group>
@@ -40,7 +44,7 @@
         (onTaskOpened)="
           triggerOpenTaskInfoDialog($event, currentProject.employees)
         "
-        (onTaskCreated)="triggerCreateTaskDialog()"
+        (onTaskCreated)="triggerCreateTaskDialog(currentProject.employees)"
       />
     </mat-tab>
     <mat-tab label="Dashboard">
