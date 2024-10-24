@@ -67,6 +67,7 @@ export class TasksBoardTabComponent {
         event.previousIndex
       ] as TodoTask;
       task.status = newStatus;
+      task.employeeId = task.employee?.id!;
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,

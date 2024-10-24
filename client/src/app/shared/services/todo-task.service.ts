@@ -31,4 +31,8 @@ export class TodoTaskService {
   updateTask(task: TodoTaskUpdateDTO) {
     return this._httpClient.put(this._apiUrl, { ...task }).pipe(take(1));
   }
+
+  deleteTask(id: string) {
+    return this._httpClient.delete(this._apiUrl + '/' + id).pipe(take(1));
+  }
 }

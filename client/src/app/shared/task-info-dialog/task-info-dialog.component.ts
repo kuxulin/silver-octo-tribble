@@ -21,6 +21,7 @@ import {
 import AvailableTaskStatus from '../models/enums/AvailableStatus';
 import { SelectListComponent } from '../select-list/select-list.component';
 import AvailableUserRole from '../models/enums/AvailableUserRole';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-task-info-dialog',
@@ -35,6 +36,7 @@ import AvailableUserRole from '../models/enums/AvailableUserRole';
     FormsModule,
     ReactiveFormsModule,
     SelectListComponent,
+    MatIconModule,
   ],
   templateUrl: './task-info-dialog.component.html',
   styleUrl: './task-info-dialog.component.scss',
@@ -59,7 +61,7 @@ export class TaskInfoDialogComponent {
   ) {}
 
   ngOnInit() {
-    if (!!this.data) {
+    if (!!this.data && !!this.data.task) {
       this.form.setControl('title', new FormControl(this.data.task.title));
 
       this.form.setControl('text', new FormControl(this.data.task.title));
@@ -105,11 +107,15 @@ export class TaskInfoDialogComponent {
     return this.form.valid;
   }
 
+  deleteTask() {
+    this.dialogRef.close({ flag: true });
+  }
+
   onClose(flag: boolean) {
     if (!this.isSomethingChanged()) flag = false;
 
     let newTask: Partial<TodoTask> = {
-      id: this.data?.task.id || undefined,
+      id: this.data?.task?.id || undefined,
       title: this.form.value.title!,
       text: this.form.value.text!,
       status:

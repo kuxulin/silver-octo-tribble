@@ -1,7 +1,12 @@
-<h2 mat-dialog-title>Task</h2>
+<h2 mat-dialog-title>
+  Task<button matSuffix mat-mini-fab (click)="deleteTask()">
+    <mat-icon>delete</mat-icon>
+  </button>
+</h2>
+
 <mat-dialog-content>
   <form [formGroup]="form">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" style="margin-top: 6px">
       <mat-label>Title</mat-label>
       <input matInput formControlName="title" />
     </mat-form-field>
