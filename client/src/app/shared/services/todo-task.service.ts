@@ -5,6 +5,7 @@ import TodoTask from '../models/TodoTask';
 import { take } from 'rxjs';
 import TodoTaskCreateDTO from '../models/DTOs/TodoTaskCreateDTO';
 import TodoTaskUpdateDTO from '../models/DTOs/TodoTaskUpdateDTO';
+import AvailableTaskStatus from '../models/enums/AvailableStatus';
 
 @Injectable({
   providedIn: 'root',
@@ -32,10 +33,25 @@ export class TodoTaskService {
     return this._httpClient.put(this._apiUrl, { ...task }).pipe(take(1));
   }
 
+  changeTaskStatus(taskId: string, status: AvailableTaskStatus) {
+    return this._httpClient
+      .patch(
+        this._apiUrl + '/status',
+        {},
+        {
+          params: {
+            taskId,
+            status,
+          },
+        }
+      )
+      .pipe(take(1));
+  }
+
   changeTaskEmployee(taskId: string, employeeId: string) {
     return this._httpClient
       .patch(
-        this._apiUrl,
+        this._apiUrl + '/employee',
         {},
         {
           params: {

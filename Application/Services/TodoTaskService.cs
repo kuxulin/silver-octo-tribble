@@ -70,21 +70,28 @@ internal class TodoTaskService : ITodoTaskService
         if (task is null)
             return DefinedError.AbsentElement;
 
-        if (dto.Status is not null)
-        {
-            if (!Enum.IsDefined(typeof(AvailableTaskStatus), dto.Status))
-                return DefinedError.InvalidElement;
-
-            var status = new TodoTaskStatus() { Id = ((int)dto.Status.Value) };
-            task.Status = status;
-        }
-
         if (dto.Title is not null)
             task.Title = dto.Title;
 
         if (dto.Text is not null)
             task.Text = dto.Text;
 
+        var result = await _todoTaskRepository.UpdateAsync(task);
+        return _mapper.Map<TodoTaskReadDTO>(result);
+    }
+
+    public async Task<Result<TodoTaskReadDTO>> ChangeTaskStatusAsync(Guid taskId, AvailableTaskStatus status)
+    {
+        var task = await _todoTaskRepository.GetAll().FirstOrDefaultAsync(t => t.Id == taskId);
+
+        if (task is null)
+            return DefinedError.AbsentElement;
+
+        if (!Enum.IsDefined(typeof(AvailableTaskStatus), status))
+            return DefinedError.InvalidElement;
+
+        var todoTaskStatus = new TodoTaskStatus() { Id = ((int)status) };
+        task.Status = todoTaskStatus;
         var result = await _todoTaskRepository.UpdateAsync(task);
         return _mapper.Map<TodoTaskReadDTO>(result);
     }

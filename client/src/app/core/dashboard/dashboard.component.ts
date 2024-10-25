@@ -225,20 +225,25 @@ export class DashboardComponent implements OnInit {
 
   private handlePossibleUpdates(task: TodoTask, newTask: TodoTask) {
     let request = new Observable<Object>();
-    if (task.employeeId != newTask.employeeId)
+    if (this.isManager && task.employeeId != newTask.employeeId)
       request = this._todoTaskService.changeTaskEmployee(
         newTask.id,
         newTask.employeeId
       );
 
     if (
-      task.status != newTask.status ||
-      task.title != newTask.title ||
-      task.text != newTask.text
+      this.isManager &&
+      (task.title != newTask.title || task.text != newTask.text)
     )
       request = merge(
         request,
         this._todoTaskService.updateTask({ ...newTask })
+      );
+
+    if (task.status != newTask.status)
+      request = merge(
+        request,
+        this._todoTaskService.changeTaskStatus(newTask.id, newTask.status)
       );
 
     return request;

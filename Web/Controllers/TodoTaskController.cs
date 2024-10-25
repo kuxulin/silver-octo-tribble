@@ -1,6 +1,8 @@
 ﻿using Core.Constants;
 using Core.DTOs.Change;
 using Core.DTOs.TodoTask;
+using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -64,7 +66,7 @@ public class TodoTaskController : ControllerBase
         return Ok(result.Value);
     }
 
-    [HttpPatch]
+    [HttpPatch("employee")]
     public async Task<IActionResult> ChangeTaskEmployee(Guid taskId, Guid? employeeId)
     {
         var result = await _taskService.ChangeTaskEmployeeAsync(taskId,employeeId);
@@ -73,6 +75,18 @@ public class TodoTaskController : ControllerBase
             return StatusCode(result.Error.StatusCode, result.Error.Message);
 
         await CreateChange(DefinedAction.Assign, result.Value.ProjectId, result.Value.Title, result.Value.Id);
+        return Ok(result.Value);
+    }
+
+    [HttpPatch("status")]
+    public async Task<IActionResult> ChangeTaskStatus(Guid taskId, AvailableTaskStatus status)
+    {
+        var result = await _taskService.ChangeTaskStatusAsync(taskId, status);
+
+        if (!result.IsSuccess)
+            return StatusCode(result.Error.StatusCode, result.Error.Message);
+
+        await CreateChange(DefinedAction.ChangeStatus, result.Value.ProjectId, result.Value.Title, result.Value.Id);
         return Ok(result.Value);
     }
 
