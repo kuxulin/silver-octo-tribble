@@ -4,5 +4,4 @@ export default interface TodoTaskUpdateDTO {
   id: string;
   title: string;
   text: string;
-  status: AvailableTaskStatus;
 }
