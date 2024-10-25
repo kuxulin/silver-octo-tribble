@@ -112,6 +112,11 @@ class UserService : IUserService
         return await _userRepository.GetAll().Include(u => u.UserRoles).Include(u => u.Image).FirstOrDefaultAsync(u => u.Id == id);
     }
 
+    private async Task<User> GetPartialUserById(int id)
+    {
+        return await _userRepository.GetAll().Include(u => u.UserRoles).FirstOrDefaultAsync(u => u.Id == id);
+    }
+
     public async Task<Result<bool>> ChangeUserRolesAsync(int id, IEnumerable<AvailableUserRole> newRoles)
     {
         foreach (var role in newRoles)
@@ -122,37 +127,51 @@ class UserService : IUserService
             }
         }
 
-        var user = await GetUserById(id);
+        var user = await GetPartialUserById(id);
 
         if (user == null)
             return DefinedError.AbsentElement;
 
-        await ConfigureNewRoles(user, newRoles);
         await _userRepository.ChangeUserRolesAsync(user, newRoles.Select(r => r.ToString()).ToArray());
-        await _managerRepository.SaveChangesAsync();
+        await ConfigureNewRoles(user, newRoles);
         return true;
     }
 
     private async Task ConfigureNewRoles(User user, IEnumerable<AvailableUserRole> newRoles)
     {
-        if (newRoles.Contains(AvailableUserRole.Manager) && !user.UserRoles.Select(ur => ur.RoleId).Any(id => id == (int)AvailableUserRole.Manager))
+        Manager? manager = user.Manager;
+        Employee? employee = user.Employee;
+        if (newRoles.Contains(AvailableUserRole.Manager) && user.ManagerId is null)
         {
-            var manager = new Manager() { UserId = user.Id };
+            manager = new Manager() { UserId = user.Id };
             await _managerRepository.AddAsync(manager, isSaved: false);
+
         }
 
-        if (!newRoles.Contains(AvailableUserRole.Manager) && user.UserRoles.Select(ur => ur.RoleId).Any(id => id == (int)AvailableUserRole.Manager))
-            await _managerRepository.DeleteAsync(user.Manager.Id, isSaved: false);
-
-
-        if (newRoles.Contains(AvailableUserRole.Employee) && !user.UserRoles.Select(ur => ur.RoleId).Any(id => id == (int)AvailableUserRole.Employee))
+        if (!newRoles.Contains(AvailableUserRole.Manager) && user.ManagerId is not null)
         {
-            var employee = new Employee() { UserId = user.Id };
+            await _managerRepository.DeleteAsync(user.ManagerId.Value, isSaved: false);
+            manager = null;
+        }
+
+        if (newRoles.Contains(AvailableUserRole.Employee) && user.EmployeeId is null)
+        {
+            employee = new Employee() { UserId = user.Id };
             await _employeeRepository.AddAsync(employee, isSaved: false);
         }
 
-        if (!newRoles.Contains(AvailableUserRole.Employee) && user.UserRoles.Select(ur => ur.RoleId).Any(id => id == (int)AvailableUserRole.Employee))
-            await _employeeRepository.DeleteAsync(user.Employee.Id, isSaved: false);
+        if (!newRoles.Contains(AvailableUserRole.Employee) && user.EmployeeId is not null)
+        {
+            await _employeeRepository.DeleteAsync(user.EmployeeId.Value, isSaved: false);
+            employee = null;
+        }
+
+        user.Manager = manager;
+        user.Employee = employee;
+        await _managerRepository.SaveChangesAsync();
+        user.ManagerId = manager?.Id;
+        user.EmployeeId = employee?.Id;
+        await _userRepository.UpdateUserAsync(user);
     }
 
     public async Task<Result<UsersMetrics>> GetUsersMetricsAsync()
@@ -179,7 +198,7 @@ class UserService : IUserService
 
     public async Task<Result<UserReadDTO>> UpdateUserAsync(UserUpdateDTO userUpdateDTO)
     {
-        var user = await GetUserById(userUpdateDTO.Id);
+        var user = await GetPartialUserById(userUpdateDTO.Id);
         var usernameFromToken = _tokenService.GetFieldFromToken(userUpdateDTO.AccessToken, DefinedClaim.Name);
 
         if (user == null)

@@ -104,6 +104,8 @@ public class AuthService : IAuthService
             Roles = roles.ToArray(),
             Id = user.Id,
             IsBlocked = user.IsBlocked,
+            EmployeeId = user.EmployeeId,
+            ManagerId = user.ManagerId,
         };
     }
 }

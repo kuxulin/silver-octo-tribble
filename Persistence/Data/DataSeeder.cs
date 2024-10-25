@@ -3,6 +3,7 @@ using Core.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data.Contexts;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Persistence.Data;
 public static class DataSeeder
@@ -15,6 +16,7 @@ public static class DataSeeder
         if (usersManager.Users.Any(u => u.UserName == "maks"))
             return provider;
 
+        var context = provider.GetRequiredService<DatabaseContext>();
         Role[] roles = { new() { Name = AvailableUserRole.Admin.ToString() }, new() { Name = AvailableUserRole.Manager.ToString() }, new() { Name = AvailableUserRole.Employee.ToString() } };
 
         foreach (var role in roles)
@@ -22,29 +24,33 @@ public static class DataSeeder
             await rolesManager.CreateAsync(role);
         }
 
-        var image = new ApplicationImage()
-        {
-            Name = "User.png",
-            Content = GetImageString("User.png"),
-        };
-
         var user = new User
         {
             FirstName = "Maksym",
             LastName = "Moroz",
             UserName = "maks",
             PhoneNumber = "+380953867137",
-            Image = image,
         };
-        
+
+        var image = new ApplicationImage()
+        {
+            Name = "User.png",
+            Content = GetImageString("User.png"),
+        };
+
+        user.Image = image;
         await usersManager.CreateAsync(user, "string");
         await usersManager.AddToRoleAsync(user, roles[0].Name);
+        user.ImageId = image.Id;
+        context.Users.Update(user);
+        await context.SaveChangesAsync();
         return provider;
     }
 
     public static async Task<IServiceProvider> SeedUsers(this IServiceProvider provider)
     {
         var usersManager = provider.GetRequiredService<UserManager<User>>();
+        var context = provider.GetRequiredService<DatabaseContext>();
 
         if (usersManager.Users.Count() > 1)
             return provider;
@@ -135,32 +141,41 @@ public static class DataSeeder
                 UserName = "writer",
                 PhoneNumber = "+380927857197",
             },
-        };   
+        };
+        var images = new List<ApplicationImage>();
 
-        foreach (var user in managers)
-        {
-            user.Image = new ApplicationImage()
+        for (int i = 0; i < employees.Count + managers.Count; i++)
+            images.Add(new ApplicationImage()
             {
                 Name = name,
-                Content = content,
-            };
-            user.Manager = new Manager();
-            await usersManager.CreateAsync(user, "string");
-            await usersManager.AddToRoleAsync(user, AvailableUserRole.Manager.ToString());
-        }
+                Content = content
+            });
 
-        foreach (var user in employees)
+        for (int i = 0; i < managers.Count; i++)
         {
-            user.Image = new ApplicationImage()
-            {
-                Name = name,
-                Content = content,
-            };
-            user.Employee = new Employee();
-            await usersManager.CreateAsync(user, "string");
-            await usersManager.AddToRoleAsync(user, AvailableUserRole.Employee.ToString());
+            managers[i].Image = images[i];
+            var manager = new Manager() { CreationDate = managers[i].CreationDate };
+            managers[i].Manager = manager;
+            await usersManager.CreateAsync(managers[i], "string");
+            await usersManager.AddToRoleAsync(managers[i], AvailableUserRole.Manager.ToString());
+            managers[i].ImageId = images[i].Id;
+            managers[i].ManagerId = manager.Id;
+            context.Update(managers[i]);
         }
 
+        for (int i = 0; i < employees.Count; i++)
+        {
+            employees[i].Image = images[i + managers.Count];
+            var employee = new Employee() { CreationDate = employees[i].CreationDate };
+            employees[i].Employee = employee;
+            await usersManager.CreateAsync(employees[i], "string");
+            await usersManager.AddToRoleAsync(employees[i], AvailableUserRole.Employee.ToString());
+            employees[i].ImageId = images[i + managers.Count].Id;
+            employees[i].EmployeeId = employee.Id;
+            context.Update(employees[i]);
+        }
+
+        await context.SaveChangesAsync();
         return provider;
     }
 

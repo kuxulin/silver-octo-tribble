@@ -6,4 +6,6 @@ public class TokenDTO
     public string? UserName { get; set; }
     public int Id { get; set; }
     public bool IsBlocked { get; set; }
+    public Guid? EmployeeId { get; set; }
+    public Guid? ManagerId { get; set; }
 }

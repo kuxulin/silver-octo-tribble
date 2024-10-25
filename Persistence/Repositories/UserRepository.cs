@@ -28,6 +28,11 @@ class UserRepository : IUserRepository
             .Include(u => u.UserRoles);
     }
 
+    public IQueryable<User> GetPartialUsers()
+    {
+        return _context.Users;
+    }
+
     public async Task DeleteUsersAsync(IEnumerable<User> users)
     {
         _context.Users.RemoveRange(users);
