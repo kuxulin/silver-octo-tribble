@@ -6,6 +6,7 @@ using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.ResultPattern;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace Application.Services;
 
@@ -51,15 +52,15 @@ class ProjectService : IProjectService
         return _mapper.Map<ProjectReadDTO>(project);
     }
 
-    public async Task<Result<IEnumerable<ProjectReadDTO>>> GetProjectsByManagerIdAsync(int id)
+    public async Task<Result<IEnumerable<ProjectReadDTO>>> GetProjectsByManagerIdAsync(Guid id)
     {
-        var projects = await _projectRepository.GetAll().Where(p => p.Managers.Any(m => m.UserId == id)).ToListAsync();
+        var projects = await _projectRepository.GetProjectsByManagerId(id).ToListAsync();
         return _mapper.Map<List<ProjectReadDTO>>(projects);
     }
 
-    public async Task<Result<IEnumerable<ProjectReadDTO>>> GetProjectsByEmployeeIdAsync(int id)
+    public async Task<Result<IEnumerable<ProjectReadDTO>>> GetProjectsByEmployeeIdAsync(Guid id)
     {
-        var projects = await _projectRepository.GetAll().Include(p => p.Employees).Where(p => p.Employees.Any(e => e.UserId == id)).ToListAsync();
+        var projects = await _projectRepository.GetProjectsByEmployeeId(id).ToListAsync();
         return _mapper.Map<List<ProjectReadDTO>>(projects);
     }
 
@@ -147,7 +148,7 @@ class ProjectService : IProjectService
 
     public async Task<Result<bool>> DeleteProjectAsync(Guid id)
     {
-        var project = await GetByIdAsync(id);
+        var project = await _projectRepository.GetAll().FirstOrDefaultAsync(p => p.Id == id); ;
 
         if (project is null)
             return DefinedError.AbsentElement;

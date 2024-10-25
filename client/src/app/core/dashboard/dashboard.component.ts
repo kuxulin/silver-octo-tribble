@@ -72,12 +72,12 @@ export class DashboardComponent implements OnInit {
   }
 
   fetchProjects() {
-    let managerProjects$ = this._projectService.getProjectsByManager(
-      this.currentUserId
-    );
-    let employeeProjects$ = this._projectService.getProjectsByEmployee(
-      this.currentUserId
-    );
+    let managerProjects$ = !!this.currentUser.managerId
+      ? this._projectService.getProjectsByManager(this.currentUser.managerId)
+      : of([]);
+    let employeeProjects$ = !!this.currentUser.employeeId
+      ? this._projectService.getProjectsByEmployee(this.currentUser.employeeId)
+      : of([]);
 
     this.projects$ = merge(managerProjects$, employeeProjects$).pipe(
       tap((res) => this.chooseSelectedProject(res))

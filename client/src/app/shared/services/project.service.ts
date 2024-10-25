@@ -14,14 +14,12 @@ export class ProjectService {
 
   constructor(private _httpClient: HttpClient) {}
 
-  getProjectsByManager(userId: number) {
-    return this._httpClient.get<Project[]>(this._apiUrl + '/manager/' + userId);
+  getProjectsByManager(id: string) {
+    return this._httpClient.get<Project[]>(this._apiUrl + '/manager/' + id);
   }
 
-  getProjectsByEmployee(userId: number) {
-    return this._httpClient.get<Project[]>(
-      this._apiUrl + '/employee/' + userId
-    );
+  getProjectsByEmployee(id: string) {
+    return this._httpClient.get<Project[]>(this._apiUrl + '/employee/' + id);
   }
 
   getProjectById(id: string) {

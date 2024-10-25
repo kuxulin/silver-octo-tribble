@@ -17,6 +17,16 @@ internal class ProjectRepository : BaseCRUDRepository<Project, DatabaseContext>,
         return base.GetAll();
     }
 
+    public IQueryable<Project> GetProjectsByManagerId(Guid id)
+    {
+        return GetAll().Include(p => p.Managers).Where(p => p.Managers.Any(m => m.Id == id));
+    }
+
+    public IQueryable<Project> GetProjectsByEmployeeId(Guid id)
+    {
+        return GetAll().Include(p => p.Employees).Where(p => p.Employees.Any(e => e.Id == id));
+    }
+
     public async override Task<Project> AddAsync(Project entity, bool isSaved = true)
     {
         if (entity.Managers?.Count > 0)

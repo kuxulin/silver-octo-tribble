@@ -25,7 +25,7 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet("manager/{managerId}")]
-    public async Task<IActionResult> GetProjectsByManagerId(int managerId)
+    public async Task<IActionResult> GetProjectsByManagerId(Guid managerId)
     {
         var result = await _service.GetProjectsByManagerIdAsync(managerId);
 
@@ -36,7 +36,7 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet("employee/{employeeId}")]
-    public async Task<IActionResult> GetProjectsByEmployeeId(int employeeId)
+    public async Task<IActionResult> GetProjectsByEmployeeId(Guid employeeId)
     {
         var result = await _service.GetProjectsByEmployeeIdAsync(employeeId);
 
