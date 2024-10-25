@@ -38,8 +38,12 @@ export class HeaderMenuComponent implements OnInit {
     return this._authService.isEmployee(user);
   }
 
-  isManager(user: UserAuthDTO) {
-    return this._authService.isManager(user);
+  isEmployeeInGeneral(user: UserAuthDTO) {
+    return this._authService.isEmployeeInGeneral(user);
+  }
+
+  isManagerInGeneral(user: UserAuthDTO) {
+    return this._authService.isManagerInGeneral(user);
   }
 
   isAdmin(user: UserAuthDTO) {

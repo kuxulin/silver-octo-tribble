@@ -16,7 +16,7 @@
       </mat-select>
     </mat-form-field>
     } @if (isManager) {
-    <button mat-fab (click)="triggerCreateProjectDialog(currentUserId)">
+    <button mat-fab (click)="triggerCreateProjectDialog(currentUser.id)">
       <mat-icon>add</mat-icon>
     </button>
     @if(currentProject$ | async; as currentProject){

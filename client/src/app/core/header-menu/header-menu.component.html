@@ -1,6 +1,7 @@
 <mat-toolbar class="menu">
   <span>Todo List</span>
-  @if (currentUser$|async; as user;) { @if(isManager(user) || isEmployee(user)){
+  @if (currentUser$|async; as user;) { @if(isManagerInGeneral(user) ||
+  isEmployeeInGeneral(user)){
   <button mat-button routerLink="/dashboard">Dashboard</button>
   } @if(isAdmin(user)){
   <button mat-button routerLink="/panel">Admin panel</button>
@@ -16,6 +17,6 @@
   </button>
   <button mat-flat-button (click)="logOut()">Log out</button>
   } @else {
-  <button mat-flat-button routerLink="/login">LogIn</button>
+  <button mat-flat-button routerLink="/login">Log in</button>
   }
 </mat-toolbar>

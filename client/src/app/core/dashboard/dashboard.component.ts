@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ProjectService } from '../../shared/services/project.service';
-import { map, merge, Observable, shareReplay, take, tap } from 'rxjs';
+import { map, merge, Observable, of, shareReplay, tap } from 'rxjs';
 import Project from '../../shared/models/Project';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
   projects$!: Observable<Project[]>;
   todoTasks$!: Observable<TodoTask[]>;
   currentUser$!: Observable<UserAuthDTO>;
-  currentUserId!: number;
+  currentUser!: UserAuthDTO;
   selectedProjectId = '';
   isManager = false;
   isEmployee = false;
@@ -61,14 +61,14 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.currentUser$ = this._authService.user$;
-
-    this.currentUser$.pipe(take(1)).subscribe((res) => {
-      this.currentUserId = res.id;
-      this.isManager = this._authService.isManager(res);
-      this.isEmployee = this._authService.isEmployee(res);
-      this.fetchProjects();
-    });
+    this.currentUser$ = this._authService.user$.pipe(
+      tap((res) => {
+        this.currentUser = res;
+        this.isManager = this._authService.isManagerInGeneral(res);
+        this.isEmployee = this._authService.isEmployeeInGeneral(res);
+        this.fetchProjects();
+      })
+    );
   }
 
   fetchProjects() {
@@ -146,7 +146,7 @@ export class DashboardComponent implements OnInit {
           if (this.isManager) return res;
 
           return res.filter(
-            (task) => task.employee?.user.id === this.currentUserId
+            (task) => task.employee?.user.id === this.currentUser.id
           );
         })
       );
