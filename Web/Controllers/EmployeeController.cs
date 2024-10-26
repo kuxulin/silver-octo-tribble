@@ -18,7 +18,7 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProjects()
+    public async Task<IActionResult> GetEmployees()
     {
         var todoTasks = await _service.GetAllAsync();
         return Ok(todoTasks);
@@ -47,7 +47,7 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateProject(EmployeeUpdateDTO dto)
+    public async Task<IActionResult> UpdateEmployee(EmployeeUpdateDTO dto)
     {
         var result = await _service.UpdateEmployeeAsync(dto);
 
@@ -58,7 +58,7 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteProject(Guid id)
+    public async Task<IActionResult> DeleteEmployee(Guid id)
     {
         var result = await _service.DeleteEmployeeAsync(id);
 

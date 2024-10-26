@@ -76,7 +76,7 @@ export class TasksBoardTabComponent {
       );
 
       this._todoTaskService
-        .updateTask({ ...task })
+        .changeTaskStatus(task.id, task.status)
         .subscribe(() => this.onTaskChanged.emit());
     }
   }

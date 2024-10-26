@@ -37,7 +37,6 @@ export class RolesAssignDialogComponent implements OnInit {
   }
 
   changeRolePeek(role: AvailableUserRole) {
-    console.log(role);
     if (this.newRoles.some((r) => r === role))
       this.newRoles.splice(this.newRoles.indexOf(role), 1);
     else this.newRoles.push(role);

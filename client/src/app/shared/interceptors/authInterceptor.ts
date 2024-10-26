@@ -13,7 +13,7 @@ export function authInterceptor(
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {
   if (
-    ['auth/login', 'auth/register', 'auth/refresh'].some((url) =>
+    ['auth/login', 'auth/register', 'auth/refresh', 'auth/logout'].some((url) =>
       req.url.includes(url)
     )
   )

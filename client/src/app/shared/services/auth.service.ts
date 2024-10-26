@@ -51,10 +51,9 @@ export class AuthService {
 
   private setSession(result: UserAuthDTO) {
     sessionStorage.setItem(SESSION_STORAGE.TOKEN, result.token);
-    let user: Partial<UserAuthDTO> = {
-      userName: result.userName,
-      roles: result.roles,
-      id: result.id,
+    let user: UserAuthDTO = {
+      ...result,
+      token: '',
     };
     this._subject.next(user);
   }
@@ -73,21 +72,27 @@ export class AuthService {
     return sessionStorage.getItem(SESSION_STORAGE.TOKEN);
   }
 
-  isEmployee(user: UserAuthDTO) {
+  isEmployeeInGeneral(user: UserAuthDTO) {
     return user.roles.some(
-      (role) => role === AvailableUserRole[AvailableUserRole.Employee]
+      (role) =>
+        role.toString() ===
+        AvailableUserRole[AvailableUserRole.Employee].toString()
     );
   }
 
-  isManager(user: UserAuthDTO) {
+  isManagerInGeneral(user: UserAuthDTO) {
     return user.roles.some(
-      (role) => role === AvailableUserRole[AvailableUserRole.Manager]
+      (role) =>
+        role.toString() ===
+        AvailableUserRole[AvailableUserRole.Manager].toString()
     );
   }
 
   isAdmin(user: UserAuthDTO) {
     return user.roles.some(
-      (role) => role === AvailableUserRole[AvailableUserRole.Admin]
+      (role) =>
+        role.toString() ===
+        AvailableUserRole[AvailableUserRole.Admin].toString()
     );
   }
 

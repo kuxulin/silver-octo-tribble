@@ -49,8 +49,7 @@ public class DatabaseContext : IdentityDbContext
         modelBuilder.Entity<User>()
             .HasOne(u => u.Image)
             .WithOne(i => i.User)
-            .HasForeignKey<ApplicationImage>(u => u.UserId)
-            .IsRequired(false);
+            .HasForeignKey<ApplicationImage>(u => u.UserId);
 
         modelBuilder.Entity<User>()
             .HasOne(u => u.Manager)

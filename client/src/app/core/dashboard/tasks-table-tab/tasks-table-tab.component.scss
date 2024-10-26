@@ -2,12 +2,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 80%;
   width: 90%;
   margin-left: 5%;
   .mat-mdc-table {
     width: 70%;
-    height: 70%;
+    height: 90%;
     overflow: auto;
     .mat-mdc-header-row,
     .mat-mdc-row,

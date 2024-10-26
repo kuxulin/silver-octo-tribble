@@ -3,18 +3,25 @@ using Core.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data.Contexts;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Persistence.Data;
 public static class DataSeeder
 {
-    public static async Task<IServiceProvider> SeedAdminAndRoles(this IServiceProvider provider)
+    public static async Task<IServiceProvider> SeedData(this IServiceProvider provider)
+    {
+        await SeedAdminAndRoles(provider);
+        await SeedTaskStatuses(provider);
+        await SeedUsers(provider);
+        return provider;
+    }
+
+    private static async Task SeedAdminAndRoles(IServiceProvider provider)
     {
         var usersManager = provider.GetRequiredService<UserManager<User>>();
         var rolesManager = provider.GetRequiredService<RoleManager<Role>>();
 
         if (usersManager.Users.Any(u => u.UserName == "maks"))
-            return provider;
+            return;
 
         var context = provider.GetRequiredService<DatabaseContext>();
         Role[] roles = { new() { Name = AvailableUserRole.Admin.ToString() }, new() { Name = AvailableUserRole.Manager.ToString() }, new() { Name = AvailableUserRole.Employee.ToString() } };
@@ -44,16 +51,34 @@ public static class DataSeeder
         user.ImageId = image.Id;
         context.Users.Update(user);
         await context.SaveChangesAsync();
-        return provider;
     }
 
-    public static async Task<IServiceProvider> SeedUsers(this IServiceProvider provider)
+    private static async Task SeedTaskStatuses(IServiceProvider provider)
+    {
+        var context = provider.GetRequiredService<DatabaseContext>();
+
+        if (context.TaskStatuses.Any())
+            return;
+
+        var statuses = new List<TodoTaskStatus>()
+        {
+            new TodoTaskStatus() { Name = AvailableTaskStatus.Todo.ToString() },
+            new TodoTaskStatus() { Name = AvailableTaskStatus.InProgress.ToString() },
+            new TodoTaskStatus() { Name = AvailableTaskStatus.OnReview.ToString() },
+            new TodoTaskStatus() { Name = AvailableTaskStatus.Completed.ToString() },
+        };
+
+        context.TaskStatuses.AddRange(statuses);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedUsers(IServiceProvider provider)
     {
         var usersManager = provider.GetRequiredService<UserManager<User>>();
         var context = provider.GetRequiredService<DatabaseContext>();
 
         if (usersManager.Users.Count() > 1)
-            return provider;
+            return;
 
         var name = "User.png";
         var content = GetImageString("User.png");
@@ -176,7 +201,6 @@ public static class DataSeeder
         }
 
         await context.SaveChangesAsync();
-        return provider;
     }
 
     private static string GetImageString(string imageName)

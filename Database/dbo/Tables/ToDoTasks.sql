@@ -9,6 +9,6 @@
     CONSTRAINT [PK_TodoTasks] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_TodoTasks_Projects] FOREIGN KEY ([ProjectId]) REFERENCES [dbo].[Projects] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_TodoTasks_Employees] FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employees] ([Id]) ON DELETE SET NULL,
-    CONSTRAINT [FK_TodoTasks_TodoTaskStatuses] FOREIGN KEY ([StatusId]) REFERENCES [dbo].[TodoTaskStatuses] ([Id])
+    CONSTRAINT [FK_TodoTasks_TaskStatuses] FOREIGN KEY ([StatusId]) REFERENCES [dbo].[TaskStatuses] ([Id])
 );
 
