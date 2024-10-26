@@ -8,4 +8,5 @@ export default interface Change {
   actionType: AvailableAction;
   creationDate: Date;
   taskTitle: string | undefined;
+  projectId: string;
 }

@@ -1,4 +1,5 @@
 ﻿using Core.Constants;
+using Core.Entities;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,20 @@ namespace Web.Controllers
         public async Task<IActionResult> GetProjectChanges(Guid projectId)
         {
             var changes = await _changeService.GetChangesByProjectIdAsync(projectId);
+            return Ok(changes);
+        }
+
+        [HttpGet("manager/{managerId}")]
+        public async Task<IActionResult> GetManagerChanges(Guid managerId)
+        {
+            var changes = await _changeService.GetChangesByManagerIdAsync(managerId);
+            return Ok(changes);
+        }
+
+        [HttpGet("employee/{employeeId}")]
+        public async Task<IActionResult> GetEmployeeChanges(Guid employeeId)
+        {
+            var changes = await _changeService.GetChangesByEmployeeIdAsync(employeeId);
             return Ok(changes);
         }
     }

@@ -4,6 +4,7 @@ namespace Core.Interfaces.Services;
 public interface IChangeService
 {
     Task<IEnumerable<ChangeReadDTO>> GetChangesByProjectIdAsync(Guid projectId);
-    Task<IEnumerable<ChangeReadDTO>> GetChangesByUserIdAsync(int userId);
+    Task<IEnumerable<ChangeReadDTO>> GetChangesByManagerIdAsync(Guid managerId);
+    Task<IEnumerable<ChangeReadDTO>> GetChangesByEmployeeIdAsync(Guid employeeId);
     Task CreateChangeAsync(ChangeCreateDTO dTO); 
 }

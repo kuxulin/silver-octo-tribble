@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ProjectService } from '../../shared/services/project.service';
-import { map, merge, Observable, of, shareReplay, tap } from 'rxjs';
+import { map, merge, Observable, of, shareReplay, take, tap } from 'rxjs';
 import Project from '../../shared/models/Project';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,6 +21,7 @@ import { TasksTableTabComponent } from './tasks-table-tab/tasks-table-tab.compon
 import { TasksBoardTabComponent } from './tasks-board-tab/tasks-board-tab.component';
 import Employee from '../../shared/models/Employee';
 import { LogsDialogComponent } from '../../shared/logs-dialog/logs-dialog.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -57,10 +58,15 @@ export class DashboardComponent implements OnInit {
   constructor(
     private _projectService: ProjectService,
     private _authService: AuthService,
-    private _todoTaskService: TodoTaskService
+    private _todoTaskService: TodoTaskService,
+    private _route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this._route.queryParams.subscribe(
+      (params) => (this.selectedProjectId = params['selectedProjectId'])
+    );
+
     this.currentUser$ = this._authService.user$.pipe(
       tap((res) => {
         this.currentUser = res;
@@ -88,13 +94,12 @@ export class DashboardComponent implements OnInit {
     if (projects.length === 0) return;
 
     let selectedProject = projects[0];
-    this.selectedProjectId = projects[0].id;
 
     if (this.selectedProjectId) {
       let res = projects.find((p) => p.id === this.selectedProjectId)!;
       this.selectedProjectId = res.id;
       selectedProject = res;
-    }
+    } else this.selectedProjectId = projects[0].id;
 
     this.fetchCurrentProject();
     return selectedProject;

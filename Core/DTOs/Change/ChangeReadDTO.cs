@@ -9,4 +9,5 @@ public class ChangeReadDTO : BaseReadDTO
     public TodoTaskReadDTO Task { get; set; }
     public string ActionType { get; set; }
     public string? TaskTitle { get; set; }
+    public Guid ProjectId { get; set; }
 }
