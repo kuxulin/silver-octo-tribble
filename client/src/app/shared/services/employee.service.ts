@@ -7,7 +7,7 @@ import Employee from '../models/Employee';
   providedIn: 'root',
 })
 export class EmployeeService {
-  private _apiUrl = environment.api + '/Employee';
+  private _apiUrl = environment.server + 'api/Employee';
 
   constructor(private _httpClient: HttpClient) {}
 

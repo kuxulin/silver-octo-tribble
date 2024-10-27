@@ -10,7 +10,7 @@ import ProjectUpdateDTO from '../models/DTOs/ProjectUpdateDTO';
   providedIn: 'root',
 })
 export class ProjectService {
-  private _apiUrl = environment.api + '/Project';
+  private _apiUrl = environment.server + 'api/Project';
 
   constructor(private _httpClient: HttpClient) {}
 

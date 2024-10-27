@@ -140,9 +140,9 @@
           *matCellDef="let element"
           (click)="navigateToUser(element.id)"
         >
-          <img
-            [src]="'data:image/jpeg;base64,' + element.image?.content || ''"
-            [width]="40"
+          <app-avatar-image
+            [imageContent]="element.image.content"
+            [userName]="element.userName"
           />
         </td>
       </ng-container>

@@ -13,9 +13,10 @@
       <mat-list>
         @for (manager of currentProject.managers; track $index) {
         <mat-list-item>
-          <img
+          <app-avatar-image
             matListItemAvatar
-            [src]="'data:image/jpeg;base64,' + manager.user.image.content"
+            [imageContent]="manager.user.image.content"
+            [userName]="manager.user.userName"
           />
           <h3 matListItemTitle>
             {{ manager.user.firstName }} {{ manager.user.lastName }}
@@ -48,9 +49,10 @@
       <mat-list>
         @for (employee of currentProject.employees; track $index) {
         <mat-list-item>
-          <img
+          <app-avatar-image
             matListItemAvatar
-            [src]="'data:image/jpeg;base64,' + employee.user.image.content"
+            [imageContent]="employee.user.image.content"
+            [userName]="employee.user.userName"
           />
           <h3 matListItemTitle>
             {{ employee.user.firstName }} {{ employee.user.lastName }}

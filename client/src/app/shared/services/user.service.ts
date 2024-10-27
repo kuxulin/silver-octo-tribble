@@ -13,7 +13,7 @@ import UserUpdateDTO from '../models/DTOs/UserUpdateDTO';
   providedIn: 'root',
 })
 export class UserService {
-  private _apiUrl = environment.api + '/User';
+  private _apiUrl = environment.server + 'api/User';
 
   constructor(private _httpClient: HttpClient) {}
 

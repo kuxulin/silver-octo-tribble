@@ -9,7 +9,7 @@ import { map } from 'rxjs';
   providedIn: 'root',
 })
 export class ChangeService {
-  private _apiUrl = environment.api + '/Change';
+  private _apiUrl = environment.server + 'api/Change';
 
   constructor(private _httpClient: HttpClient) {}
 

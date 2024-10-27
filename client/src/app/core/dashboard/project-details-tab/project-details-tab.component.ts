@@ -12,11 +12,17 @@ import { AuthService } from '../../../shared/services/auth.service';
 import { ProjectService } from '../../../shared/services/project.service';
 import { TodoTaskService } from '../../../shared/services/todo-task.service';
 import { UpdateUsersInProjectDialogComponent } from '../../../shared/update-users-in-project-dialog/update-users-in-project-dialog.component';
+import { AvatarImageComponent } from '../../../shared/avatar-image/avatar-image.component';
 
 @Component({
   selector: 'dashboard-project-details-tab',
   standalone: true,
-  imports: [MatListModule, MatIconModule, MatButtonModule],
+  imports: [
+    MatListModule,
+    MatIconModule,
+    MatButtonModule,
+    AvatarImageComponent,
+  ],
   templateUrl: './project-details-tab.component.html',
   styleUrl: './project-details-tab.component.scss',
 })

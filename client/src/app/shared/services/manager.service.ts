@@ -7,7 +7,7 @@ import Manager from '../models/Manager';
   providedIn: 'root',
 })
 export class ManagerService {
-  private _apiUrl = environment.api + '/Manager';
+  private _apiUrl = environment.server + 'api/Manager';
 
   constructor(private _httpClient: HttpClient) {}
 

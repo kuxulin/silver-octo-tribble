@@ -11,7 +11,7 @@ import AvailableTaskStatus from '../models/enums/AvailableStatus';
   providedIn: 'root',
 })
 export class TodoTaskService {
-  private _apiUrl = environment.api + '/TodoTask';
+  private _apiUrl = environment.server + 'api/TodoTask';
 
   constructor(private _httpClient: HttpClient) {}
 

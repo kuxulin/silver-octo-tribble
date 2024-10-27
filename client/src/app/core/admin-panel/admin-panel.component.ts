@@ -40,6 +40,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import UsersMetrics from '../../shared/models/UserMetrics';
 import { Router } from '@angular/router';
+import { AvatarImageComponent } from '../../shared/avatar-image/avatar-image.component';
 
 @Component({
   selector: 'app-admin-panel',
@@ -59,6 +60,7 @@ import { Router } from '@angular/router';
     FormsModule,
     MatCheckboxModule,
     MatCardModule,
+    AvatarImageComponent,
   ],
   providers: [
     { provide: DateAdapter, useClass: AppDateAdapter },

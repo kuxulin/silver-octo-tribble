@@ -7,16 +7,21 @@ import LoginRegisterDTO from '../models/DTOs/LoginRegisterDTO';
 import AvailableUserRole from '../models/enums/AvailableUserRole';
 import { Router } from '@angular/router';
 import UserAuthDTO from '../models/DTOs/UserAuthDTO';
+import { OnlineUsersService } from './online-users.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private _apiUrl = environment.api + '/auth';
+  private _apiUrl = environment.server + 'api/auth';
   private _subject = new ReplaySubject<Object>(1);
   user$ = this._subject.asObservable() as Observable<UserAuthDTO>;
 
-  constructor(private _httpClient: HttpClient, private _router: Router) {}
+  constructor(
+    private _httpClient: HttpClient,
+    private _router: Router,
+    private _onlineUsersService: OnlineUsersService
+  ) {}
 
   login(userName: string, password: string) {
     return this._httpClient
@@ -49,13 +54,30 @@ export class AuthService {
       );
   }
 
-  private setSession(result: UserAuthDTO) {
-    sessionStorage.setItem(SESSION_STORAGE.TOKEN, result.token);
-    let user: UserAuthDTO = {
-      ...result,
-      token: '',
-    };
-    this._subject.next(user);
+  private async makeUserOnline() {
+    await this._onlineUsersService.makeUserOnline();
+  }
+
+  private makeUserOffline() {
+    this._onlineUsersService.makeUserOffline();
+  }
+
+  private setSession(result: UserAuthDTO | null = null) {
+    if (result) {
+      sessionStorage.setItem(SESSION_STORAGE.TOKEN, result.token);
+
+      let user: UserAuthDTO = {
+        ...result,
+        token: '',
+      };
+
+      this._subject.next(user);
+      this.makeUserOnline();
+    } else {
+      this._subject.next(0);
+      this._router.navigate(['login']);
+      this.makeUserOffline();
+    }
   }
 
   refreshTokens() {
@@ -102,10 +124,7 @@ export class AuthService {
       .delete(this._apiUrl + '/logout', { withCredentials: true })
       .pipe(
         take(1),
-        tap(() => {
-          this._subject.next(0);
-          this._router.navigate(['login']);
-        })
+        tap(() => this.setSession())
       );
   }
 }
