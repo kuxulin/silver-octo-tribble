@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { DataService } from './data.service';
+import { NotificationsService } from './notifications.service';
 import { SESSION_STORAGE } from '../../consts';
 @Injectable({
   providedIn: 'root',
@@ -10,20 +12,17 @@ export class OnlineUsersService {
   private _hubConnection: HubConnection | null = null;
   private _onlineUsersSubject = new BehaviorSubject<string[]>([]);
   onlineUsers$ = this._onlineUsersSubject.asObservable();
-  constructor() {}
+  constructor(
+    private _dataService: DataService,
+    private _notificationsService: NotificationsService
+  ) {}
 
-  private getAuthToken() {
-    return sessionStorage.getItem(SESSION_STORAGE.TOKEN);
-  }
-
-  async startConnection() {
+  async startConnectionAsync() {
     this._hubConnection = new HubConnectionBuilder()
       .withUrl(environment.server + 'onlineStatusHub', {
         accessTokenFactory: () => this.getAuthToken()!,
       })
       .build();
-
-    await this._hubConnection.start();
 
     this._hubConnection.on('AddOnlineUser', (users: string[]) =>
       this._onlineUsersSubject.next(users)
@@ -32,15 +31,20 @@ export class OnlineUsersService {
     this._hubConnection.on('RemoveOfflineUser', (users: string[]) =>
       this._onlineUsersSubject.next(users)
     );
+
+    await this._hubConnection.start();
+  }
+
+  getAuthToken() {
+    return sessionStorage.getItem(SESSION_STORAGE.TOKEN);
   }
 
   async makeUserOnline() {
-    await this.startConnection();
-    this._hubConnection!.invoke('UserConnectedAsync');
+    await this.startConnectionAsync();
+    await this._notificationsService.startConnectionAsync();
   }
 
   makeUserOffline() {
-    this._hubConnection!.invoke('UserDisconnectedAsync');
     this.stopConnection();
   }
 

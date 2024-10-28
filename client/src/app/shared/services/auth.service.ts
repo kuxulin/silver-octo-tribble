@@ -8,6 +8,7 @@ import AvailableUserRole from '../models/enums/AvailableUserRole';
 import { Router } from '@angular/router';
 import UserAuthDTO from '../models/DTOs/UserAuthDTO';
 import { OnlineUsersService } from './online-users.service';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,8 @@ export class AuthService {
   constructor(
     private _httpClient: HttpClient,
     private _router: Router,
-    private _onlineUsersService: OnlineUsersService
+    private _onlineUsersService: OnlineUsersService,
+    private _dataService: DataService
   ) {}
 
   login(userName: string, password: string) {
@@ -64,7 +66,7 @@ export class AuthService {
 
   private setSession(result: UserAuthDTO | null = null) {
     if (result) {
-      sessionStorage.setItem(SESSION_STORAGE.TOKEN, result.token);
+      this._dataService.setAuthToken(result.token);
 
       let user: UserAuthDTO = {
         ...result,
@@ -88,10 +90,6 @@ export class AuthService {
         tap((res) => this.setSession(res)),
         shareReplay()
       );
-  }
-
-  getAuthToken() {
-    return sessionStorage.getItem(SESSION_STORAGE.TOKEN);
   }
 
   isEmployeeInGeneral(user: UserAuthDTO) {
@@ -119,7 +117,7 @@ export class AuthService {
   }
 
   logOut() {
-    sessionStorage.removeItem(SESSION_STORAGE.TOKEN);
+    this._dataService.setAuthToken('');
     return this._httpClient
       .delete(this._apiUrl + '/logout', { withCredentials: true })
       .pipe(

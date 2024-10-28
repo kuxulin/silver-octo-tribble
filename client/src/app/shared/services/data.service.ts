@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SESSION_STORAGE } from '../../consts';
 
 @Injectable({
   providedIn: 'root',
@@ -12,5 +13,14 @@ export class DataService {
 
   getRowData() {
     return this._rowData;
+  }
+
+  getAuthToken() {
+    return sessionStorage.getItem(SESSION_STORAGE.TOKEN);
+  }
+
+  setAuthToken(token: string) {
+    if (!token) sessionStorage.removeItem(SESSION_STORAGE.TOKEN);
+    else sessionStorage.setItem(SESSION_STORAGE.TOKEN, token);
   }
 }

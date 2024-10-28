@@ -3,23 +3,24 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Infrastructure.SignalR.Hubs;
-public class OnlineStatusHub : Hub
+[Authorize(Policy = DefinedPolicy.DefaultPolicy)]
+internal class OnlineStatusHub : Hub
 {
     private static List<string> _onlineUsers = [];
-    [Authorize(Policy = DefinedPolicy.DefaultPolicy)]
-    public async Task UserConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
         var userName = Context.User?.Identity?.Name;
         _onlineUsers.Add(userName);
         await Clients.All.SendAsync("AddOnlineUser", _onlineUsers);
+        await base.OnConnectedAsync();
     }
 
-    [Authorize(Policy = DefinedPolicy.DefaultPolicy)]
-    public async Task UserDisconnectedAsync()
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var userName = Context.User?.Identity?.Name;
         _onlineUsers.Remove(userName);
         await Clients.All.SendAsync("RemoveOfflineUser", _onlineUsers);
+        await base.OnDisconnectedAsync(exception);
     }
 }
 
