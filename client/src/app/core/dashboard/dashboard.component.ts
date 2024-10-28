@@ -195,7 +195,7 @@ export class DashboardComponent implements OnInit {
               title: res.newTask.title!,
               text: res.newTask.text!,
               projectId: this.selectedProjectId,
-              employeeId: res.newTask.employeeId!,
+              employeeId: res.newTask.employee?.id!,
             })
             .subscribe(() => this.fetchTasks());
         }
@@ -230,10 +230,10 @@ export class DashboardComponent implements OnInit {
 
   private handlePossibleUpdates(task: TodoTask, newTask: TodoTask) {
     let request = new Observable<Object>();
-    if (this.isManager && task.employeeId != newTask.employeeId)
+    if (this.isManager && task.employee?.id != newTask.employee?.id)
       request = this._todoTaskService.changeTaskEmployee(
         newTask.id,
-        newTask.employeeId
+        newTask.employee?.id!
       );
 
     if (

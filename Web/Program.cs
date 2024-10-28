@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
+app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value);
 app.UseAuthentication();
 
 using (var scope = app.Services.CreateScope())
@@ -58,8 +58,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseAuthorization();
-app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value);
 app.MapControllers();
-app.MapHub<OnlineStatusHub>("/onlineStatusHub");
+app.AddHubs();
 
 app.Run();

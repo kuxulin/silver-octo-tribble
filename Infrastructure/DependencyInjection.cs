@@ -98,4 +98,9 @@ public static class DependencyInjection
             swagger.AddSecurityRequirement(securityRequirements);
         });
     }
+
+    public static void AddHubs(this WebApplication app)
+    {
+        app.MapHub<OnlineStatusHub>("/onlineStatusHub");
+    }
 }
