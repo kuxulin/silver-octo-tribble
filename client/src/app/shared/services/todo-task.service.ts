@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import TodoTask from '../models/TodoTask';
@@ -49,15 +49,17 @@ export class TodoTaskService {
   }
 
   changeTaskEmployee(taskId: string, employeeId: string) {
+    let params = new HttpParams();
+    params = params.append('taskId', taskId);
+
+    if (employeeId) params = params.append('employeeId', employeeId);
+
     return this._httpClient
       .patch(
         this._apiUrl + '/employee',
         {},
         {
-          params: {
-            taskId,
-            employeeId,
-          },
+          params: params,
         }
       )
       .pipe(take(1));

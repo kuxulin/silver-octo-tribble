@@ -6,7 +6,6 @@ export default interface TodoTask {
   title: string;
   text: string;
   status: AvailableTaskStatus;
-  employeeId: string;
   employee: Employee | null;
   projectId: string;
 }

@@ -123,7 +123,9 @@ export class TaskInfoDialogComponent {
           this.form.value.status! as keyof typeof AvailableTaskStatus
         ],
       projectId: '',
-      employeeId: this.newUser?.employeeId!,
+      employee: !!this.newUser
+        ? { id: this.newUser.employeeId!, user: this.newUser }
+        : null,
     };
     this.dialogRef.close({ flag, newTask });
   }

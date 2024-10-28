@@ -3,5 +3,6 @@ enum AvailableAction {
   Delete = 'Delete',
   Assign = 'Assign',
   Update = 'Update',
+  ChangeStatus = 'Change status',
 }
 export default AvailableAction;
