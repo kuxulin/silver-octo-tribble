@@ -15,7 +15,10 @@ internal class ChangeRepository :BaseCRUDRepository<Change, DatabaseContext>,ICh
 
     public override IQueryable<Change> GetAll()
     {
-        return base.GetAll().Include(c => c.Creator).Include(c => c.Task);
+        return base.GetAll()
+            .Include(c => c.Creator)
+            .Include(c => c.Task)
+            .ThenInclude(t => t.Employee);
     }
 
     public override async Task<Change> AddAsync(Change entity, bool isSaved = true)
