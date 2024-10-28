@@ -1,8 +1,9 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderMenuComponent } from './core/header-menu/header-menu.component';
 import { AuthService } from './shared/services/auth.service';
 import { OnlineUsersService } from './shared/services/online-users.service';
+import { DataService } from './shared/services/data.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private _authService: AuthService,
-    private _onlineUsersService: OnlineUsersService
+    private _onlineUsersService: OnlineUsersService,
+    private _dataService: DataService
   ) {}
 
   ngOnInit() {
@@ -25,7 +27,7 @@ export class AppComponent implements OnInit {
 
   @HostListener('window:beforeunload')
   unloadHandler() {
-    if (this._authService.getAuthToken())
+    if (this._dataService.getAuthToken())
       this._onlineUsersService.makeUserOffline();
   }
 }

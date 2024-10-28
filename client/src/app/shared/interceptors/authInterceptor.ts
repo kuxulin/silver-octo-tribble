@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import UserAuthDTO from '../models/DTOs/UserAuthDTO';
+import { DataService } from '../services/data.service';
 
 let refreshingTokens: Observable<UserAuthDTO> | null = null;
 
@@ -20,9 +21,10 @@ export function authInterceptor(
     return next(req);
 
   const authService: AuthService = inject(AuthService);
+  const dataService: DataService = inject(DataService);
   const router: Router = inject(Router);
 
-  let token = authService.getAuthToken();
+  let token = dataService.getAuthToken();
   let tokenInfo: JwtPayload;
 
   try {
@@ -37,7 +39,7 @@ export function authInterceptor(
 
     return refreshingTokens.pipe(
       switchMap(() => {
-        token = authService.getAuthToken();
+        token = dataService.getAuthToken();
 
         req = req.clone({
           headers: req.headers.set('Authorization', `Bearer ${token}`),
