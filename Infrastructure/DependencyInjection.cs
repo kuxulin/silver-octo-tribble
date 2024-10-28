@@ -2,8 +2,9 @@
 using Core.Interfaces.Services;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
+using Infrastructure.SignalR.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -21,6 +22,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
     {
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<INotificationsHubService, NotificationsHubService>();
         return services;
     }
 
@@ -53,7 +55,7 @@ public static class DependencyInjection
                         var accessToken = context.Request.Query["access_token"];
                         var path = context.HttpContext.Request.Path;
 
-                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/onlineStatusHub"))
+                        if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/onlineStatusHub") || path.StartsWithSegments("/notificationsHub")))
                         {
                             context.Token = accessToken;
                         }
@@ -102,5 +104,6 @@ public static class DependencyInjection
     public static void AddHubs(this WebApplication app)
     {
         app.MapHub<OnlineStatusHub>("/onlineStatusHub");
+        app.MapHub<NotificationsHub>("/notificationsHub");
     }
 }

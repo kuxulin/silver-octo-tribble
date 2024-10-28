@@ -16,12 +16,14 @@ public class TodoTaskController : ControllerBase
     private readonly ITodoTaskService _taskService;
     private readonly IChangeService _changeService;
     private readonly ITokenService _tokenService;
+    private readonly INotificationsHubService _notificationsHub;
 
-    public TodoTaskController(ITodoTaskService taskService, IChangeService changeService, ITokenService tokenService)
+    public TodoTaskController(ITodoTaskService taskService, IChangeService changeService, ITokenService tokenService,INotificationsHubService notificationsHub)
     {
         _taskService = taskService;
         _changeService = changeService;
         _tokenService = tokenService;
+        _notificationsHub = notificationsHub;
     }
 
     [HttpGet]
@@ -116,7 +118,9 @@ public class TodoTaskController : ControllerBase
             ProjectId = projectId
         };
 
-        await _changeService.CreateChangeAsync(changeDto);
+        var id = await _changeService.CreateChangeAsync(changeDto);
+        var change = (await _changeService.GetChangeByIdAsync(id)).Value;
+        await _notificationsHub.OnChangeCreated(change);
     }
 
     private int GetIdFromToken()

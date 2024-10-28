@@ -11,6 +11,7 @@ import UserAuthDTO from '../../shared/models/DTOs/UserAuthDTO';
 import { MatMenuModule } from '@angular/material/menu';
 import Change from '../../shared/models/Change';
 import { ChangeService } from '../../shared/services/change.service';
+import { NotificationsService } from '../../shared/services/notifications.service';
 
 @Component({
   selector: 'app-header-menu',
@@ -29,32 +30,42 @@ import { ChangeService } from '../../shared/services/change.service';
 })
 export class HeaderMenuComponent implements OnInit {
   currentUser$!: Observable<UserAuthDTO>;
+  currentUserValue!: UserAuthDTO;
   managerChanges$!: Observable<Change[]>;
   employeeChanges$!: Observable<Change[]>;
   constructor(
     private _authService: AuthService,
     private _changeService: ChangeService,
-    private _router: Router
+    private _router: Router,
+    private _notificationsService: NotificationsService
   ) {}
 
   ngOnInit(): void {
     this.fetchUser();
+    this._notificationsService.onChangeCreatedEvent.subscribe(() =>
+      this.fetchChanges()
+    );
   }
 
   fetchUser() {
     this.currentUser$ = this._authService.user$.pipe(
-      tap((res) => this.fetchChanges(res.employeeId, res.managerId))
+      tap((res) => {
+        this.currentUserValue = res;
+        this.fetchChanges();
+      })
     );
   }
 
-  fetchChanges(employeeId: string | undefined, managerId: string | undefined) {
-    if (!!managerId)
-      this.managerChanges$ =
-        this._changeService.getChangesFromManager(managerId);
+  fetchChanges() {
+    if (!!this.currentUserValue.managerId)
+      this.managerChanges$ = this._changeService.getChangesFromManager(
+        this.currentUserValue.managerId
+      );
 
-    if (!!employeeId)
-      this.employeeChanges$ =
-        this._changeService.getChangesFromEmployee(employeeId);
+    if (!!this.currentUserValue.employeeId)
+      this.employeeChanges$ = this._changeService.getChangesFromEmployee(
+        this.currentUserValue.employeeId
+      );
   }
 
   isEmployeeInGeneral(user: UserAuthDTO) {
@@ -81,5 +92,9 @@ export class HeaderMenuComponent implements OnInit {
 
   logOut() {
     this._authService.logOut().subscribe(() => this.fetchUser());
+  }
+
+  ngOnDestroy() {
+    this._notificationsService.onChangeCreatedEvent.unsubscribe();
   }
 }

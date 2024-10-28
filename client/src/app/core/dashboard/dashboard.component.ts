@@ -22,6 +22,7 @@ import { TasksBoardTabComponent } from './tasks-board-tab/tasks-board-tab.compon
 import Employee from '../../shared/models/Employee';
 import { LogsDialogComponent } from '../../shared/logs-dialog/logs-dialog.component';
 import { ActivatedRoute } from '@angular/router';
+import { NotificationsService } from '../../shared/services/notifications.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -59,7 +60,8 @@ export class DashboardComponent implements OnInit {
     private _projectService: ProjectService,
     private _authService: AuthService,
     private _todoTaskService: TodoTaskService,
-    private _route: ActivatedRoute
+    private _route: ActivatedRoute,
+    private _notificationsService: NotificationsService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +77,10 @@ export class DashboardComponent implements OnInit {
         this.fetchProjects();
       })
     );
+
+    this._notificationsService.onChangeCreatedEvent.subscribe(() => {
+      this.fetchTasks();
+    });
   }
 
   fetchProjects() {
@@ -252,5 +258,9 @@ export class DashboardComponent implements OnInit {
       );
 
     return request;
+  }
+
+  ngOnDestroy() {
+    this._notificationsService.onChangeCreatedEvent.unsubscribe();
   }
 }
