@@ -10,4 +10,5 @@ export default interface Change {
   creationDate: Date;
   taskTitle: string | undefined;
   projectId: string;
+  isRead: boolean;
 }

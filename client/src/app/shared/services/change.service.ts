@@ -74,4 +74,17 @@ export class ChangeService {
         )
       );
   }
+
+  makeChangeRead(changeId: string, userId: number) {
+    return this._httpClient.patch(
+      this._apiUrl + '/read',
+      {},
+      {
+        params: {
+          changeId,
+          userId,
+        },
+      }
+    );
+  }
 }

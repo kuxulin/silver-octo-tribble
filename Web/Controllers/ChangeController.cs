@@ -1,8 +1,6 @@
 ﻿using Core.Constants;
-using Core.Entities;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
@@ -38,6 +36,13 @@ namespace Web.Controllers
         {
             var changes = await _changeService.GetChangesByEmployeeIdAsync(employeeId);
             return Ok(changes);
+        }
+
+        [HttpPatch("read")]
+        public async Task<IActionResult> MakeChangeRead(Guid changeId, int userId)
+        {
+            await _changeService.MakeChangeRead(changeId, userId);
+            return Ok();
         }
     }
 }

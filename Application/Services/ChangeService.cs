@@ -80,4 +80,13 @@ internal class ChangeService : IChangeService
         change = await _changeRepository.AddAsync(change);
         return change.Id;
     }
+
+    public async Task MakeChangeRead(Guid changeId, int userId)
+    {
+        var change = await _changeRepository.GetAll().Include(c => c.UserChanges).FirstOrDefaultAsync(c => c.Id == changeId);   
+
+        change.UserChanges.Where(uc => uc.UserId == userId).First().IsRead = true;
+
+        await _changeRepository.UpdateAsync(change);
+    }
 }

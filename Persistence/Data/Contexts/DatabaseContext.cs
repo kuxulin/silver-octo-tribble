@@ -28,6 +28,7 @@ public class DatabaseContext : IdentityDbContext
     public DbSet<ApplicationImage> Images { get; set; }
     public DbSet<TodoTaskStatus> TaskStatuses { get; set; }
     public DbSet<Change> Changes { get; set; }
+    public DbSet<UserChange> UserChanges { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -96,5 +97,21 @@ public class DatabaseContext : IdentityDbContext
             .HasOne(c => c.Project)
             .WithMany()
             .HasForeignKey(c => c.ProjectId);
+
+        modelBuilder.Entity<UserChange>()
+            .HasKey(uc => new { uc.UserId, uc.ChangeId });
+
+        modelBuilder.Entity<UserChange>()
+            .HasOne(uc => uc.User)
+            .WithMany(u => u.UserChanges)
+            .HasForeignKey(uc => uc.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<UserChange>()
+           .HasOne(uc => uc.Change)
+           .WithMany(c => c.UserChanges)
+           .HasForeignKey(uc => uc.ChangeId)
+           .OnDelete(DeleteBehavior.Cascade);
+
     }
 }

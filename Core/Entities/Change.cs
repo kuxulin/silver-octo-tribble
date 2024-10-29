@@ -9,4 +9,5 @@ public class Change : BaseEntity
     public string? TaskTitle { get; set; }
     public Guid ProjectId { get; set; }
     public Project Project { get; set; }
+    public ICollection<UserChange>? UserChanges { get; set; }
 }

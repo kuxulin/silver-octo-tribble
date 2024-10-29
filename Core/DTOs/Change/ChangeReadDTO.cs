@@ -10,4 +10,5 @@ public class ChangeReadDTO : BaseReadDTO
     public string ActionType { get; set; }
     public string? TaskTitle { get; set; }
     public Guid ProjectId { get; set; }
+    public bool IsRead { get; set; }
 }

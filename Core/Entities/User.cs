@@ -17,6 +17,8 @@ public class User : IdentityUser<int>
     public Guid? EmployeeId { get; set; }
     public Employee? Employee { get; set; }
 
+    public ICollection<UserChange>? UserChanges { get; set; }
+
     public User()
     {
         CreationDate = DateTime.UtcNow;
