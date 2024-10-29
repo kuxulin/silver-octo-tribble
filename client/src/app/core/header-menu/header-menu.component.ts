@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
-import { Observable, tap } from 'rxjs';
+import { Observable, Subscription, tap } from 'rxjs';
 import UserAuthDTO from '../../shared/models/DTOs/UserAuthDTO';
 import { MatMenuModule } from '@angular/material/menu';
 import Change from '../../shared/models/Change';
@@ -33,6 +33,7 @@ export class HeaderMenuComponent implements OnInit {
   currentUserValue!: UserAuthDTO;
   managerChanges$!: Observable<Change[]>;
   employeeChanges$!: Observable<Change[]>;
+  onCreated!: Subscription;
   constructor(
     private _authService: AuthService,
     private _changeService: ChangeService,
@@ -42,8 +43,8 @@ export class HeaderMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchUser();
-    this._notificationsService.onChangeCreatedEvent.subscribe(() =>
-      this.fetchChanges()
+    this.onCreated = this._notificationsService.onChangeCreatedEvent.subscribe(
+      () => this.fetchChanges()
     );
   }
 
@@ -84,9 +85,16 @@ export class HeaderMenuComponent implements OnInit {
     return this._changeService.convertChange(change);
   }
 
-  navigateToProject(projectId: string) {
+  navigateToProject(change: Change) {
+    if (!change.isRead)
+      this._changeService
+        .makeChangeRead(change.id, this.currentUserValue.id)
+        .subscribe(() => {
+          this.fetchChanges();
+        });
+
     this._router.navigate(['dashboard/'], {
-      queryParams: { selectedProjectId: projectId },
+      queryParams: { selectedProjectId: change.projectId },
     });
   }
 
@@ -95,6 +103,6 @@ export class HeaderMenuComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this._notificationsService.onChangeCreatedEvent.unsubscribe();
+    this.onCreated.unsubscribe();
   }
 }

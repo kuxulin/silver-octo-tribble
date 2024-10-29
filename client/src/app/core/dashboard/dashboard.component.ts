@@ -1,7 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ProjectService } from '../../shared/services/project.service';
-import { map, merge, Observable, of, shareReplay, take, tap } from 'rxjs';
+import {
+  map,
+  merge,
+  Observable,
+  of,
+  shareReplay,
+  Subscription,
+  take,
+  tap,
+} from 'rxjs';
 import Project from '../../shared/models/Project';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -55,7 +64,7 @@ export class DashboardComponent implements OnInit {
   inProgress$!: Observable<TodoTask[]>;
   onReview$!: Observable<TodoTask[]>;
   completed$!: Observable<TodoTask[]>;
-
+  onCreatedSubscription!: Subscription;
   constructor(
     private _projectService: ProjectService,
     private _authService: AuthService,
@@ -78,9 +87,10 @@ export class DashboardComponent implements OnInit {
       })
     );
 
-    this._notificationsService.onChangeCreatedEvent.subscribe(() => {
-      this.fetchTasks();
-    });
+    this.onCreatedSubscription =
+      this._notificationsService.onChangeCreatedEvent.subscribe(() => {
+        this.fetchTasks();
+      });
   }
 
   fetchProjects() {
@@ -261,6 +271,6 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this._notificationsService.onChangeCreatedEvent.unsubscribe();
+    this.onCreatedSubscription.unsubscribe();
   }
 }

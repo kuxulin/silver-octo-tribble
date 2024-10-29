@@ -17,7 +17,11 @@
     <button mat-menu-item [matMenuTriggerFor]="managerChanges">Manager</button>
     <mat-menu #managerChanges="matMenu" xPosition="before">
       @for(change of (managerChanges$ | async); track $index) {
-      <button mat-menu-item (click)="navigateToProject(change.projectId)">
+      <button
+        mat-menu-item
+        (click)="navigateToProject(change)"
+        [style.background-color]="change.isRead ? null : '#ff6969'"
+      >
         {{ convertChange(change) }}
       </button>
       }
@@ -28,7 +32,11 @@
     </button>
     <mat-menu #employeeChanges="matMenu" xPosition="before">
       @for(change of employeeChanges$ | async; track $index) {
-      <button mat-menu-item (click)="navigateToProject(change.projectId)">
+      <button
+        mat-menu-item
+        (click)="navigateToProject(change)"
+        [style.background-color]="change.isRead ? null : '#ff6969'"
+      >
         {{ convertChange(change) }}
       </button>
       }</mat-menu
