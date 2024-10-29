@@ -14,18 +14,21 @@ internal class ChangeService : IChangeService
     private readonly IChangeRepository _changeRepository;
     private readonly IMapper _mapper;
     private readonly IProjectRepository _projectRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IUserChangeRepository _userChangeRepository;
 
-    public ChangeService(IChangeRepository changeRepository, IProjectRepository projectRepository, IMapper mapper)
+    public ChangeService(IChangeRepository changeRepository, IProjectRepository projectRepository, IUserChangeRepository userChangeRepository, IUserRepository userRepository, IMapper mapper)
     {
         _changeRepository = changeRepository;
         _mapper = mapper;
         _projectRepository = projectRepository;
+        _userRepository = userRepository;
+        _userChangeRepository = userChangeRepository;
     }
 
     public async Task<IEnumerable<ChangeReadDTO>> GetChangesByProjectIdAsync(Guid projectId)
     {
         var changes = await _changeRepository.GetAll().Where(c => c.ProjectId == projectId).ToListAsync();
-
         return _mapper.Map<IEnumerable<ChangeReadDTO>>(changes);
     }
 
@@ -44,34 +47,55 @@ internal class ChangeService : IChangeService
 
         var changes = await _changeRepository
             .GetAll()
+            .Include(c => c.UserChanges)
             .Where(c => c.ActionType == DefinedAction.ChangeStatus
                         && projects.Select(p => p.Id).Contains(c.ProjectId))
             .ToListAsync();
 
-        return _mapper.Map<IEnumerable<ChangeReadDTO>>(changes);
+        var userId = await _userRepository.GetAll().Where(u => u.ManagerId == managerId).Select(u => u.Id).FirstAsync();
+        changes = await AttachUserChangesAsync(changes, userId);
+        return _mapper.Map<IEnumerable<ChangeReadDTO>>(changes, opts => opts.Items["userId"] = userId);
     }
 
     public async Task<IEnumerable<ChangeReadDTO>> GetChangesByEmployeeIdAsync(Guid employeeId)
     {
-        var query = _changeRepository.GetAll().Where(c => c.Task.EmployeeId == employeeId);
+        var query = _changeRepository.GetAll().Include(c => c.UserChanges).Where(c => c.Task.EmployeeId == employeeId);
         var result = new List<Change>();
 
         var lastAssignChangeFlags = await query
             .Where(c => c.ActionType == DefinedAction.Assign)
-            .GroupBy(c => c.TaskId, (key,value) => value.OrderByDescending(c => c.CreationDate).First())
+            .GroupBy(c => c.TaskId, (key, value) => value.OrderByDescending(c => c.CreationDate).First())
             .ToListAsync();
-        
+
         foreach (var flagChange in lastAssignChangeFlags)
         {
             var taskChanges = await query
-                                    .Where(c => c.TaskId == flagChange.TaskId 
-                                                && c.CreationDate >= flagChange.CreationDate)
+                                    .Where(c => c.TaskId == flagChange.TaskId
+                                             && c.CreationDate >= flagChange.CreationDate)
                                     .ToListAsync();
 
-            result.AddRange(taskChanges);                        
+            result.AddRange(taskChanges);
         }
 
-        return _mapper.Map<IEnumerable<ChangeReadDTO>>(result);
+        var userId = await _userRepository.GetAll().Where(u => u.EmployeeId == employeeId).Select(u => u.Id).FirstAsync();
+        result = await AttachUserChangesAsync(result, userId);
+        return _mapper.Map<IEnumerable<ChangeReadDTO>>(result, opts => opts.Items["userId"] = userId);
+    }
+
+    private async Task<List<Change>> AttachUserChangesAsync(List<Change> actualChanges, int userId)
+    {
+        foreach (var change in actualChanges)
+        {
+            if (!change.UserChanges.Any(uc => uc.UserId == userId))
+            {
+                var userChange = new UserChange() { ChangeId = change.Id, UserId = userId };
+                change.UserChanges.Add(userChange);
+                await _userChangeRepository.AddUserChangeAsync(userChange, isSaved: false);
+            }
+        }
+
+        await _userChangeRepository.SaveChangesAsync();
+        return actualChanges;
     }
 
     public async Task<Guid> CreateChangeAsync(ChangeCreateDTO dto)
@@ -84,9 +108,7 @@ internal class ChangeService : IChangeService
     public async Task MakeChangeRead(Guid changeId, int userId)
     {
         var change = await _changeRepository.GetAll().Include(c => c.UserChanges).FirstOrDefaultAsync(c => c.Id == changeId);   
-
         change.UserChanges.Where(uc => uc.UserId == userId).First().IsRead = true;
-
         await _changeRepository.UpdateAsync(change);
     }
 }
