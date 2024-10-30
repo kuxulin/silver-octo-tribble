@@ -1,4 +1,5 @@
 ﻿using Core.Constants;
+using Core.DTOs.User;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -39,9 +40,11 @@ namespace Web.Controllers
         }
 
         [HttpPatch("read")]
-        public async Task<IActionResult> MakeChangeRead(Guid changeId, int userId)
+        public async Task<IActionResult> MakeChangesRead(IEnumerable<Guid> changeIds)
         {
-            await _changeService.MakeChangeRead(changeId, userId);
+            var authHeader = HttpContext.Request.Headers.Authorization.FirstOrDefault();
+            var token = authHeader["Bearer ".Length..].Trim();
+            await _changeService.MakeChangesRead(changeIds,token);
             return Ok();
         }
     }

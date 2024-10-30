@@ -16,14 +16,16 @@ internal class ChangeService : IChangeService
     private readonly IProjectRepository _projectRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUserChangeRepository _userChangeRepository;
+    private readonly ITokenService _tokenService;
 
-    public ChangeService(IChangeRepository changeRepository, IProjectRepository projectRepository, IUserChangeRepository userChangeRepository, IUserRepository userRepository, IMapper mapper)
+    public ChangeService(IChangeRepository changeRepository, IProjectRepository projectRepository, IUserChangeRepository userChangeRepository, IUserRepository userRepository,ITokenService tokenService, IMapper mapper)
     {
         _changeRepository = changeRepository;
         _mapper = mapper;
         _projectRepository = projectRepository;
         _userRepository = userRepository;
         _userChangeRepository = userChangeRepository;
+        _tokenService = tokenService;
     }
 
     public async Task<IEnumerable<ChangeReadDTO>> GetChangesByProjectIdAsync(Guid projectId)
@@ -105,10 +107,17 @@ internal class ChangeService : IChangeService
         return change.Id;
     }
 
-    public async Task MakeChangeRead(Guid changeId, int userId)
+    public async Task MakeChangesRead(IEnumerable<Guid> changeIds, string token)
     {
-        var change = await _changeRepository.GetAll().Include(c => c.UserChanges).FirstOrDefaultAsync(c => c.Id == changeId);   
-        change.UserChanges.Where(uc => uc.UserId == userId).First().IsRead = true;
-        await _changeRepository.UpdateAsync(change);
+        int userId = int.Parse(_tokenService.GetFieldFromToken(token, DefinedClaim.Id));
+        var changes = await _changeRepository.GetAll().Include(c => c.UserChanges).Where(c => changeIds.Any(id => id == c.Id)).ToListAsync();
+
+        foreach (var change in changes)
+        {
+            change.UserChanges.Where(uc => uc.UserId == userId).First().IsRead = true;
+            await _changeRepository.UpdateAsync(change,isSaved:false);
+        }
+
+        await _changeRepository.SaveChangesAsync();
     }
 }

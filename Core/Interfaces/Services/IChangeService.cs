@@ -9,5 +9,5 @@ public interface IChangeService
     Task<IEnumerable<ChangeReadDTO>> GetChangesByManagerIdAsync(Guid managerId);
     Task<IEnumerable<ChangeReadDTO>> GetChangesByEmployeeIdAsync(Guid employeeId);
     Task<Guid> CreateChangeAsync(ChangeCreateDTO dTO);
-    Task MakeChangeRead(Guid changeId, int userId);
+    Task MakeChangesRead(IEnumerable<Guid> changeIds, string token);
 }

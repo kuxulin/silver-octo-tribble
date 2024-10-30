@@ -85,13 +85,16 @@ export class HeaderMenuComponent implements OnInit {
     return this._changeService.convertChange(change);
   }
 
+  readChanges(changes: Change[]) {
+    this._changeService
+      .makeChangeRead(changes.map((c) => c.id))
+      .subscribe(() => {
+        this.fetchChanges();
+      });
+  }
+
   navigateToProject(change: Change) {
-    if (!change.isRead)
-      this._changeService
-        .makeChangeRead(change.id, this.currentUserValue.id)
-        .subscribe(() => {
-          this.fetchChanges();
-        });
+    if (!change.isRead) this.readChanges([change]);
 
     this._router.navigate(['dashboard/'], {
       queryParams: { selectedProjectId: change.projectId },

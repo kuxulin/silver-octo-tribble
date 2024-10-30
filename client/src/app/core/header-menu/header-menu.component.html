@@ -16,7 +16,9 @@
     @if(isManagerInGeneral(user)){
     <button mat-menu-item [matMenuTriggerFor]="managerChanges">Manager</button>
     <mat-menu #managerChanges="matMenu" xPosition="before">
-      @for(change of (managerChanges$ | async); track $index) {
+      @if(managerChanges$ | async; as changes) {
+      <button mat-button (click)="readChanges(changes)">Read all</button>
+      @for(change of changes; track $index) {
       <button
         mat-menu-item
         (click)="navigateToProject(change)"
@@ -24,14 +26,16 @@
       >
         {{ convertChange(change) }}
       </button>
-      }
+      } }
     </mat-menu>
     } @if(isEmployeeInGeneral(user) ){
     <button mat-menu-item [matMenuTriggerFor]="employeeChanges">
       Employee
     </button>
     <mat-menu #employeeChanges="matMenu" xPosition="before">
-      @for(change of employeeChanges$ | async; track $index) {
+      @if(employeeChanges$ | async; as changes) {
+      <button mat-button (click)="readChanges(changes)">Read all</button>
+      @for(change of changes; track $index) {
       <button
         mat-menu-item
         (click)="navigateToProject(change)"
@@ -39,8 +43,8 @@
       >
         {{ convertChange(change) }}
       </button>
-      }</mat-menu
-    >
+      } }
+    </mat-menu>
     }
   </mat-menu>
   <button mat-flat-button [routerLink]="['/user', user.id]">
