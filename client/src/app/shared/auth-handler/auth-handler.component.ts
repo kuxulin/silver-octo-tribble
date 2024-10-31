@@ -2,10 +2,11 @@ import { Component, Input } from '@angular/core';
 import LoginRegisterDTO from '../models/DTOs/LoginRegisterDTO';
 import { AuthService } from '../services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Subject, takeUntil } from 'rxjs';
+import { merge, of, Subject, takeUntil } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-auth-handler',
@@ -24,7 +25,11 @@ export class AuthHandlerComponent {
   private _destroy$ = new Subject<boolean>();
   errorText = '';
 
-  constructor(private _authService: AuthService, private _router: Router) {}
+  constructor(
+    private _authService: AuthService,
+    private _router: Router,
+    private _dataService: DataService
+  ) {}
 
   onSubmitClick() {
     if (!this.areFieldsValid) return;
@@ -33,9 +38,14 @@ export class AuthHandlerComponent {
       ? this._authService.login(this.dto.userName!, this.dto.password!)
       : this._authService.register(this.dto as LoginRegisterDTO);
 
-    methodToExecute$.pipe(takeUntil(this._destroy$)).subscribe({
+    let logOut$ = !!this._dataService.getAuthToken()
+      ? this._authService.logOut()
+      : of();
+
+    let combinedOperation$ = merge(logOut$, methodToExecute$);
+    combinedOperation$.pipe(takeUntil(this._destroy$)).subscribe({
       next: (res) => {
-        this._router.navigate(['user/', res.id]);
+        if (res) this._router.navigate(['user/', res.id]);
       },
       error: (response: HttpErrorResponse) => {
         this.errorText = !!response.error.message
