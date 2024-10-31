@@ -119,7 +119,7 @@ export class AuthService {
   logOut() {
     this._dataService.setAuthToken('');
     return this._httpClient
-      .delete(this._apiUrl + '/logout', { withCredentials: true })
+      .delete<never>(this._apiUrl + '/logout', { withCredentials: true })
       .pipe(
         take(1),
         tap(() => this.setSession())
