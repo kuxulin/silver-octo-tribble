@@ -1,4 +1,4 @@
-﻿namespace Core.Metrics;
+namespace Core.Entities;
 public class UsersMetrics
 {
     public int TotalCount { get; set; }
