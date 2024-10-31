@@ -23,13 +23,16 @@ internal class EmployeeService : IEmployeeService
     public async Task<Result<IEnumerable<EmployeeReadDTO>>> GetAllAsync()
     {
         var employees = await _employeeRepository.GetAll().ToListAsync();
-
         return _mapper.Map<List<EmployeeReadDTO>>(employees);
     }
 
     public async Task<Result<IEnumerable<EmployeeReadDTO>>> GetEmployeesInProjectAsync(Guid projectId)
     {
-        var employees = await _employeeRepository.GetAll().Include(e => e.User).Include(e => e.Projects).Where(e => e.Projects.Any(p => p.Id == projectId)).ToListAsync();
+        var employees = await _employeeRepository.GetAll()
+            .Include(e => e.User)
+            .Include(e => e.Projects)
+            .Where(e => e.Projects != null && e.Projects.Any(p => p.Id == projectId))
+            .ToListAsync();
         return _mapper.Map<List<EmployeeReadDTO>>(employees);
     }
 
@@ -41,7 +44,6 @@ internal class EmployeeService : IEmployeeService
             return DefinedError.DuplicateEntity;
 
         var employee = _mapper.Map<Employee>(dto);
-
         var result = await _employeeRepository.AddAsync(employee);
         return employee.Id;
     }
@@ -54,7 +56,6 @@ internal class EmployeeService : IEmployeeService
             return DefinedError.AbsentElement;
 
         var employee = _mapper.Map<Employee>(dto);
-
         var result = await _employeeRepository.UpdateAsync(employee);
         return result.Id;
     }

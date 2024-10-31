@@ -18,7 +18,7 @@ internal class ChangeService : IChangeService
     private readonly IUserChangeRepository _userChangeRepository;
     private readonly ITokenService _tokenService;
 
-    public ChangeService(IChangeRepository changeRepository, IProjectRepository projectRepository, IUserChangeRepository userChangeRepository, IUserRepository userRepository,ITokenService tokenService, IMapper mapper)
+    public ChangeService(IChangeRepository changeRepository, IProjectRepository projectRepository, IUserChangeRepository userChangeRepository, IUserRepository userRepository, ITokenService tokenService, IMapper mapper)
     {
         _changeRepository = changeRepository;
         _mapper = mapper;
@@ -61,7 +61,7 @@ internal class ChangeService : IChangeService
 
     public async Task<IEnumerable<ChangeReadDTO>> GetChangesByEmployeeIdAsync(Guid employeeId)
     {
-        var query = _changeRepository.GetAll().Include(c => c.UserChanges).Where(c => c.Task.EmployeeId == employeeId);
+        var query = _changeRepository.GetAll().Include(c => c.UserChanges).Where(c => c.Task != null && c.Task.EmployeeId == employeeId);
         var result = new List<Change>();
 
         var lastAssignChangeFlags = await query
@@ -88,7 +88,7 @@ internal class ChangeService : IChangeService
     {
         foreach (var change in actualChanges)
         {
-            if (!change.UserChanges.Any(uc => uc.UserId == userId))
+            if (change.UserChanges is not null && !change.UserChanges.Any(uc => uc.UserId == userId))
             {
                 var userChange = new UserChange() { ChangeId = change.Id, UserId = userId };
                 change.UserChanges.Add(userChange);
@@ -114,8 +114,11 @@ internal class ChangeService : IChangeService
 
         foreach (var change in changes)
         {
+            if (change.UserChanges is null)
+                continue;
+
             change.UserChanges.Where(uc => uc.UserId == userId).First().IsRead = true;
-            await _changeRepository.UpdateAsync(change,isSaved:false);
+            await _changeRepository.UpdateAsync(change, isSaved: false);
         }
 
         await _changeRepository.SaveChangesAsync();

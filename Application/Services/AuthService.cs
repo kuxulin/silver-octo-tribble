@@ -94,13 +94,13 @@ public class AuthService : IAuthService
     private async Task<TokenDTO> GenerateAccessTokenAsync(User user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
-        var accessToken = await _tokenService.CreateAccessTokenAsync(user, userRoles);
+        var accessToken = _tokenService.CreateAccessToken(user, userRoles);
         var roles = await _userManager.GetRolesAsync(user);
 
         return new TokenDTO
         {
             Token = accessToken,
-            UserName = user.UserName,
+            UserName = user.UserName!,
             Roles = roles.ToArray(),
             Id = user.Id,
             IsBlocked = user.IsBlocked,

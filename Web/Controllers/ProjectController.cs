@@ -30,7 +30,7 @@ public class ProjectController : ControllerBase
         var result = await _service.GetProjectsByManagerIdAsync(managerId);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -41,7 +41,7 @@ public class ProjectController : ControllerBase
         var result = await _service.GetProjectsByEmployeeIdAsync(employeeId);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -52,7 +52,7 @@ public class ProjectController : ControllerBase
         var result = await _service.GetByIdAsync(id);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -63,7 +63,7 @@ public class ProjectController : ControllerBase
         var result = await _service.CreateProjectAsync(dto);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -74,7 +74,7 @@ public class ProjectController : ControllerBase
         var result = await _service.UpdateProjectAsync(dto);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -85,7 +85,7 @@ public class ProjectController : ControllerBase
         var result = await _service.DeleteProjectAsync(id);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok();
     }

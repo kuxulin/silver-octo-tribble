@@ -7,7 +7,6 @@ using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
-using Core.Metrics;
 using Core.ResultPattern;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -48,7 +47,7 @@ class UserService : IUserService
 
         if (!options.SortField.IsNullOrEmpty())
         {
-            var sortFunction = ExpressionsGenerator<User>.CreateSortExpression(options.SortField);
+            var sortFunction = ExpressionsGenerator<User>.CreateSortExpression(options.SortField!);
             usersQuery = options.SortByDescending ? usersQuery.OrderByDescending(sortFunction) : usersQuery.OrderBy(sortFunction);
         }
 
@@ -60,10 +59,10 @@ class UserService : IUserService
             });
 
         if (!options.FilterRoleIds.IsNullOrEmpty())
-            query = query.Where(ur => ur.UserRoles.Select(ur => ur.RoleId).Intersect(options.FilterRoleIds).Any());
+            query = query.Where(ur => ur.UserRoles.Select(ur => ur.RoleId).Intersect(options.FilterRoleIds!).Any());
 
         if (!options.PartialUserName.IsNullOrEmpty())
-            query = query.Where(ur => ur.User.UserName.Contains(options.PartialUserName));
+            query = query.Where(ur => ur.User.UserName!.Contains(options.PartialUserName!));
 
         if (options.IsBlocked.HasValue)
             query = query.Where(ur => ur.User.IsBlocked == options.IsBlocked);
@@ -107,12 +106,15 @@ class UserService : IUserService
         return true;
     }
 
-    private async Task<User> GetUserById(int id)
+    private async Task<User?> GetUserById(int id)
     {
-        return await _userRepository.GetAll().Include(u => u.UserRoles).Include(u => u.Image).FirstOrDefaultAsync(u => u.Id == id);
+        return await _userRepository.GetAll()
+            .Include(u => u.UserRoles)
+            .Include(u => u.Image)
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    private async Task<User> GetPartialUserById(int id)
+    private async Task<User?> GetPartialUserById(int id)
     {
         return await _userRepository.GetAll().Include(u => u.UserRoles).FirstOrDefaultAsync(u => u.Id == id);
     }
@@ -201,7 +203,7 @@ class UserService : IUserService
         var user = await GetPartialUserById(userUpdateDTO.Id);
         var usernameFromToken = _tokenService.GetFieldFromToken(userUpdateDTO.AccessToken, DefinedClaim.Name);
 
-        if (user == null)
+        if (user is null)
             return DefinedError.AbsentElement;
 
         if (user.UserName != usernameFromToken)
@@ -228,7 +230,7 @@ class UserService : IUserService
         {
             var newImage = _mapper.Map<ApplicationImage>(userUpdateDTO.ImageDto);
             newImage.UserId = user.Id;
-            await _imageRepository.ReplaceImage(user.Image, newImage);
+            await _imageRepository.ReplaceImage(user.Image!, newImage);
             user.Image = newImage;
         }
 

@@ -17,7 +17,7 @@ internal class ChangeRepository :BaseCRUDRepository<Change, DatabaseContext>,ICh
     {
         return base.GetAll()
             .Include(c => c.Creator)
-            .Include(c => c.Task)
+            .Include(c => c.Task!)
             .ThenInclude(t => t.Employee);
     }
 

@@ -47,7 +47,7 @@ public static class DataSeeder
 
         user.Image = image;
         await usersManager.CreateAsync(user, "string");
-        await usersManager.AddToRoleAsync(user, roles[0].Name);
+        await usersManager.AddToRoleAsync(user, roles[0].Name!);
         user.ImageId = image.Id;
         context.Users.Update(user);
         await context.SaveChangesAsync();
@@ -214,10 +214,12 @@ public static class DataSeeder
     private static DirectoryInfo GetSolutionDirectoryInfo()
     {
         var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
-        while (directory != null && !directory.GetFiles("*.sln").Any())
+
+        while (!(directory == null || directory.GetFiles("*.sln").Length != 0))
         {
             directory = directory.Parent;
         }
-        return directory;
+
+        return directory!;
     }
 }

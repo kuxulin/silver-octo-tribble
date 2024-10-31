@@ -17,12 +17,12 @@ internal class TokenService : ITokenService
         _configuration = configuration.Value;
     }
 
-    public async Task<string> CreateAccessTokenAsync(User user, IEnumerable<string> userRoles)
+    public string CreateAccessToken(User user, IEnumerable<string> userRoles)
     {
         var authClaims = new List<Claim>
         {
             new Claim(DefinedClaim.Id,user.Id.ToString()),
-            new Claim(DefinedClaim.Name, user.UserName),
+            new Claim(DefinedClaim.Name, user.UserName!),
             new Claim(DefinedClaim.IsBlocked, user.IsBlocked.ToString())
         };
 

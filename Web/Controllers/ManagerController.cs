@@ -30,7 +30,7 @@ public class ManagerController : ControllerBase
         var result = await _service.GetManagersInProjectAsync(projectId);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -41,7 +41,7 @@ public class ManagerController : ControllerBase
         var result = await _service.CreateManagerAsync(dto);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -52,7 +52,7 @@ public class ManagerController : ControllerBase
         var result = await _service.UpdateManagerAsync(dto);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -63,7 +63,7 @@ public class ManagerController : ControllerBase
         var result = await _service.DeleteManagerAsync(id);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok();
     }

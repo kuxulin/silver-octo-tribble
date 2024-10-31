@@ -10,7 +10,7 @@ internal class OnlineStatusHub : Hub
     private static ConcurrentBag<string> _onlineUsers = [];
     public override async Task OnConnectedAsync()
     {
-        var userName = Context.User?.Identity?.Name;
+        var userName = Context.User?.Identity?.Name!;
         _onlineUsers.Add(userName);
         await Clients.All.SendAsync("AddOnlineUser", _onlineUsers);
         await base.OnConnectedAsync();

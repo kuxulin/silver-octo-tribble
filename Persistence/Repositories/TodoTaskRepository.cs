@@ -15,7 +15,7 @@ internal class TodoTaskRepository : BaseCRUDRepository<TodoTask, DatabaseContext
     public override IQueryable<TodoTask> GetAll()
     {
         return base.GetAll()
-            .Include(t => t.Employee)
+            .Include(t => t.Employee!)
             .ThenInclude(e => e.User);
     }
 

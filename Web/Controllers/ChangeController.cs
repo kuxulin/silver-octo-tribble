@@ -42,7 +42,7 @@ namespace Web.Controllers
         [HttpPatch("read")]
         public async Task<IActionResult> MakeChangesRead(IEnumerable<Guid> changeIds)
         {
-            var authHeader = HttpContext.Request.Headers.Authorization.FirstOrDefault();
+            var authHeader = HttpContext.Request.Headers.Authorization.First()!;
             var token = authHeader["Bearer ".Length..].Trim();
             await _changeService.MakeChangesRead(changeIds,token);
             return Ok();

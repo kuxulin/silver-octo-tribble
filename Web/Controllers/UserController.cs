@@ -36,7 +36,7 @@ public class UserController : ControllerBase
         var result = await _userService.DeleteUsersAsync(ids);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok();
     }
@@ -49,7 +49,7 @@ public class UserController : ControllerBase
         var result = await _userService.ChangeUsersStatusAsync(ids, isBlocked);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok();
     }
@@ -62,7 +62,7 @@ public class UserController : ControllerBase
         var result = await _userService.ChangeUserRolesAsync(id, newUserRoles);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok();
     }
@@ -82,7 +82,7 @@ public class UserController : ControllerBase
         var result = await _userService.GetUserByIdAsync(id);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -90,12 +90,12 @@ public class UserController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDTO userUpdateDTO)
     {
-        var authHeader = HttpContext.Request.Headers.Authorization.FirstOrDefault();
+        string authHeader = HttpContext.Request.Headers.Authorization.First()!;
         userUpdateDTO.AccessToken = authHeader["Bearer ".Length..].Trim();
         var result = await _userService.UpdateUserAsync(userUpdateDTO);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }

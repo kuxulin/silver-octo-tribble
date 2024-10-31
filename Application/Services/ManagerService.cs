@@ -27,7 +27,11 @@ internal class ManagerService : IManagerService
 
     public async Task<Result<IEnumerable<ManagerReadDTO>>> GetManagersInProjectAsync(Guid projectId)
     {
-        var managers = await _repository.GetAll().Include(m => m.User).Include(m => m.Projects).Where(m => m.Projects.Any(p => p.Id == projectId)).ToListAsync();
+        var managers = await _repository.GetAll()
+            .Include(m => m.User)
+            .Include(m => m.Projects)
+            .Where(m => m.Projects != null && m.Projects.Any(p => p.Id == projectId))
+            .ToListAsync();
         return _mapper.Map<List<ManagerReadDTO>>(managers);
     }
 
@@ -61,7 +65,6 @@ internal class ManagerService : IManagerService
         if (manager is null)
             return DefinedError.AbsentElement;
 
-        
         var result = await _repository.UpdateAsync(manager);
         return manager.Id;
     }

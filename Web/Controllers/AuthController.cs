@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using System.IdentityModel.Tokens.Jwt;
-using Core.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Core.DTOs.Auth;
 using Core.Interfaces.Services;
-using Core.DTOs.Auth;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
 
@@ -25,10 +21,10 @@ public class AuthController : ControllerBase
         var loginResult = await _authService.Login(dto);
 
         if (!loginResult.IsSuccess)
-            return StatusCode(loginResult.Error.StatusCode, loginResult.Error);
+            return StatusCode(loginResult.Error!.StatusCode, loginResult.Error);
 
-        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(loginResult.Value.UserName);
-        AppendCookies(refreshTokenResult.Value);
+        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(loginResult.Value!.UserName);
+        AppendCookies(refreshTokenResult.Value!);
         return Ok(loginResult.Value);
     }
 
@@ -36,28 +32,32 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register(RegisterDTO dto)
     {
         var accessTokenResult = await _authService.Register(dto);
-        
-        if(!accessTokenResult.IsSuccess) 
-            return StatusCode(accessTokenResult.Error.StatusCode, accessTokenResult.Error);
 
-        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(accessTokenResult.Value.UserName);
-        AppendCookies(refreshTokenResult.Value);
+        if (!accessTokenResult.IsSuccess)
+            return StatusCode(accessTokenResult.Error!.StatusCode, accessTokenResult.Error);
+
+        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(accessTokenResult.Value!.UserName);
+        AppendCookies(refreshTokenResult.Value!);
         return Ok(accessTokenResult.Value);
     }
 
     [HttpGet("refresh")]
     public async Task<IActionResult> RefreshTokens()
     {
-        string oldRefreshToken = GetRefreshToken();
+        string? oldRefreshToken = GetRefreshToken();
+
+        if (oldRefreshToken is null)
+            return BadRequest();
+
         var accessTokenResult = await _authService.CreateAccessTokenFromRefresh(oldRefreshToken);
 
         if (!accessTokenResult.IsSuccess)
         {
-            return StatusCode(accessTokenResult.Error.StatusCode, accessTokenResult.Error);
+            return StatusCode(accessTokenResult.Error!.StatusCode, accessTokenResult.Error);
         }
 
-        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(accessTokenResult.Value.UserName);
-        AppendCookies(refreshTokenResult.Value);
+        var refreshTokenResult = await _authService.CreateRefreshTokenAsync(accessTokenResult.Value!.UserName);
+        AppendCookies(refreshTokenResult.Value!);
         return Ok(accessTokenResult.Value);
     }
 
@@ -65,12 +65,17 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> LogOut()
     {
         var refreshToken = GetRefreshToken();
-        await _authService.DeleteRefreshTokenAsync(refreshToken);
-        Response.Cookies.Delete("refreshToken");
+
+        if (refreshToken is not null)
+        {
+            await _authService.DeleteRefreshTokenAsync(refreshToken);
+            Response.Cookies.Delete("refreshToken");
+        }
+
         return Ok();
     }
 
-    private string GetRefreshToken()
+    private string? GetRefreshToken()
     {
         return Request.Cookies["refreshToken"];
     }

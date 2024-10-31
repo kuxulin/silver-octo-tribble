@@ -30,7 +30,7 @@ public class EmployeeController : ControllerBase
         var result = await _service.GetEmployeesInProjectAsync(projectId);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -41,7 +41,7 @@ public class EmployeeController : ControllerBase
         var result = await _service.CreateEmployeeAsync(dto);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -52,7 +52,7 @@ public class EmployeeController : ControllerBase
         var result = await _service.UpdateEmployeeAsync(dto);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -63,7 +63,7 @@ public class EmployeeController : ControllerBase
         var result = await _service.DeleteEmployeeAsync(id);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }

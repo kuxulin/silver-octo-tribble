@@ -18,7 +18,7 @@ class ProjectService : IProjectService
     private readonly ITodoTaskRepository _taskRepository;
     private readonly IMapper _mapper;
 
-    public ProjectService(IProjectRepository repository, IManagerRepository managerRepository, IEmployeeRepository employeeRepository,ITodoTaskRepository taskRepository, IMapper mapper)
+    public ProjectService(IProjectRepository repository, IManagerRepository managerRepository, IEmployeeRepository employeeRepository, ITodoTaskRepository taskRepository, IMapper mapper)
     {
         _projectRepository = repository;
         _managerRepository = managerRepository;
@@ -40,7 +40,7 @@ class ProjectService : IProjectService
             .Include(p => p.Managers)
             .ThenInclude(m => m.User)
             .ThenInclude(u => u.Image)
-            .Include(p => p.Employees)
+            .Include(p => p.Employees!)
             .ThenInclude(e => e.User)
             .ThenInclude(u => u.Image)
             .Include(p => p.ToDoTasks)
@@ -72,7 +72,7 @@ class ProjectService : IProjectService
             return DefinedError.DuplicateEntity;
 
         var areSomeManagerIdsInvalid = dto.ManagerIds.Except(_managerRepository.GetAll().Select(m => m.Id)).Any();
-        var areSomeEmployeeIdsInvalid = dto.EmployeeIds.Except(_employeeRepository.GetAll().Select(e => e.Id)).Any();
+        var areSomeEmployeeIdsInvalid = dto.EmployeeIds?.Except(_employeeRepository.GetAll().Select(e => e.Id)).Any() ?? false;
 
         if (areSomeManagerIdsInvalid || areSomeEmployeeIdsInvalid)
             return DefinedError.AbsentElement;
@@ -119,30 +119,28 @@ class ProjectService : IProjectService
 
     private async Task UpdateProjectEmployeesAsync(Project project, ProjectUpdateDTO dto)
     {
-        var existingEmployeeIds = project.Employees.Select(e => e.Id);
-        var employeeToRemoveIds = existingEmployeeIds.Except(dto.EmployeeIds);
-        var employeeToAddIds = dto.EmployeeIds.Except(existingEmployeeIds);
+        var existingEmployeeIds = project.Employees?.Select(e => e.Id) ?? [];
+        var employeeToRemoveIds = existingEmployeeIds.Except(dto.EmployeeIds!);
+        var employeeToAddIds = dto.EmployeeIds!.Except(existingEmployeeIds);
 
         foreach (var employeeToRemoveId in employeeToRemoveIds)
         {
-            project.Employees.Remove(project.Employees.FirstOrDefault(e => e.Id == employeeToRemoveId));
-
+            project.Employees!.Remove(project.Employees.FirstOrDefault(e => e.Id == employeeToRemoveId)!);
             var tasks = await _taskRepository.GetAll().Where(t => t.EmployeeId == employeeToRemoveId).ToListAsync();
 
             foreach (var task in tasks)
             {
                 task.Employee = null;
-                await _taskRepository.UpdateAsync(task,false);
+                await _taskRepository.UpdateAsync(task, false);
             }
+        }
 
-        }           
-
-        if (employeeToAddIds.Count() > 0)
+        if (employeeToAddIds.Any())
         {
             var employeesToAdd = await _employeeRepository.GetAll().Where(e => employeeToAddIds.Contains(e.Id)).ToListAsync();
 
             foreach (var employeeToAdd in employeesToAdd)
-                project.Employees.Add(employeeToAdd);
+                project.Employees!.Add(employeeToAdd);
         }
     }
 

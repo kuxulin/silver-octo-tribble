@@ -1,7 +1,6 @@
 ﻿using Core.Constants;
 using Core.DTOs.Change;
 using Core.DTOs.TodoTask;
-using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +17,7 @@ public class TodoTaskController : ControllerBase
     private readonly ITokenService _tokenService;
     private readonly INotificationsHubService _notificationsHub;
 
-    public TodoTaskController(ITodoTaskService taskService, IChangeService changeService, ITokenService tokenService,INotificationsHubService notificationsHub)
+    public TodoTaskController(ITodoTaskService taskService, IChangeService changeService, ITokenService tokenService, INotificationsHubService notificationsHub)
     {
         _taskService = taskService;
         _changeService = changeService;
@@ -39,7 +38,7 @@ public class TodoTaskController : ControllerBase
         var result = await _taskService.GetByProjectIdAsync(projectId);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
         return Ok(result.Value);
     }
@@ -50,9 +49,9 @@ public class TodoTaskController : ControllerBase
         var result = await _taskService.CreateTodoTaskAsync(dto);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
-        await CreateChange(DefinedAction.Create, result.Value.ProjectId, result.Value.Title, result.Value.Id);
+        await CreateChange(DefinedAction.Create, result.Value!.ProjectId, result.Value.Title, result.Value.Id);
         return Ok(result.Value);
     }
 
@@ -62,21 +61,21 @@ public class TodoTaskController : ControllerBase
         var result = await _taskService.UpdateTodoTaskAsync(dto);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
-        await CreateChange(DefinedAction.Update, result.Value.ProjectId, result.Value.Title, result.Value.Id);
+        await CreateChange(DefinedAction.Update, result.Value!.ProjectId, result.Value.Title, result.Value.Id);
         return Ok(result.Value);
     }
 
     [HttpPatch("employee")]
     public async Task<IActionResult> ChangeTaskEmployee(Guid taskId, Guid? employeeId)
     {
-        var result = await _taskService.ChangeTaskEmployeeAsync(taskId,employeeId);
+        var result = await _taskService.ChangeTaskEmployeeAsync(taskId, employeeId);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
-        await CreateChange(DefinedAction.Assign, result.Value.ProjectId, result.Value.Title, result.Value.Id);
+        await CreateChange(DefinedAction.Assign, result.Value!.ProjectId, result.Value.Title, result.Value.Id);
         return Ok(result.Value);
     }
 
@@ -86,9 +85,9 @@ public class TodoTaskController : ControllerBase
         var result = await _taskService.ChangeTaskStatusAsync(taskId, status);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
-        await CreateChange(DefinedAction.ChangeStatus, result.Value.ProjectId, result.Value.Title, result.Value.Id);
+        await CreateChange(DefinedAction.ChangeStatus, result.Value!.ProjectId, result.Value.Title, result.Value.Id);
         return Ok(result.Value);
     }
 
@@ -98,9 +97,9 @@ public class TodoTaskController : ControllerBase
         var result = await _taskService.DeleteTodoTaskAsync(id);
 
         if (!result.IsSuccess)
-            return StatusCode(result.Error.StatusCode, result.Error.Message);
+            return StatusCode(result.Error!.StatusCode, result.Error.Message);
 
-        await CreateChange(DefinedAction.Delete, result.Value.ProjectId, result.Value.Title);
+        await CreateChange(DefinedAction.Delete, result.Value!.ProjectId, result.Value.Title);
         return Ok();
     }
 
@@ -119,13 +118,13 @@ public class TodoTaskController : ControllerBase
         };
 
         var id = await _changeService.CreateChangeAsync(changeDto);
-        var change = (await _changeService.GetChangeByIdAsync(id)).Value;
+        var change = (await _changeService.GetChangeByIdAsync(id)).Value!;
         await _notificationsHub.OnChangeCreated(change);
     }
 
     private int GetIdFromToken()
     {
-        var authHeader = HttpContext.Request.Headers.Authorization.FirstOrDefault();
+        var authHeader = HttpContext.Request.Headers.Authorization.First()!;
         var accessToken = authHeader["Bearer ".Length..].Trim();
         return int.Parse(_tokenService.GetFieldFromToken(accessToken, DefinedClaim.Id));
     }

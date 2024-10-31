@@ -11,5 +11,5 @@ public class UserUpdateDTO
     [RegularExpression(@"^\+\d{8,15}$", ErrorMessage = "Entered phone format is not valid.")]
     public string? PhoneNumber { get; set; }
     public ApplicationImageCreateDTO? ImageDto {  get; set; } 
-    public string? AccessToken { get; set; }
+    public string AccessToken { get; set; } = null!;
 }
