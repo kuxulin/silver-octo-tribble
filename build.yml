@@ -16,7 +16,6 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   serverProject: '**/Web/Web.csproj'
-  clientDir: '**/client'
   databaseProject: '**/Database/Database.sqlproj'
 
 steps:
@@ -58,7 +57,7 @@ steps:
   displayName: 'Install Angular app packages'
   inputs:
     command: 'ci'
-    workingDir: $(clientDir)
+    workingDir: client
 
 - task: Npm@1
   displayName: Build the app
@@ -70,7 +69,7 @@ steps:
 - task: ArchiveFiles@2
   displayName: Zip Angular dist folder
   inputs:
-    rootFolderOrFile: 'dist/angularNamedByMe'
+    rootFolderOrFile: 'dist/client'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/Client'
