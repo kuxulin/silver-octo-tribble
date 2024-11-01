@@ -35,14 +35,6 @@ steps:
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)/Server"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-
-#- task: DotNetCoreCLI@2
-#  displayName: 'Publish server'
-#  inputs:
-#    command: 'publish'
-#    publishWebProjects: false
-#    projects: '$(serverProject)'
-#    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Web'
     
 - task: NodeTool@0
   displayName: Install Node
@@ -74,7 +66,8 @@ steps:
     rootFolderOrFile: '$(clientDir)/dist'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/Client'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/Client/client'
+
     replaceExistingArchive: true
 
 - task: VSBuild@1
