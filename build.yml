@@ -1,0 +1,70 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-latest'
+  name: Default
+  demands: selfHosted
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  serverProject: '**/Web/Web.csproj'
+  clientDir: '**/client'
+  databaseProject: '**/Database/Database.sqlproj'
+
+steps:
+- task: NuGetToolInstaller@1
+  displayName: 'NuGet tool installing'
+
+- task: NuGetCommand@2
+  displayName: 'Restore solution'
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  displayName: 'Build server'
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish server'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '$(serverProject)'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Web'
+    
+- task: NodeTool@0
+  inputs:
+    versionSource: 'spec'
+    versionSpec: '20.12.2'
+
+- script: |
+      cd $(clientDir)
+      npm install -g @angular/cli
+      npm install
+      ng build --output-path=$(Build.ArtifactStagingDirectory)/Client
+
+- task: VSBuild@1
+  displayName: 'Build Database Project and Create DACPAC'
+  inputs:
+    solution: '$(databaseProject)'
+    msbuildArgs: '/t:Build /p:OutputPath=$(Build.ArtifactStagingDirectory)/Database'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'drop3'    
