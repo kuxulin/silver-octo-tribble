@@ -66,12 +66,11 @@ steps:
     command: custom
     verbose: false
     customCommand: 'run build'
-    workingDir: $(clientDir)
 
 - task: ArchiveFiles@2
   displayName: Zip Angular dist folder
   inputs:
-    rootFolderOrFile: 'dist/$(clientDir)'
+    rootFolderOrFile: '$(clientDir)/dist'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/Client'
