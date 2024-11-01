@@ -58,6 +58,7 @@ steps:
   displayName: 'Install Angular app packages'
   inputs:
     command: 'ci'
+    workingDir: $(clientDir)
 
 - task: Npm@1
   displayName: Build the app
