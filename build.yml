@@ -32,28 +32,48 @@ steps:
   displayName: 'Build server'
   inputs:
     solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)"'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)/Server"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Publish server'
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: '$(serverProject)'
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Web'
+#- task: DotNetCoreCLI@2
+#  displayName: 'Publish server'
+#  inputs:
+#    command: 'publish'
+#    publishWebProjects: false
+#    projects: '$(serverProject)'
+#    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Web'
     
 - task: NodeTool@0
+  displayName: Install Node
   inputs:
     versionSource: 'spec'
     versionSpec: '20.12.2'
 
 - script: |
-      cd $(clientDir)
-      npm install -g @angular/cli
-      npm install
-      ng build --output-path=$(Build.ArtifactStagingDirectory)/Client
+    npm install -g @angular/cli
+  displayName: 'Install the Angular CLI globally'
+
+- task: Npm@1
+  displayName: 'Install Angular app packages'
+  inputs:
+    command: 'ci'
+
+- task: Npm@1
+  displayName: Build the app
+  inputs:
+    command: custom
+    verbose: false
+    customCommand: 'run build'
+
+- task: ArchiveFiles@2
+  displayName: Zip Angular dist folder
+  inputs:
+    rootFolderOrFile: 'dist/angularNamedByMe'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/Client'
+    replaceExistingArchive: true
 
 - task: VSBuild@1
   displayName: 'Build Database Project and Create DACPAC'
