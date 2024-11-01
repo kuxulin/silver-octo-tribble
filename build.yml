@@ -17,6 +17,7 @@ variables:
   buildConfiguration: 'Release'
   serverProject: '**/Web/Web.csproj'
   databaseProject: '**/Database/Database.sqlproj'
+  clientDir: 'client'
 
 steps:
 - task: NuGetToolInstaller@1
@@ -57,19 +58,20 @@ steps:
   displayName: 'Install Angular app packages'
   inputs:
     command: 'ci'
-    workingDir: client
+    workingDir: $(clientDir)
 
 - task: Npm@1
-  displayName: Build the app
+  displayName: Build an angular app
   inputs:
     command: custom
     verbose: false
     customCommand: 'run build'
+    workingDir: $(clientDir)
 
 - task: ArchiveFiles@2
   displayName: Zip Angular dist folder
   inputs:
-    rootFolderOrFile: 'dist/client'
+    rootFolderOrFile: 'dist/$(clientDir)'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/Client'
