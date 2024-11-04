@@ -9,8 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("Jwt"));
-builder.Services.AddAuthenticationConfigurations(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>());
-builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("ServerConnection"));
+builder.Services.AddAuthenticationConfigurations(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>()!);
+builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("ServerConnection")!);
 builder.Services.AddMappers();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
@@ -18,10 +18,10 @@ builder.Services.AddInfrastructureServices();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value,
+    options.AddPolicy(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!,
         policyBuilder =>
         {
-            policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:LocalPolicy:Origin").Value)
+            policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:LocalPolicy:Origin").Value!)
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                    .AllowCredentials();
@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value);
+app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!);
 app.UseAuthentication();
 
 using (var scope = app.Services.CreateScope())
