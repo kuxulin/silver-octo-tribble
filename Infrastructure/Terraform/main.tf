@@ -31,7 +31,6 @@ resource "azurerm_mssql_server" "res-2" {
 resource "azurerm_mssql_database" "res-12" {
   name                 = var.sql_db_name
   server_id            = azurerm_mssql_server.res-2.id
-  storage_account_type = "Local"
   depends_on = [azurerm_resource_group.res-0]
 }
 
