@@ -6,80 +6,88 @@
 trigger:
 - none
 
-pool:
-  vmImage: 'windows-latest'
-  name: Default
-  demands: selfHosted
-
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  serverProject: '**/Web/Web.csproj'
-  databaseProject: '**/Database/Database.sqlproj'
-  clientDir: 'client'
+ buildConfiguration: 'Release'
+ vmImage: 'windows-latest'
 
-steps:
-- task: NuGetToolInstaller@1
-  displayName: 'NuGet tool installing'
+stages:
+  - stage: "Build"
+    jobs: 
+    - job: 'Build'
+      pool:
+        vmImage: $(vmImage)
+        name: Default
+        demands: selfHosted
 
-- task: NuGetCommand@2
-  displayName: 'Restore solution'
-  inputs:
-    restoreSolution: '$(solution)'
+      variables:
+        solution: '**/*.sln'
+        buildPlatform: 'Any CPU'
+        serverProject: '**/Web/Web.csproj'
+        databaseProject: '**/Database/Database.sqlproj'
+        clientDir: 'client'
 
-- task: VSBuild@1
-  displayName: 'Build server'
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)/Server"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    
-- task: NodeTool@0
-  displayName: Install Node
-  inputs:
-    versionSource: 'spec'
-    versionSpec: '20.12.2'
+      steps:
+      - task: NuGetToolInstaller@1
+        displayName: 'NuGet tool installing'
 
-- script: |
-    npm install -g @angular/cli
-  displayName: 'Install the Angular CLI globally'
+      - task: NuGetCommand@2
+        displayName: 'Restore solution'
+        inputs:
+          restoreSolution: '$(solution)'
 
-- task: Npm@1
-  displayName: 'Install Angular app packages'
-  inputs:
-    command: 'ci'
-    workingDir: $(clientDir)
+      - task: VSBuild@1
+        displayName: 'Build server'
+        inputs:
+          solution: '$(solution)'
+          msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)/Server"'
+          platform: '$(buildPlatform)'
+          configuration: '$(buildConfiguration)'
+          
+      - task: NodeTool@0
+        displayName: Install Node
+        inputs:
+          versionSource: 'spec'
+          versionSpec: '20.12.2'
 
-- task: Npm@1
-  displayName: Build an angular app
-  inputs:
-    command: custom
-    verbose: false
-    customCommand: 'run build'
-    workingDir: $(clientDir)
+      - script: |
+          npm install -g @angular/cli
+        displayName: 'Install the Angular CLI globally'
 
-- task: ArchiveFiles@2
-  displayName: Zip Angular dist folder
-  inputs:
-    rootFolderOrFile: '$(clientDir)/dist'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/Client/client'
+      - task: Npm@1
+        displayName: 'Install Angular app packages'
+        inputs:
+          command: 'ci'
+          workingDir: $(clientDir)
 
-    replaceExistingArchive: true
+      - task: Npm@1
+        displayName: Build an angular app
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run build'
+          workingDir: $(clientDir)
 
-- task: VSBuild@1
-  displayName: 'Build Database Project and Create DACPAC'
-  inputs:
-    solution: '$(databaseProject)'
-    msbuildArgs: '/t:Build /p:OutputPath=$(Build.ArtifactStagingDirectory)/Database'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifacts'
-  inputs:
-    pathToPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: 'drop3'    
+      - task: ArchiveFiles@2
+        displayName: Zip Angular dist folder
+        inputs:
+          rootFolderOrFile: '$(clientDir)/dist'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/Client/client'
+
+          replaceExistingArchive: true
+
+      - task: VSBuild@1
+        displayName: 'Build Database Project and Create DACPAC'
+        inputs:
+          solution: '$(databaseProject)'
+          msbuildArgs: '/t:Build /p:OutputPath=$(Build.ArtifactStagingDirectory)/Database'
+          platform: '$(buildPlatform)'
+          configuration: '$(buildConfiguration)'
+          
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifacts'
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'drop3'    
+
