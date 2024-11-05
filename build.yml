@@ -24,7 +24,7 @@ stages:
         buildPlatform: 'Any CPU'
         serverProject: '**/Web/Web.csproj'
         databaseProject: '**/Database/Database.sqlproj'
-        terraformDir: '**/Infrastructure/Terraform'
+        terraformDir: 'Infrastructure/Terraform'
         clientDir: 'client'
 
       steps:
