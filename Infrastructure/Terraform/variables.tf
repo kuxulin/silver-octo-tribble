@@ -49,6 +49,12 @@ variable client-app-name {
 
 variable tenant_id {
   type = string
-  description = "id of a current tenant"
+  description = "Id of a current tenant"
   default = "9e00bf3c-d568-4597-a3a4-ecae26153172"
+}
+
+variable storage_account_name {
+  type = string
+  description = "Name of a storage account"
+  default = "storage-account"
 }
