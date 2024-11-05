@@ -56,5 +56,5 @@ variable tenant_id {
 variable storage_account_name {
   type = string
   description = "Name of a storage account"
-  default = "storage-account"
+  default = "accountnbbnnvas"
 }

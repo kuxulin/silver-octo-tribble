@@ -129,4 +129,5 @@ resource "azurerm_storage_account" "example" {
   location                 = var.resource_group_location
   account_tier             = "Standard"
   account_replication_type = "GRS"
+  depends_on = [azurerm_resource_group.res-0]
 }
