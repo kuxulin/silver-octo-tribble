@@ -24,6 +24,7 @@ stages:
         buildPlatform: 'Any CPU'
         serverProject: '**/Web/Web.csproj'
         databaseProject: '**/Database/Database.sqlproj'
+        terraformDir: '**/Infrastructure/Terraform'
         clientDir: 'client'
 
       steps:
@@ -42,6 +43,12 @@ stages:
           msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)/Server"'
           platform: '$(buildPlatform)'
           configuration: '$(buildConfiguration)'
+          
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(terraformDir)'
+          Contents: '**'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/Terraform'
           
       - task: NodeTool@0
         displayName: Install Node
