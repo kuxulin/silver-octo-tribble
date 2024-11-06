@@ -122,11 +122,11 @@ resource "azurerm_application_insights" "res-57" {
   depends_on = [azurerm_resource_group.res-0]
 }
 
-resource "azurerm_storage_account" "example" {
-  name                     = var.storage_account_name
-  resource_group_name      = var.resource_group_name
-  location                 = var.resource_group_location
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
-  depends_on = [azurerm_resource_group.res-0]
-}
+# resource "azurerm_storage_account" "example" {
+#   name                     = var.storage_account_name
+#   resource_group_name      = var.resource_group_name
+#   location                 = var.resource_group_location
+#   account_tier             = "Standard"
+#   account_replication_type = "GRS"
+#   depends_on = [azurerm_resource_group.res-0]
+# }
