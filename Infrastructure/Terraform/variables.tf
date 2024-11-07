@@ -9,7 +9,11 @@ variable "resource_group_name" {
   description = "Resource group name."
   default     = "__ResourceGroupName__"
 }
-
+variable "key_vault_name" {
+  type = string
+  description = "Key vault name"
+  default = "__KeyVaultName__"
+}
 variable "sql_server_name"{
    type        = string
   description = "The name of the SQL Server."
@@ -47,8 +51,14 @@ variable client-app-name {
   default = "__ClientAppName__"
 }
 
-variable tenant_id {
+variable connection_string_name {
   type = string
-  description = "Id of a current tenant"
-  default = "__TenantId__"
+  description = "Name of database connection string"
+  default = "__AzureSQLConnectionStringName__"
+}
+
+variable connection_string_value {
+  type = string
+  description = "Value of database connection string"
+  default = "__AzureSQLConnectionStringValue__"
 }

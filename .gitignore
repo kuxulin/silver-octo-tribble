@@ -438,4 +438,4 @@ terraform.rc
 
 # Custom
 /azure
-Infrastructure/Terraform/realVariables.txt
+Infrastructure/Terraform/variables.txt

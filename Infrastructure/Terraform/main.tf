@@ -2,18 +2,15 @@ data "azurerm_resource_group" "res-0" {
   name     = var.resource_group_name
 }
 
-resource "random_integer" "ri" {
-  min = 10000
-  max = 99999
-}
+data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "res-1" {
   enable_rbac_authorization = true
   location                  = var.resource_group_location
-  name                      = "default-key-vault1"
+  name                      = var.key_vault_name
   resource_group_name       = var.resource_group_name
   sku_name                  = "standard"
-  tenant_id                 = var.tenant_id
+  tenant_id                 = data.azurerm_client_config.current.tenant_id
 }
 
 resource "azurerm_mssql_server" "res-2" {
@@ -43,7 +40,7 @@ resource "azurerm_windows_web_app" "client" {
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
   location                                       = var.resource_group_location
-  name                                           = "${var.client-app-name}-${random_integer.ri.result}"
+  name                                           = var.client-app-name
   public_network_access_enabled                  = false
   resource_group_name                            = var.resource_group_name
   service_plan_id                                = azurerm_service_plan.res-45.id
@@ -69,7 +66,7 @@ resource "azurerm_windows_web_app" "server" {
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
   location                                       = var.resource_group_location
-  name                                           = "${var.server-app-name}-${random_integer.ri.result}"
+  name                                           = var.server-app-name
   public_network_access_enabled                  = false
   resource_group_name                            = var.resource_group_name
   service_plan_id                                = azurerm_service_plan.res-45.id
@@ -83,6 +80,11 @@ resource "azurerm_windows_web_app" "server" {
       preload       = false
       virtual_path  = "/"
     }
+  }
+
+  connection {
+    type = "SQL Database"   
+    host = azurerm_mssql_server.res-2.name 
   }
 
   app_settings = {

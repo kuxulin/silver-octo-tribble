@@ -10,7 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddAuthenticationConfigurations(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>()!);
-builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("ServerConnection")!);
+
+if(builder.Environment.IsDevelopment())
+    builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("LocalServerConnectionString")!);
+else
+    builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("AzureServerConnectionString")!);
+
 builder.Services.AddMappers();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
