@@ -10,18 +10,20 @@ resource "azurerm_key_vault" "res-1" {
   resource_group_name       = var.resource_group_name
   sku_name                  = "standard"
   tenant_id                 = data.azurerm_client_config.current.tenant_id
-  access_policy = {
-    tenant_id    = data.azurerm_client_config.current.tenant_id
-    object_id    = data.azurerm_client_config.current.object_id
-    
-    key_permissions = [
-      "Get", "List", "Update", "Create", "Import", "Delete", "Recover", "Backup", "Restore", "Get Rotation Policy", "Set Rotation Policy", "Rotate"
-    ]
+  access_policy = [
+    {
+      tenant_id    = data.azurerm_client_config.current.tenant_id
+      object_id    = data.azurerm_client_config.current.object_id
 
-    secret_permissions = [
-      "Get", "List",  "Set", "Delete", "Recover", "Backup", "Restore"
-    ]
-  }
+      key_permissions = [
+        "Get", "List", "Update", "Create", "Import", "Delete", "Recover", "Backup", "Restore", "Get Rotation Policy", "Set Rotation Policy", "Rotate"
+      ]
+
+      secret_permissions = [
+        "Get", "List",  "Set", "Delete", "Recover", "Backup", "Restore"
+      ]
+    }
+  ]
 }
 
 resource "azurerm_key_vault_secret" "connection_string" {
