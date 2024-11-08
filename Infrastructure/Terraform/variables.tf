@@ -62,3 +62,9 @@ variable connection_string_value {
   description = "Value of database connection string"
   default = "__AzureSQLConnectionStringValue__"
 }
+
+variable default_ip_adress {
+  type = string
+  description = "Default IP address"
+  default = "__DefaultIPAdress__"
+}

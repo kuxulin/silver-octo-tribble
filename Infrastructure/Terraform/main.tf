@@ -13,6 +13,12 @@ resource "azurerm_key_vault" "res-1" {
   tenant_id                 = data.azurerm_client_config.current.tenant_id
 }
 
+resource "azurerm_key_vault_secret" "connection_string" {
+  name         = var.connection_string_name
+  value        = var.connection_string_value
+  key_vault_id = var.azurerm_key_vault.res-1.id
+}
+
 resource "azurerm_mssql_server" "res-2" {
   administrator_login          = var.admin_username
   administrator_login_password = var.admin_password
@@ -20,6 +26,16 @@ resource "azurerm_mssql_server" "res-2" {
   name                          = "${var.sql_server_name}"
   resource_group_name           = var.resource_group_name
   version                       = "12.0"
+}
+
+resource "azurerm_mssql_firewall_rule" "res-43" {
+  end_ip_address   = var.default_ip_adress
+  name             = "default"
+  server_id        = azurerm_mssql_server.res-2.id
+  start_ip_address = var.default_ip_adress
+  depends_on = [
+    azurerm_mssql_server.res-3,
+  ]
 }
 
 resource "azurerm_mssql_database" "res-12" {
@@ -49,10 +65,15 @@ resource "azurerm_windows_web_app" "client" {
   site_config {
     always_on                         = false
     ftps_state                        = "FtpsOnly"
+    ip_restriction_default_action = "Deny"
     virtual_application {
-      physical_path = "site\\wwwroot"
+      physical_path = "site\\wwwroot\\client\\browser"
       preload       = false
       virtual_path  = "/"
+    }
+    ip_restriction {
+      ip_address = var.default_ip_adress
+      priority   = 300
     }
   }
 
@@ -67,7 +88,6 @@ resource "azurerm_windows_web_app" "server" {
   https_only                                     = true
   location                                       = var.resource_group_location
   name                                           = var.server-app-name
-  public_network_access_enabled                  = false
   resource_group_name                            = var.resource_group_name
   service_plan_id                                = azurerm_service_plan.res-45.id
   webdeploy_publish_basic_authentication_enabled = false
@@ -75,20 +95,21 @@ resource "azurerm_windows_web_app" "server" {
   site_config {
     always_on                         = false
     ftps_state                        = "FtpsOnly"
+    ip_restriction_default_action = "Deny"
     virtual_application {
       physical_path = "site\\wwwroot"
       preload       = false
       virtual_path  = "/"
     }
-  }
-
-  connection {
-    type = "SQL Database"   
-    host = azurerm_mssql_server.res-2.name 
+    ip_restriction {
+      ip_address = var.default_ip_adress
+      priority   = 300
+    }
   }
 
   app_settings = {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.res-57.instrumentation_key
+    "${var.connection_string_name}" = var.connection_string_value
   }
 }
 
