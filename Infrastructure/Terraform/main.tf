@@ -15,7 +15,7 @@ resource "azurerm_key_vault" "res-1" {
       object_id    = data.azurerm_client_config.current.object_id
 
       key_permissions = [
-        "Get", "List", "Update", "Create", "Import", "Delete", "Recover", "Backup", "Restore", "Get Rotation Policy", "Set Rotation Policy", "Rotate"
+        "Get", "List", "Update", "Create", "Import", "Delete", "Recover", "Backup", "Restore", "GetRotationPolicy", "SetRotationPolicy", "Rotate"
       ]
 
       secret_permissions = [
