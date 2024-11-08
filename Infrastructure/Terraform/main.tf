@@ -23,9 +23,19 @@ resource "azurerm_mssql_server" "res-2" {
   administrator_login          = var.admin_username
   administrator_login_password = var.admin_password
   location                      = var.resource_group_location
-  name                          = "${var.sql_server_name}"
+  name                          = var.sql_server_name
   resource_group_name           = var.resource_group_name
   version                       = "12.0"
+}
+
+resource "azurerm_mssql_firewall_rule" "res-42" {
+  end_ip_address   = "0.0.0.0"
+  name             = "AllowAllWindowsAzureIps"
+  server_id        = azurerm_mssql_server.res-2.id
+  start_ip_address = "0.0.0.0"
+  depends_on = [
+    azurerm_mssql_server.res-2,
+  ]
 }
 
 resource "azurerm_mssql_firewall_rule" "res-43" {
@@ -34,7 +44,7 @@ resource "azurerm_mssql_firewall_rule" "res-43" {
   server_id        = azurerm_mssql_server.res-2.id
   start_ip_address = var.default_ip_adress
   depends_on = [
-    azurerm_mssql_server.res-3,
+    azurerm_mssql_server.res-2,
   ]
 }
 
@@ -52,6 +62,11 @@ resource "azurerm_service_plan" "res-45" {
 }
 
 resource "azurerm_windows_web_app" "client" {
+   app_settings = {
+    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.res-57.instrumentation_key
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE = "true"
+    WEBSITE_RUN_FROM_PACKAGE        = "1"
+  }
   client_affinity_enabled                        = true
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
@@ -72,17 +87,18 @@ resource "azurerm_windows_web_app" "client" {
       virtual_path  = "/"
     }
     ip_restriction {
-      ip_address = var.default_ip_adress
+      ip_address = "${var.default_ip_adress}/32"
       priority   = 300
     }
-  }
-
-  app_settings = {
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.res-57.instrumentation_key
   }
 }
 
 resource "azurerm_windows_web_app" "server" {
+   app_settings = {
+    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.res-57.instrumentation_key
+    "${var.connection_string_name}" = var.connection_string_value
+  }
+
   client_affinity_enabled                        = true
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
@@ -102,14 +118,9 @@ resource "azurerm_windows_web_app" "server" {
       virtual_path  = "/"
     }
     ip_restriction {
-      ip_address = var.default_ip_adress
+      ip_address = "${var.default_ip_adress}/32"
       priority   = 300
     }
-  }
-
-  app_settings = {
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.res-57.instrumentation_key
-    "${var.connection_string_name}" = var.connection_string_value
   }
 }
 
