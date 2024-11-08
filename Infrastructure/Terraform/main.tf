@@ -16,7 +16,7 @@ resource "azurerm_key_vault" "res-1" {
 resource "azurerm_key_vault_secret" "connection_string" {
   name         = var.connection_string_name
   value        = var.connection_string_value
-  key_vault_id = var.azurerm_key_vault.res-1.id
+  key_vault_id = azurerm_key_vault.res-1.id
 }
 
 resource "azurerm_mssql_server" "res-2" {
