@@ -83,7 +83,6 @@ resource "azurerm_windows_web_app" "client" {
   https_only                                     = true
   location                                       = var.resource_group_location
   name                                           = var.client-app-name
-  public_network_access_enabled                  = false
   resource_group_name                            = var.resource_group_name
   service_plan_id                                = azurerm_service_plan.res-45.id
   webdeploy_publish_basic_authentication_enabled = false
