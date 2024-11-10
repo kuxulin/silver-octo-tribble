@@ -64,7 +64,7 @@ resource "azurerm_mssql_firewall_rule" "res-44" {
   server_id        = azurerm_mssql_server.res-2.id
   start_ip_address = var.default_ip_adress
   depends_on = [
-    azurerm_mssql_server.res-4,
+    azurerm_mssql_server.res-2,
   ]
 }
 
