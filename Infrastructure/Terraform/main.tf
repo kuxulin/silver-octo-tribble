@@ -16,7 +16,7 @@ resource "azurerm_key_vault" "res-1" {
 resource "azurerm_key_vault_access_policy" "default" {
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = data.azurerm_client_config.current.object_id
-  key_vault_id = azurerm_key_vault.res-1
+  key_vault_id = azurerm_key_vault.res-1.id
 
   secret_permissions = [
     "Get", "List",  "Set", "Delete", "Recover", "Backup", "Restore"
@@ -26,7 +26,7 @@ resource "azurerm_key_vault_access_policy" "default" {
 resource "azurerm_key_vault_access_policy" "server_policy" {
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_windows_web_app.server.id
-  key_vault_id = azurerm_key_vault.res-1
+  key_vault_id = azurerm_key_vault.res-1.id
 
   secret_permissions = [
     "Get", 
