@@ -37,6 +37,8 @@ resource "azurerm_key_vault_secret" "database_connection_string" {
   name         = var.connection_string_name
   value        = var.connection_string_value
   key_vault_id = azurerm_key_vault.res-1.id
+
+  depends_on = [ azurerm_key_vault_access_policy.default ]
 }
 
 resource "azurerm_mssql_server" "res-2" {
