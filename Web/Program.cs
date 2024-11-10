@@ -14,7 +14,7 @@ builder.Services.AddAuthenticationConfigurations(builder.Configuration.GetSectio
 if(builder.Environment.IsDevelopment())
     builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("LocalServerConnectionString")!);
 else
-    builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("AzureServerConnectionString")!);
+    builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("AzureSQLConnectionString")!);
 
 builder.Services.AddMappers();
 builder.Services.AddRepositories();
@@ -53,7 +53,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!);
+app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!); // if not development policy should be not local (with origin equals to variable from release pipeline)
 app.UseAuthentication();
 
 using (var scope = app.Services.CreateScope())

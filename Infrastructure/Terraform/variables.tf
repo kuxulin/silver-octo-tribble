@@ -32,11 +32,16 @@ variable "admin_username" {
   default     = "__SQLName__"
 }
 
-variable "admin_password" {
+variable "database_admin_password_name" {
   type        = string
-  description = "The administrator password of the SQL logical server."
-  sensitive   = true
-  default     = "__SQLPassword__"
+  description = "The administrator password name of the SQL logical server."
+  default     = "__SQLPasswordName__"
+}
+
+variable "database_admin_password_value" {
+  type        = string
+  description = "The administrator password value of the SQL logical server."
+  default     = "__SQLPasswordValue__"
 }
 
 variable server-app-name {
