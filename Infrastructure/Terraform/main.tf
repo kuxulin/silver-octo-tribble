@@ -172,8 +172,8 @@ resource "azurerm_app_service_connection" "server_database" {
   client_type = "dotnet"
   authentication {
     type = "secret"
-    secret = var.connection_string_value
-    name = var.connection_string_name
+    secret = var.admin_username
+    name = var.database_admin_password_value
   }
 }
 
