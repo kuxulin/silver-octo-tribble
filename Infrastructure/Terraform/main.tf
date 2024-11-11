@@ -4,6 +4,11 @@ data "azurerm_resource_group" "res-0" {
 
 data "azurerm_client_config" "current" {}
 
+locals  {
+  default_ip_adress_start = "${var.default_ip_adress}.0"
+  default_ip_adress_end = "${var.default_ip_adress}.255"
+}
+
 resource "azurerm_key_vault" "res-1" {
   location                  = var.resource_group_location
   name                      = var.key_vault_name
@@ -61,20 +66,10 @@ resource "azurerm_mssql_firewall_rule" "res-42" {
 }
 
 resource "azurerm_mssql_firewall_rule" "res-44" {
-  end_ip_address   = var.default_ip_adress
+  start_ip_address = local.default_ip_adress_start
+  end_ip_address   = local.default_ip_adress_end
   name             = "default"
   server_id        = azurerm_mssql_server.res-2.id
-  start_ip_address = var.default_ip_adress
-  depends_on = [
-    azurerm_mssql_server.res-2,
-  ]
-}
-
-resource "azurerm_mssql_firewall_rule" "res-43" {
-  end_ip_address   = var.default_ip_adress
-  name             = "default"
-  server_id        = azurerm_mssql_server.res-2.id
-  start_ip_address = var.default_ip_adress
   depends_on = [
     azurerm_mssql_server.res-2,
   ]
@@ -118,7 +113,7 @@ resource "azurerm_windows_web_app" "client" {
       virtual_path  = "/"
     }
     ip_restriction {
-      ip_address = "${var.default_ip_adress}/32"
+      ip_address = "${local.default_ip_adress_start}/32"
       priority   = 300
     }
   }
@@ -159,7 +154,7 @@ resource "azurerm_windows_web_app" "server" {
       virtual_path  = "/"
     }
     ip_restriction {
-      ip_address = "${var.default_ip_adress}/32"
+      ip_address = "${local.default_ip_adress_start}/32"
       priority   = 300
     }
   }
