@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  server: process.env['ServerAddress'],
+  server: 'server-14866.azurewebsites.net',
 };
