@@ -127,7 +127,7 @@ resource "azurerm_windows_web_app" "server" {
   connection_string {
     name  = var.connection_string_name
     type  = "SQLAzure"
-    value = "@Microsoft.KeyVault(SecretUri=https://${azurerm_key_vault.res-1.vault_uri}/secrets/${azurerm_key_vault_secret.database_connection_string.name}/${azurerm_key_vault_secret.database_connection_string.version})"
+    value = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.database_connection_string.name}/${azurerm_key_vault_secret.database_connection_string.version})"
   }
 
   identity {
