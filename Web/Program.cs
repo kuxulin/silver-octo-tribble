@@ -56,8 +56,9 @@ app.UseHttpsRedirection();
 app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!); // if not development policy should be not local (with origin equals to variable from release pipeline)
 app.UseAuthentication();
 
-using (var scope = app.Services.CreateScope())
+if(app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     await services.SeedData();
 }
