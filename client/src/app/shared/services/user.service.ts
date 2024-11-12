@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable, take } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import UserQueryOptions from '../models/queryOptions/UserQueryOptions';
 import PagedResult from '../models/PagedResult';
 import User from '../models/User';

@@ -1,6 +1,6 @@
 import { EventEmitter, inject, Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { DataService } from './data.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import Change from '../models/Change';

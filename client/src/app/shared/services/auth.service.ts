@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, shareReplay, take, tap } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { SESSION_STORAGE } from '../../consts';
+import { environment } from '../../../environments/environment';
 import LoginRegisterDTO from '../models/DTOs/LoginRegisterDTO';
 import AvailableUserRole from '../models/enums/AvailableUserRole';
 import { Router } from '@angular/router';

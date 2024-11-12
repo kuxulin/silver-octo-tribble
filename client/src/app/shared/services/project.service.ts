@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import ProjectCreateDTO from '../models/DTOs/ProjectCreateDTO';
 import Project from '../models/Project';
-import { map, take } from 'rxjs';
+import { take } from 'rxjs';
 import ProjectUpdateDTO from '../models/DTOs/ProjectUpdateDTO';
 
 @Injectable({
