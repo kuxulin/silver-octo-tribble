@@ -71,7 +71,7 @@ stages:
         inputs:
           command: custom
           verbose: false
-          customCommand: 'run build'
+          customCommand: 'run build --configuration=production'
           workingDir: $(clientDir)
 
       - task: ArchiveFiles@2
