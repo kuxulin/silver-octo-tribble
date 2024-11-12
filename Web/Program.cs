@@ -4,18 +4,23 @@ using Core.Constants;
 using Application;
 using Persistence.Data;
 using Core.Enums;
-using Infrastructure.SignalR.Hubs;
-var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("Jwt"));
-builder.Services.AddAuthenticationConfigurations(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>()!);
+var builder = WebApplication.CreateBuilder(args);
+IConfiguration configuration;
 
 if (builder.Environment.IsDevelopment())
+{
+    configuration = builder.Configuration.GetSection("LocalJwtConfig"); 
     builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("LocalServerConnectionString")!);
+}
 else
+{
+    configuration = builder.Configuration.GetSection("ProductionJwtConfig");
     builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("AzureSQLConnectionString")!);
+}
 
+builder.Services.Configure<JwtConfiguration>(configuration);
+builder.Services.AddAuthenticationConfigurations(configuration.Get<JwtConfiguration>()!);
 builder.Services.AddMappers();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
@@ -31,11 +36,19 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod()
                    .AllowCredentials();
         });
+    options.AddPolicy(builder.Configuration.GetSection("Policies:ProductionPolicy:Name").Value!,
+       policyBuilder =>
+       {
+           policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:ProductionPolicy:Origin").Value!)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+       });
 });
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(DefinedPolicy.AdminPolicy, policy => policy.RequireRole(AvailableUserRole.Admin.ToString()))
-    .AddPolicy(DefinedPolicy.DefaultPolicy, policy => policy.RequireClaim(DefinedClaim.IsBlocked,false.ToString()));
+    .AddPolicy(DefinedPolicy.DefaultPolicy, policy => policy.RequireClaim(DefinedClaim.IsBlocked, false.ToString()));
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
@@ -53,19 +66,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!); // if not development policy should be not local (with origin equals to variable from release pipeline)
-app.UseAuthentication();
-
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
+    app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!);
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     await services.SeedData();
 }
+else
+    app.UseCors(builder.Configuration.GetSection("Policies:ProductionPolicy:Name").Value!);
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.AddHubs();
-
 app.MapGet("/", () => "Hello World!");
 app.Run();
