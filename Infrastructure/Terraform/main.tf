@@ -46,6 +46,14 @@ resource "azurerm_key_vault_secret" "database_connection_string" {
   depends_on = [ azurerm_key_vault_access_policy.default ]
 }
 
+resource "azurerm_key_vault_secret" "jwt_symmetric_key" {
+  name         = var.jwt_key_name
+  value        = var.jwt_key_value
+  key_vault_id = azurerm_key_vault.res-1.id
+
+  depends_on = [ azurerm_key_vault_access_policy.default ]
+}
+
 resource "azurerm_mssql_server" "res-2" {
   administrator_login          = var.admin_username
   administrator_login_password = var.database_admin_password_value
@@ -89,17 +97,18 @@ resource "azurerm_service_plan" "res-45" {
 }
 
 resource "azurerm_windows_web_app" "client" {
-   app_settings = {
+  app_settings = {
     APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.res-57.instrumentation_key
     WEBSITE_ENABLE_SYNC_UPDATE_SITE = "true"
     WEBSITE_RUN_FROM_PACKAGE        = "1"
     ServerAddress  = "${azurerm_windows_web_app.server.name}.azurewebsites.net"
   }
+
   client_affinity_enabled                        = true
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
   location                                       = var.resource_group_location
-  name                                           = var.client-app-name
+  name                                           = var.client_app_name
   resource_group_name                            = var.resource_group_name
   service_plan_id                                = azurerm_service_plan.res-45.id
   webdeploy_publish_basic_authentication_enabled = false
@@ -119,14 +128,15 @@ resource "azurerm_windows_web_app" "client" {
 
 resource "azurerm_windows_web_app" "server" { 
   app_settings = {
-    ClientAddress = "${var.client-app-name}.azurewebsites.net"
-    ServerAddress  = "${var.server-app-name}.azurewebsites.net"
+    ClientAddress = "${var.client_app_name}.azurewebsites.net"
+    ServerAddress  = "${var.server_app_name}.azurewebsites.net"
+    "${var.jwt_key_name}" = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.jwt_symmetric_key.name}/${azurerm_key_vault_secret.jwt_symmetric_key.version})"
   }
   client_affinity_enabled                        = true
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
   location                                       = var.resource_group_location
-  name                                           = var.server-app-name
+  name                                           = var.server_app_name
   resource_group_name                            = var.resource_group_name
   service_plan_id                                = azurerm_service_plan.res-45.id
   webdeploy_publish_basic_authentication_enabled = false

@@ -1,12 +1,12 @@
 variable "resource_group_location" {
   type        = string
-  description = "Location for all resources."
+  description = "Location for all resources"
   default     = "__Location__"
 }
 
 variable "resource_group_name" {
   type        = string
-  description = "Resource group name."
+  description = "Resource group name"
   default     = "__ResourceGroupName__"
 }
 variable "key_vault_name" {
@@ -16,44 +16,58 @@ variable "key_vault_name" {
 }
 variable "sql_server_name"{
    type        = string
-  description = "The name of the SQL Server."
+  description = "The name of the SQL Server"
   default     = "__SQLServerName__"
 }
 
 variable "sql_db_name" {
   type        = string
-  description = "The name of the SQL Database."
+  description = "The name of the SQL Database"
   default     = "__DatabaseName__"
 }
 
 variable "admin_username" {
   type        = string
-  description = "The administrator username of the SQL logical server."
+  description = "The administrator username of the SQL logical server"
   default     = "__AdminUserName__"
 }
 
 variable "database_admin_password_name" {
   type        = string
-  description = "The administrator password name of the SQL logical server."
+  description = "The administrator password name of the SQL logical server"
   default     = "__DatabaseAdminPasswordName__"
 }
 
 variable "database_admin_password_value" {
   type        = string
-  description = "The administrator password value of the SQL logical server."
+  description = "The administrator password value of the SQL logical server"
   default     = "__DatabaseAdminPasswordValue__"
+  sensitive = true
 }
 
-variable server-app-name {
+variable server_app_name {
   type = string
   description = "Name of the app for ASP NET server"
   default = "__ServerAppName__"
 }
 
-variable client-app-name {
+variable client_app_name {
   type = string
   description = "Name of the app for an Angular client"
   default = "__ClientAppName__"
+}
+
+variable jwt_key_name {
+  type = string
+  description = "Name of the key environment variable"
+  default = "__JWTKeyName__"
+}
+
+variable jwt_key_value {
+  type = string
+  description = "Value of the key environment variable"
+  default = "__JWTKeyValue__"
+  sensitive = true
 }
 
 variable connection_string_name {
@@ -66,6 +80,7 @@ variable connection_string_value {
   type = string
   description = "Value of database connection string"
   default = "__AzureSQLConnectionStringValue__"
+  sensitive = true
 }
 
 variable default_ip_adress {
