@@ -93,6 +93,7 @@ resource "azurerm_windows_web_app" "client" {
     APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.res-57.instrumentation_key
     WEBSITE_ENABLE_SYNC_UPDATE_SITE = "true"
     WEBSITE_RUN_FROM_PACKAGE        = "1"
+    ServerAddress  = "${azurerm_windows_web_app.server.name}.azurewebsites.net"
   }
   client_affinity_enabled                        = true
   ftp_publish_basic_authentication_enabled       = false
@@ -112,9 +113,15 @@ resource "azurerm_windows_web_app" "client" {
       virtual_path  = "/"
     }
   }
+
+  depends_on = [ azurerm_windows_web_app.server ]
 }
 
 resource "azurerm_windows_web_app" "server" { 
+  app_settings = {
+    ClientAddress = "${var.client-app-name}.azurewebsites.net"
+    ServerAddress  = "${var.server-app-name}.azurewebsites.net"
+  }
   client_affinity_enabled                        = true
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
