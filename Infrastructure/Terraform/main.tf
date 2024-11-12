@@ -106,25 +106,15 @@ resource "azurerm_windows_web_app" "client" {
   site_config {
     always_on                         = false
     ftps_state                        = "FtpsOnly"
-    ip_restriction_default_action = "Deny"
     virtual_application {
       physical_path = "site\\wwwroot\\client\\browser"
       preload       = false
       virtual_path  = "/"
     }
-    ip_restriction {
-      ip_address = "${local.default_ip_adress_start}/32"
-      priority   = 300
-    }
   }
 }
 
-resource "azurerm_windows_web_app" "server" {
-   app_settings = {
-    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.res-57.instrumentation_key
-    AZURE_KEYVAULT_RESOURCEENDPOINT = azurerm_key_vault.res-1.vault_uri
-  }
-
+resource "azurerm_windows_web_app" "server" { 
   client_affinity_enabled                        = true
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
@@ -137,7 +127,7 @@ resource "azurerm_windows_web_app" "server" {
   connection_string {
     name  = var.connection_string_name
     type  = "SQLAzure"
-    value = azurerm_key_vault_secret.database_connection_string.value
+    value = "@Microsoft.KeyVault(SecretUri=https://${azurerm_key_vault.res-1.vault_uri}/secrets/${azurerm_key_vault_secret.database_connection_string.name}/${azurerm_key_vault_secret.database_connection_string.version})"
   }
 
   identity {
@@ -147,16 +137,21 @@ resource "azurerm_windows_web_app" "server" {
   site_config {
     always_on                         = false
     ftps_state                        = "FtpsOnly"
-    ip_restriction_default_action = "Deny"
     virtual_application {
       physical_path = "site\\wwwroot"
       preload       = false
       virtual_path  = "/"
     }
-    ip_restriction {
-      ip_address = "${local.default_ip_adress_start}/32"
-      priority   = 300
-    }
+  }
+}
+
+resource "azurerm_app_service_connection" "server_key_vault" {
+  name               = "server_keyvault"
+  app_service_id     = azurerm_windows_web_app.server.id
+  target_resource_id = azurerm_key_vault.res-1.id
+  client_type = "dotnet"
+  authentication {
+    type = "systemAssignedIdentity"
   }
 }
 
@@ -170,6 +165,7 @@ resource "azurerm_app_service_connection" "server_database" {
     secret = var.database_admin_password_value
     name = var.admin_username
   }
+  depends_on = [ azurerm_app_service_connection.server_key_vault ]
 }
 
 resource "azurerm_monitor_action_group" "res-56" {

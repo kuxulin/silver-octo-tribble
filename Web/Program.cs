@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddAuthenticationConfigurations(builder.Configuration.GetSection("Jwt").Get<JwtConfiguration>()!);
 
-if(builder.Environment.IsDevelopment())
+if (builder.Environment.IsDevelopment())
     builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("LocalServerConnectionString")!);
 else
     builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("AzureSQLConnectionString")!);
@@ -66,4 +66,5 @@ app.UseAuthorization();
 app.MapControllers();
 app.AddHubs();
 
+app.MapGet("/", () => "Hello World!");
 app.Run();
