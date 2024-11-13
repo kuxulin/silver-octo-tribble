@@ -2,6 +2,7 @@
   <div class="dialog-box">
     @if (userAuth$ | async; as userAuth) { @if(!userAuth.isBlocked){
     <mat-card>
+      @if(user$ | async){
       <img
         mat-card-image
         [src]="'data:image/jpeg;base64,' + user.image.content"
@@ -68,6 +69,7 @@
           Submit
         </button>
       </mat-card-actions>
+      }
     </mat-card>
     } @else {
     <span
