@@ -10,8 +10,8 @@ IConfiguration configuration;
 
 if (builder.Environment.IsDevelopment())
 {
-    configuration = builder.Configuration.GetSection("LocalJwtConfig"); 
-    builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("LocalServerConnectionString")!);
+    configuration = builder.Configuration.GetSection("LocalJwtConfig");
+    builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("LocalSQLConnectionString")!);
 }
 else
 {

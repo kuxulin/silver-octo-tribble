@@ -64,6 +64,14 @@ resource "azurerm_key_vault_secret" "jwt_symmetric_key" {
   depends_on = [ azurerm_key_vault_access_policy.default ]
 }
 
+resource "azurerm_key_vault_secret" "server_storage_connection_string" {
+  name         = var.storage_connection_name
+  value        = var.storage_connection_value
+  key_vault_id = azurerm_key_vault.res-1.id
+
+  depends_on = [ azurerm_key_vault_access_policy.default ]
+}
+
 resource "azurerm_mssql_server" "res-2" {
   administrator_login          = var.admin_username
   administrator_login_password = var.database_admin_password_value
@@ -142,6 +150,7 @@ resource "azurerm_windows_web_app" "server" {
     ServerAddress  = "${var.server_app_name}.azurewebsites.net"
     "${var.jwt_key_name}" = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.jwt_symmetric_key.name}/${azurerm_key_vault_secret.jwt_symmetric_key.version})"
   }
+
   client_affinity_enabled                        = true
   ftp_publish_basic_authentication_enabled       = false
   https_only                                     = true
@@ -155,6 +164,12 @@ resource "azurerm_windows_web_app" "server" {
     name  = var.connection_string_name
     type  = "SQLAzure"
     value = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.database_connection_string.name}/${azurerm_key_vault_secret.database_connection_string.version})"
+  }
+
+  connection_string {
+    name = var.storage_connection_name
+    type = "Custom"
+    value = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.server_storage_connection_string.name}/${azurerm_key_vault_secret.server_storage_connection_string.version})"
   }
 
   identity {
@@ -191,6 +206,17 @@ resource "azurerm_app_service_connection" "server_database" {
     type = "secret"
     secret = var.database_admin_password_value
     name = var.admin_username
+  }
+  depends_on = [ azurerm_app_service_connection.server_key_vault ]
+}
+
+resource "azurerm_app_service_connection" "server_storage" {
+  name               = "server_storage"
+  app_service_id     = azurerm_windows_web_app.server.id
+  target_resource_id = data.azurerm_storage_account.storage.id
+  client_type = "dotnet"
+  authentication {
+    type = "secret"
   }
   depends_on = [ azurerm_app_service_connection.server_key_vault ]
 }

@@ -102,3 +102,17 @@ variable default_ip_adress {
   description = "Default IP address"
   default = "__DefaultIPAdress__"
 }
+
+variable storage_connection_name {
+  type = string
+  description = "A name of a account storage connection"
+  default = "__StorageAccountConnectionStringName__"
+}
+
+variable storage_connection_value {
+  type = string
+  description = "A value of a account storage connection"
+  default = "__StorageAccountConnectionStringValue__"
+  sensitive = true
+}
+
