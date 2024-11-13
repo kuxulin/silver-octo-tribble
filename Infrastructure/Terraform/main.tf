@@ -47,7 +47,7 @@ resource "azurerm_key_vault_secret" "database_connection_string" {
 }
 
 resource "azurerm_key_vault_secret" "jwt_symmetric_key" {
-  name         = var.jwt_key_name
+  name         = "JWTKey"
   value        = var.jwt_key_value
   key_vault_id = azurerm_key_vault.res-1.id
 
