@@ -12,8 +12,9 @@ class UserProfile : Profile
         CreateMap<User, UserReadDTO>()
             .ForMember(dto=> dto.RoleIds,options=>options.MapFrom(u => u.UserRoles.Select(ur => ur.RoleId)))
             .ForMember(dto => dto.ManagerId, options => options.MapFrom(u => u.ManagerId))
-             .ForMember(dto => dto.EmployeeId, options => options.MapFrom(u => u.EmployeeId));
+            .ForMember(dto => dto.EmployeeId, options => options.MapFrom(u => u.EmployeeId));
 
-        CreateMap<RegisterDTO, User>();
+        CreateMap<RegisterDTO, User>()
+           .ForMember(u => u.ImageId, options => options.MapFrom((dto,u) => u.Image!.Id));
     }
 }
