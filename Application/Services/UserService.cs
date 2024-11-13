@@ -201,7 +201,7 @@ class UserService : IUserService
     public async Task<Result<UserReadDTO>> UpdateUserAsync(UserUpdateDTO userUpdateDTO)
     {
         var user = await GetPartialUserById(userUpdateDTO.Id);
-        var usernameFromToken = _tokenService.GetFieldFromToken(userUpdateDTO.AccessToken, DefinedClaim.Name);
+        var usernameFromToken = _tokenService.GetFieldFromToken(userUpdateDTO.AccessToken!, DefinedClaim.Name);
 
         if (user is null)
             return DefinedError.AbsentElement;
@@ -230,7 +230,8 @@ class UserService : IUserService
         {
             var newImage = _mapper.Map<ApplicationImage>(userUpdateDTO.ImageDto);
             newImage.UserId = user.Id;
-            await _imageRepository.ReplaceImage(user.Image!, newImage);
+            await _imageRepository.DeleteAsync(user.Image!.Id, isSaved:false);
+            await _imageRepository.AddAsync(newImage);
             user.Image = newImage;
         }
 
