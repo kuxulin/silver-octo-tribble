@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Core.Constants;
 using Core.DTOs.Employee;
-using Core.DTOs.Manager;
 using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
@@ -34,18 +33,6 @@ internal class EmployeeService : IEmployeeService
             .Where(e => e.Projects != null && e.Projects.Any(p => p.Id == projectId))
             .ToListAsync();
         return _mapper.Map<List<EmployeeReadDTO>>(employees);
-    }
-
-    public async Task<Result<Guid>> CreateEmployeeAsync(EmployeeCreateDTO dto)
-    {
-        var duplicate = await _employeeRepository.GetAll().FirstOrDefaultAsync(e => e.UserId == dto.UserId);
-
-        if (duplicate is not null)
-            return DefinedError.DuplicateEntity;
-
-        var employee = _mapper.Map<Employee>(dto);
-        var result = await _employeeRepository.AddAsync(employee);
-        return employee.Id;
     }
 
     public async Task<Result<Guid>> UpdateEmployeeAsync(EmployeeUpdateDTO dto)

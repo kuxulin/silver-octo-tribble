@@ -35,17 +35,6 @@ public class ManagerController : ControllerBase
         return Ok(result.Value);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateManager(ManagerCreateDTO dto)
-    {
-        var result = await _service.CreateManagerAsync(dto);
-
-        if (!result.IsSuccess)
-            return StatusCode(result.Error!.StatusCode, result.Error.Message);
-
-        return Ok(result.Value);
-    }
-
     [HttpPut]
     public async Task<IActionResult> UpdateManager(ManagerUpdateDTO dto)
     {

@@ -6,7 +6,6 @@ using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.ResultPattern;
 using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
 
 namespace Application.Services;
 
