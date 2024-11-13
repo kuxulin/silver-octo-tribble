@@ -35,17 +35,6 @@ public class EmployeeController : ControllerBase
         return Ok(result.Value);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateProject(EmployeeCreateDTO dto)
-    {
-        var result = await _service.CreateEmployeeAsync(dto);
-
-        if (!result.IsSuccess)
-            return StatusCode(result.Error!.StatusCode, result.Error.Message);
-
-        return Ok(result.Value);
-    }
-
     [HttpPut]
     public async Task<IActionResult> UpdateEmployee(EmployeeUpdateDTO dto)
     {

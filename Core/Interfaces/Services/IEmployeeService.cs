@@ -1,5 +1,4 @@
 ﻿using Core.DTOs.Employee;
-using Core.DTOs.Manager;
 using Core.ResultPattern;
 
 namespace Core.Interfaces.Services;
