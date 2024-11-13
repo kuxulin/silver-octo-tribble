@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
     storage_account_name = "__StorageAccountName__"
-    container_name       = "__ContainerName__"
+    container_name       = "__DefaultContainerName__"
     key                  = "__KeyName__" 
     access_key = "__StorageKey__"
   }
