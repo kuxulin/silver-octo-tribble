@@ -1,44 +1,58 @@
-variable "resource_group_location" {
+variable resource_group_location {
   type        = string
   description = "Location for all resources"
   default     = "__Location__"
 }
 
-variable "resource_group_name" {
+variable resource_group_name {
   type        = string
   description = "Resource group name"
   default     = "__ResourceGroupName__"
 }
-variable "key_vault_name" {
+
+variable storage_account_name {
+  type = string
+  description = "A name of storage account"
+  default = "__StorageAccountName__"
+}
+
+variable storage_container_images_name {
+  type = string
+  description = "A name of a container for images"
+  default = "__ImagesContainerName__"
+}
+
+variable key_vault_name {
   type = string
   description = "Key vault name"
   default = "__KeyVaultName__"
 }
-variable "sql_server_name"{
+
+variable sql_server_name {
    type        = string
   description = "The name of the SQL Server"
   default     = "__SQLServerName__"
 }
 
-variable "sql_db_name" {
+variable sql_db_name {
   type        = string
   description = "The name of the SQL Database"
   default     = "__DatabaseName__"
 }
 
-variable "admin_username" {
+variable admin_username {
   type        = string
   description = "The administrator username of the SQL logical server"
   default     = "__AdminUserName__"
 }
 
-variable "database_admin_password_name" {
+variable database_admin_password_name {
   type        = string
   description = "The administrator password name of the SQL logical server"
   default     = "__DatabaseAdminPasswordName__"
 }
 
-variable "database_admin_password_value" {
+variable database_admin_password_value {
   type        = string
   description = "The administrator password value of the SQL logical server"
   default     = "__DatabaseAdminPasswordValue__"

@@ -4,9 +4,19 @@ data "azurerm_resource_group" "res-0" {
 
 data "azurerm_client_config" "current" {}
 
+data "azurerm_storage_account" "storage" {
+  resource_group_name = data.azurerm_resource_group.res-0.name
+  name = var.storage_account_name
+}
+
 locals  {
   default_ip_adress_start = "${var.default_ip_adress}.0"
   default_ip_adress_end = "${var.default_ip_adress}.255"
+}
+
+resource "azurerm_storage_container" "images" {
+  name = var.storage_container_images_name
+  storage_account_name = data.azurerm_storage_account.storage.name
 }
 
 resource "azurerm_key_vault" "res-1" {
