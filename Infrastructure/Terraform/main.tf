@@ -152,6 +152,10 @@ resource "azurerm_windows_web_app" "server" {
     "${var.jwt_key_name}" = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.jwt_symmetric_key.name}/${azurerm_key_vault_secret.jwt_symmetric_key.version})"
     APPINSIGHTS_INSTRUMENTATIONKEY =  azurerm_application_insights.res-57.instrumentation_key
     APPLICATIONINSIGHTS_CONNECTION_STRING =  azurerm_application_insights.res-57.connection_string
+    XDT_MicrosoftApplicationInsights_Mode           = "recommended"
+    ApplicationInsightsAgent_EXTENSION_VERSION      = "~2"
+    APPINSIGHTS_PROFILERFEATURE_VERSION             = "1.0.0"
+    APPINSIGHTS_SNAPSHOTFEATURE_VERSION             = "1.0.0"
   }
 
   client_affinity_enabled                        = true
