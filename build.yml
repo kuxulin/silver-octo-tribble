@@ -26,6 +26,7 @@ stages:
         databaseProject: '**/Database/Database.sqlproj'
         terraformDir: 'Infrastructure/Terraform'
         clientDir: 'client'
+        scriptsDir: 'Infrastructure/ReleaseScripts'
 
       steps:
       - task: NuGetToolInstaller@1
@@ -45,11 +46,19 @@ stages:
           configuration: '$(buildConfiguration)'
           
       - task: CopyFiles@2
+        displayName: 'Copy terraform files to artifacts'
         inputs:
           SourceFolder: '$(terraformDir)'
           Contents: '**'
           TargetFolder: '$(Build.ArtifactStagingDirectory)/Terraform'
-          
+
+      - task: CopyFiles@2
+        displayName: 'Copy release scripts to artifacts'
+        inputs:
+          SourceFolder: '$(scriptsDir)'
+          Contents: '**'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/Scripts'    
+
       - task: NodeTool@0
         displayName: Install Node
         inputs:
