@@ -86,6 +86,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = true,
+            SameSite = SameSiteMode.None
         };
         Response.Cookies.Append("refreshToken", token);
     }
