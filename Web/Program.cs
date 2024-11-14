@@ -4,8 +4,10 @@ using Core.Constants;
 using Application;
 using Persistence.Data;
 using Core.Enums;
+using TemplateFormattedConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.EnableTemplatedConfiguration();
 IConfiguration configuration;
 
 if (builder.Environment.IsDevelopment())
@@ -56,6 +58,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
 var app = builder.Build();
+app.UseHttpsRedirection();
 app.UseRouting();
 
 if (app.Environment.IsDevelopment())
@@ -63,8 +66,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
 {

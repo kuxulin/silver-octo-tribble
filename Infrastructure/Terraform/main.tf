@@ -118,7 +118,7 @@ resource "azurerm_windows_web_app" "client" {
   app_settings = {
     WEBSITE_ENABLE_SYNC_UPDATE_SITE = "true"
     WEBSITE_RUN_FROM_PACKAGE        = "1"
-    ServerAddress  = "${azurerm_windows_web_app.server.name}.azurewebsites.net"
+    ServerName  = "${azurerm_windows_web_app.server.name}.azurewebsites.net"
     APPINSIGHTS_INSTRUMENTATIONKEY =  azurerm_application_insights.res-57.instrumentation_key
     APPLICATIONINSIGHTS_CONNECTION_STRING =  azurerm_application_insights.res-57.connection_string
   }
@@ -147,8 +147,8 @@ resource "azurerm_windows_web_app" "client" {
 
 resource "azurerm_windows_web_app" "server" { 
   app_settings = {
-    ClientAddress = "${var.client_app_name}.azurewebsites.net"
-    ServerAddress  = "${var.server_app_name}.azurewebsites.net"
+    ClientName = "${var.client_app_name}.azurewebsites.net"
+    ServerName  = "${var.server_app_name}.azurewebsites.net"
     "${var.jwt_key_name}" = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.jwt_symmetric_key.name}/${azurerm_key_vault_secret.jwt_symmetric_key.version})"
     APPINSIGHTS_INSTRUMENTATIONKEY =  azurerm_application_insights.res-57.instrumentation_key
     APPLICATIONINSIGHTS_CONNECTION_STRING =  azurerm_application_insights.res-57.connection_string
