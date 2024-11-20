@@ -251,3 +251,50 @@ resource "azurerm_application_insights" "res-57" {
   name                = "app-insights"
   resource_group_name = var.resource_group_name
 }
+
+resource "azurerm_windows_function_app" "upload_azure_func" {
+  app_settings = {
+    AzureWebJobsSecretStorageType          = "files"
+    ImagesContainerName                    = "images"
+    WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
+  }
+  client_certificate_mode                  = "Required"
+  ftp_publish_basic_authentication_enabled = false
+  location                                 = var.resource_group_location
+  name                                     = var.upload_azure_func_name
+  resource_group_name                      = var.resource_group_name
+  service_plan_id                          = azurerm_service_plan.res-45.id
+
+  webdeploy_publish_basic_authentication_enabled = false
+
+  connection_string {
+    name = var.storage_connection_name
+    type = "Custom"
+    value = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.server_storage_connection_string.name}/${azurerm_key_vault_secret.server_storage_connection_string.version})"
+  }
+
+  site_config {
+    application_insights_connection_string = azurerm_application_insights.res-57.connection_string
+    ftps_state                             = "FtpsOnly"
+    ip_restriction_default_action          = ""
+    scm_ip_restriction_default_action      = ""
+    use_32_bit_worker                      = false
+    cors {
+      allowed_origins = ["https://portal.azure.com"]
+    }
+  }
+  depends_on = [
+    
+    azurerm_application_insights.res-57
+  ]
+}
+
+resource "azurerm_app_service_connection" "azure_upload_func_key_vault" {
+  name               = "azure_upload_func_keyvault"
+  app_service_id     = azurerm_windows_function_app.upload_azure_func.id
+  target_resource_id = azurerm_key_vault.res-1.id
+  client_type = "dotnet"
+  authentication {
+    type = "systemAssignedIdentity"
+  }
+}

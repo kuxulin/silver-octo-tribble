@@ -116,3 +116,9 @@ variable storage_connection_value {
   sensitive = true
 }
 
+variable upload_azure_func_name {
+  type = string
+  description = "A name of an azure function to upload compressed images"
+  default = "__AzureUploadFuncName__"
+}
+
