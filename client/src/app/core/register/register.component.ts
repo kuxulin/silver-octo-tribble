@@ -42,9 +42,9 @@ export class RegisterComponent {
     image: {
       content: '',
       name: '',
+      type: '',
     },
   };
-
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   checkedPassword = '';
 
@@ -58,16 +58,17 @@ export class RegisterComponent {
     if (input.files && input.files[0]) {
       let file = input.files[0];
       let reader = new FileReader();
+      reader.readAsArrayBuffer(file);
 
       reader.onload = () => {
-        let base64String = reader.result as string;
+        let base64String = reader.result!.toString();
+
         this.dto.image = {
           name: file.name,
           content: base64String.split(',')[1],
+          type: file.type,
         };
       };
-
-      reader.readAsDataURL(file);
     }
   }
 

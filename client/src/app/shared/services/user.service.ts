@@ -1,6 +1,6 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable, take } from 'rxjs';
+import { map, Observable, shareReplay, take, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import UserQueryOptions from '../models/queryOptions/UserQueryOptions';
 import PagedResult from '../models/PagedResult';
@@ -8,6 +8,7 @@ import User from '../models/User';
 import AvailableUserRole from '../models/enums/AvailableUserRole';
 import UsersMetrics from '../models/UserMetrics';
 import UserUpdateDTO from '../models/DTOs/UserUpdateDTO';
+import { ImageService } from './image.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,10 +16,21 @@ import UserUpdateDTO from '../models/DTOs/UserUpdateDTO';
 export class UserService {
   private _apiUrl = environment.server + 'api/User';
 
-  constructor(private _httpClient: HttpClient) {}
+  constructor(
+    private _httpClient: HttpClient,
+    private _imageService: ImageService
+  ) {}
 
   getUserById(id: number): Observable<User> {
-    return this._httpClient.get<User>(this._apiUrl + '/' + id);
+    return this._httpClient
+      .get<User>(this._apiUrl + '/' + id)
+      .pipe(
+        tap((user) =>
+          this._imageService
+            .getOriginalImage(user.imageId)
+            .subscribe((image) => (user.image = image))
+        )
+      );
   }
 
   getAllUsers(options: UserQueryOptions): Observable<PagedResult<User>> {
@@ -28,6 +40,13 @@ export class UserService {
         params: params,
       })
       .pipe(
+        tap((result) => {
+          result.items.forEach((user) => {
+            this._imageService
+              .getOriginalImage(user.imageId)
+              .subscribe((image) => (user.image = image));
+          });
+        }),
         map((result) => {
           result.items.forEach((user: any) => {
             user.creationDate = new Date(user.creationDate.toString() + 'Z');

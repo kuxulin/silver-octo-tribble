@@ -10,6 +10,7 @@ export default interface User {
   roleIds: AvailableUserRole[];
   creationDate: Date;
   isBlocked: boolean;
+  imageId: string;
   image: Image;
   managerId: string | undefined;
   employeeId: string | undefined;
