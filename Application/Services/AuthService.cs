@@ -2,7 +2,6 @@
 using Core.Constants;
 using Core.DTOs.Auth;
 using Core.Entities;
-using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.ResultPattern;
 using Microsoft.AspNetCore.Identity;
@@ -13,14 +12,14 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
-    private readonly IImageRepository _imageRepository;
+    private readonly IImageService _imageService;
     private readonly IMapper _mapper;
 
-    public AuthService(UserManager<User> userManager, ITokenService tokenService, IImageRepository imageRepository, IMapper mapper)
+    public AuthService(UserManager<User> userManager, ITokenService tokenService, IImageService imageService, IMapper mapper)
     {
         _userManager = userManager;
         _tokenService = tokenService;
-        _imageRepository = imageRepository;
+        _imageService = imageService;
         _mapper = mapper;
     }
 
@@ -29,14 +28,14 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByNameAsync(dto.UserName);
 
         if (user is null)
-            return DefinedError.AbsentElement; 
+            return DefinedError.AbsentElement;
 
         if (await _userManager.CheckPasswordAsync(user, dto.Password))
         {
             return await GenerateAccessTokenAsync(user);
         }
 
-        return DefinedError.NonEqualPasswords; 
+        return DefinedError.NonEqualPasswords;
     }
 
     public async Task<Result<TokenDTO>> Register(RegisterDTO dto)
@@ -47,17 +46,28 @@ public class AuthService : IAuthService
             return DefinedError.DuplicateEntity;
 
         var user = _mapper.Map<User>(dto);
+        await _userManager.CreateAsync(user, dto.Password);
+        var imageDto = dto.Image;
+        imageDto.UserId = user.Id;
+        var imageCreationResult = await _imageService.AddImageAsync(dto.Image);
 
-        IdentityResult result = await _userManager.CreateAsync(user, dto.Password);
+        if (!imageCreationResult.IsSuccess)
+        {
+            await _userManager.DeleteAsync(user);
+            return imageCreationResult.Error!;
+        }
+
+        user.ImageId = imageCreationResult.Value;
+        await _userManager.UpdateAsync(user);
         return await GenerateAccessTokenAsync(user);
     }
 
     public async Task<Result<TokenDTO>> CreateAccessTokenFromRefresh(string oldRefreshToken)
     {
-        if(!_tokenService.ValidateToken(oldRefreshToken))
+        if (!_tokenService.ValidateToken(oldRefreshToken))
             return DefinedError.InvalidElement;
 
-        string username = _tokenService.GetFieldFromToken(oldRefreshToken,DefinedClaim.Name);
+        string username = _tokenService.GetFieldFromToken(oldRefreshToken, DefinedClaim.Name);
 
         if (username is null)
             return DefinedError.InvalidElement;
@@ -65,9 +75,9 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByNameAsync(username);
 
         if (user is null)
-            return DefinedError.AbsentElement; 
+            return DefinedError.AbsentElement;
 
-        if(user.RefreshToken != oldRefreshToken)
+        if (user.RefreshToken != oldRefreshToken)
             return DefinedError.InvalidElement;
 
         return await GenerateAccessTokenAsync(user);
@@ -78,7 +88,7 @@ public class AuthService : IAuthService
         var token = _tokenService.CreateRefreshToken(username);
         var user = await _userManager.Users.FirstAsync(u => u.UserName == username);
         user.RefreshToken = token;
-        await _userManager.UpdateAsync(user); 
+        await _userManager.UpdateAsync(user);
         return token;
     }
 
