@@ -16,16 +16,16 @@ class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
-    private readonly IImageRepository _imageRepository;
+    private readonly IImageService _imageService;
     private readonly ITokenService _tokenService;
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IManagerRepository _managerRepository;
 
-    public UserService(IUserRepository userRepository, IMapper mapper, IImageRepository imageRepository, IEmployeeRepository employeeRepository, IManagerRepository managerRepository, ITokenService tokenService)
+    public UserService(IUserRepository userRepository, IMapper mapper, IImageService imageService, IEmployeeRepository employeeRepository, IManagerRepository managerRepository, ITokenService tokenService)
     {
         _userRepository = userRepository;
         _mapper = mapper;
-        _imageRepository = imageRepository;
+        _imageService = imageService;
         _tokenService = tokenService;
         _employeeRepository = employeeRepository;
         _managerRepository = managerRepository;
@@ -91,6 +91,7 @@ class UserService : IUserService
         if (users is null || users.Count < ids.Count())
             return DefinedError.AbsentElement;
 
+        await _imageService.DeleteImagesAsync(users.Select(u => u.ImageId));
         await _userRepository.DeleteUsersAsync(users);
         return true;
     }
@@ -108,14 +109,6 @@ class UserService : IUserService
 
     private async Task<User?> GetUserById(int id)
     {
-        return await _userRepository.GetAll()
-            .Include(u => u.UserRoles)
-            .Include(u => u.Image)
-            .FirstOrDefaultAsync(u => u.Id == id);
-    }
-
-    private async Task<User?> GetPartialUserById(int id)
-    {
         return await _userRepository.GetAll().Include(u => u.UserRoles).FirstOrDefaultAsync(u => u.Id == id);
     }
 
@@ -129,7 +122,7 @@ class UserService : IUserService
             }
         }
 
-        var user = await GetPartialUserById(id);
+        var user = await GetUserById(id);
 
         if (user == null)
             return DefinedError.AbsentElement;
@@ -200,7 +193,7 @@ class UserService : IUserService
 
     public async Task<Result<UserReadDTO>> UpdateUserAsync(UserUpdateDTO userUpdateDTO)
     {
-        var user = await GetPartialUserById(userUpdateDTO.Id);
+        var user = await GetUserById(userUpdateDTO.Id);
         var usernameFromToken = _tokenService.GetFieldFromToken(userUpdateDTO.AccessToken!, DefinedClaim.Name);
 
         if (user is null)
@@ -226,17 +219,30 @@ class UserService : IUserService
         if (userUpdateDTO.PhoneNumber is not null)
             user.PhoneNumber = userUpdateDTO.PhoneNumber;
 
-        if (userUpdateDTO.ImageDto is not null && userUpdateDTO.ImageDto.Content != user.Image?.Content)
+        
+        var imageIdToDelete = Guid.Empty;
+
+        if (userUpdateDTO.ImageDto is not null )
         {
-            var newImage = _mapper.Map<ApplicationImage>(userUpdateDTO.ImageDto);
-            newImage.UserId = user.Id;
-            await _imageRepository.DeleteAsync(user.Image!.Id, isSaved:false);
-            await _imageRepository.AddAsync(newImage);
-            user.Image = newImage;
+            var areEqual = (await _imageService.AreEqual(userUpdateDTO.ImageDto, user.ImageId)).Value!;
+
+            if(!areEqual)
+            {
+                var newImageResult = await _imageService.AddImageAsync(userUpdateDTO.ImageDto);
+
+                if (!newImageResult.IsSuccess)
+                    return newImageResult.Error!;
+
+                imageIdToDelete = user.ImageId;
+                user.ImageId = newImageResult.Value;
+            } 
         }
 
         var updatedUser = await _userRepository.UpdateUserAsync(user);
+
+        if (imageIdToDelete != Guid.Empty)
+            await _imageService.DeleteImagesAsync([imageIdToDelete]);
+
         return _mapper.Map<UserReadDTO>(updatedUser);
     }
 }
-

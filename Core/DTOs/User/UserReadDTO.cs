@@ -12,7 +12,8 @@ public class UserReadDTO
     public IEnumerable<int>? RoleIds { get; set; }
     public DateTime CreationDate { get; set; }
     public bool IsBlocked { get; set; }
-    public ApplicationImageReadDTO Image { get; set; } = null!;
+    public ImageReadDTO Image { get; set; } = null!;
+    public Guid ImageId { get; set; }
     public Guid? ManagerId { get; set; }
     public Guid? EmployeeId { get; set; }
 }

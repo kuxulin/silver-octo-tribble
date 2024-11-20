@@ -11,6 +11,6 @@ public class RegisterDTO
     public string Password { get; set; } = null!;
     [RegularExpression(@"^\+\d{8,15}$", ErrorMessage = "Entered phone format is not valid.")]
     public string PhoneNumber { get; set; } = null!;
-    public ApplicationImageCreateDTO Image { get; set; } = null!;
+    public ImageCreateDTO Image { get; set; } = null!;
 }
 

@@ -22,6 +22,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = DefinedPolicy.AdminPolicy)]
     public async Task<IActionResult> GetUsers([FromQuery] UserQueryOptions options)
     {
         var result = await _userService.GetUsersAsync(options);
@@ -30,7 +31,6 @@ public class UserController : ControllerBase
 
     [HttpDelete]
     [Authorize(Policy = DefinedPolicy.AdminPolicy)]
-
     public async Task<IActionResult> DeleteUser([FromBody] IEnumerable<int> ids)
     {
         var result = await _userService.DeleteUsersAsync(ids);
@@ -43,7 +43,6 @@ public class UserController : ControllerBase
 
     [HttpPatch]
     [Authorize(Policy = DefinedPolicy.AdminPolicy)]
-
     public async Task<IActionResult> ChangeUsersStatus([FromBody] IEnumerable<int> ids, bool isBlocked)
     {
         var result = await _userService.ChangeUsersStatusAsync(ids, isBlocked);
