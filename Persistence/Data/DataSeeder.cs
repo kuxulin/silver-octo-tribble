@@ -1,6 +1,9 @@
+using Core.DTOs.ApplicationImage;
 using Core.Entities;
 using Core.Enums;
+using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data.Contexts;
 
@@ -19,6 +22,7 @@ public static class DataSeeder
     {
         var usersManager = provider.GetRequiredService<UserManager<User>>();
         var rolesManager = provider.GetRequiredService<RoleManager<Role>>();
+        var imageService = provider.GetRequiredService<IImageService>();
 
         if (usersManager.Users.Any(u => u.UserName == "maks"))
             return;
@@ -31,25 +35,29 @@ public static class DataSeeder
             await rolesManager.CreateAsync(role);
         }
 
+        var imageDto = new ImageCreateDTO()
+        {
+            Name = "User.png",
+            Content = GetImageContent("User.png"),
+            Type = "image/png"
+        };
+
+        var imageId = (await imageService.AddImageAsync(imageDto)).Value!;
+
         var user = new User
         {
             FirstName = "Maksym",
             LastName = "Moroz",
             UserName = "maks",
             PhoneNumber = "+380953867137",
+            ImageId = imageId
         };
 
-        var image = new ApplicationImage()
-        {
-            Name = "User.png",
-            Content = GetImageString("User.png"),
-        };
-
-        user.Image = image;
         await usersManager.CreateAsync(user, "string");
         await usersManager.AddToRoleAsync(user, roles[0].Name!);
-        user.ImageId = image.Id;
-        context.Users.Update(user);
+        var image = await context.Images.FirstAsync(i => i.Id == imageId);
+        image.UserId = user.Id;
+        context.Images.Update(image);
         await context.SaveChangesAsync();
     }
 
@@ -76,12 +84,11 @@ public static class DataSeeder
     {
         var usersManager = provider.GetRequiredService<UserManager<User>>();
         var context = provider.GetRequiredService<DatabaseContext>();
+        var imageService = provider.GetRequiredService<IImageService>();
 
         if (usersManager.Users.Count() > 1)
             return;
 
-        var name = "User.png";
-        var content = GetImageString("User.png");
         var managers = new List<User>()
         {
             new ()
@@ -167,43 +174,48 @@ public static class DataSeeder
                 PhoneNumber = "+380927857197",
             },
         };
-        var images = new List<ApplicationImage>();
 
-        for (int i = 0; i < employees.Count + managers.Count; i++)
-            images.Add(new ApplicationImage()
-            {
-                Name = name,
-                Content = content
-            });
+        var imageDto = new ImageCreateDTO()
+        {
+            Name = "User.png",
+            Content = GetImageContent("User.png"),
+            Type = "image/png"
+        };
 
         for (int i = 0; i < managers.Count; i++)
         {
-            managers[i].Image = images[i];
+            var imageId = (await imageService.AddImageAsync(imageDto)).Value!;
+            managers[i].ImageId = imageId;
             var manager = new Manager() { CreationDate = managers[i].CreationDate };
             managers[i].Manager = manager;
             await usersManager.CreateAsync(managers[i], "string");
             await usersManager.AddToRoleAsync(managers[i], AvailableUserRole.Manager.ToString());
-            managers[i].ImageId = images[i].Id;
             managers[i].ManagerId = manager.Id;
             context.Update(managers[i]);
+            var image = await context.Images.FirstAsync(i => i.Id == imageId);
+            image.UserId = managers[i].Id;
+            context.Images.Update(image);
         }
 
         for (int i = 0; i < employees.Count; i++)
         {
-            employees[i].Image = images[i + managers.Count];
+            var imageId = (await imageService.AddImageAsync(imageDto)).Value!;
+            employees[i].ImageId = imageId; 
             var employee = new Employee() { CreationDate = employees[i].CreationDate };
             employees[i].Employee = employee;
             await usersManager.CreateAsync(employees[i], "string");
             await usersManager.AddToRoleAsync(employees[i], AvailableUserRole.Employee.ToString());
-            employees[i].ImageId = images[i + managers.Count].Id;
             employees[i].EmployeeId = employee.Id;
             context.Update(employees[i]);
+            var image = await context.Images.FirstAsync(i => i.Id == imageId);
+            image.UserId = managers[i].Id;
+            context.Images.Update(image);
         }
 
         await context.SaveChangesAsync();
     }
 
-    private static string GetImageString(string imageName)
+    private static string GetImageContent(string imageName)
     {
         string solutionDirectory = GetSolutionDirectoryInfo().FullName;
         string imagePath = Path.Combine(solutionDirectory, imageName);

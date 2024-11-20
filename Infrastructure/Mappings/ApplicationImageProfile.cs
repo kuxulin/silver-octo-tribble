@@ -8,8 +8,8 @@ class ApplicationImageProfile:Profile
 {
     public ApplicationImageProfile()
     {
-        CreateMap<ApplicationImage, ApplicationImageReadDTO>();
-        CreateMap<ApplicationImageCreateDTO, ApplicationImage>();
+        CreateMap<ApplicationImage, ImageReadDTO>();
+        CreateMap<ImageCreateDTO, ApplicationImage>()
+            .ForMember(i => i.Content, options => options.MapFrom(dto => Convert.FromBase64String(dto.Content)));
     }
 }
-
