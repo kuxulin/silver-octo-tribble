@@ -22,15 +22,7 @@ export class UserService {
   ) {}
 
   getUserById(id: number): Observable<User> {
-    return this._httpClient
-      .get<User>(this._apiUrl + '/' + id)
-      .pipe(
-        tap((user) =>
-          this._imageService
-            .getOriginalImage(user.imageId)
-            .subscribe((image) => (user.image = image))
-        )
-      );
+    return this._httpClient.get<User>(this._apiUrl + '/' + id);
   }
 
   getAllUsers(options: UserQueryOptions): Observable<PagedResult<User>> {
@@ -43,7 +35,7 @@ export class UserService {
         tap((result) => {
           result.items.forEach((user) => {
             this._imageService
-              .getOriginalImage(user.imageId)
+              .getThumbnailImage(user.imageId)
               .subscribe((image) => (user.image = image));
           });
         }),
