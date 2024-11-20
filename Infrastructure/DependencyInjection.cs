@@ -2,6 +2,7 @@
 using Core.Interfaces.Services;
 using Infrastructure.Mappings;
 using Infrastructure.Services;
+using Infrastructure.Services.ImageContent;
 using Infrastructure.SignalR.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -19,10 +20,17 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, bool isDevelopment)
     {
-        services.AddScoped<ITokenService, TokenService>();
+        services.AddSingleton<ITokenService, TokenService>();
         services.AddScoped<INotificationsHubService, NotificationsHubService>();
+        services.AddSingleton<IImageTransformingService, ImageTransformingService>();
+
+        if (isDevelopment)
+            services.AddScoped<IImageContentService, ImageContentLocalService>();
+        else
+            services.AddScoped<IImageContentService, ImageContentBlobStorageService>();
+
         return services;
     }
 
