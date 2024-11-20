@@ -22,9 +22,9 @@ public class UploadFunction
     }
 
     public async Task Run(
-    [BlobTrigger("original/{imageId}", Connection = "StorageAccountConnectionString")] BlobClient originalBlobClient,
-    [Blob("thumbnail/{imageId}", FileAccess.Write, Connection = "StorageAccountConnectionString")] BlobClient thumbnailBlobClient,
-    [Blob("profile/{imageId}", FileAccess.Write, Connection = "StorageAccountConnectionString")] BlobClient profileBlobClient)
+    [BlobTrigger("%ImagesContainerName%/original/{imageId}", Connection = "StorageAccountConnectionString")] BlobClient originalBlobClient,
+    [Blob("%ImagesContainerName%/thumbnail/{imageId}", FileAccess.Write, Connection = "StorageAccountConnectionString")] BlobClient thumbnailBlobClient,
+    [Blob("%ImagesContainerName%/profile/{imageId}", FileAccess.Write, Connection = "StorageAccountConnectionString")] BlobClient profileBlobClient)
     {
         var properties = await originalBlobClient.GetPropertiesAsync();
         var contentType = properties.Value.ContentType;
