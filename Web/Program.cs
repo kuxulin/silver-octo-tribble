@@ -1,51 +1,44 @@
-using Persistence;
-using Infrastructure;
-using Core.Constants;
 using Application;
-using Persistence.Data;
+using Azure.Storage.Blobs;
+using Core.Constants;
 using Core.Enums;
+using Infrastructure;
+using Persistence;
+using Persistence.Data;
 using TemplateFormattedConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.EnableTemplatedConfiguration();
-IConfiguration configuration;
 
 if (builder.Environment.IsDevelopment())
-{
-    configuration = builder.Configuration.GetSection("LocalJwtConfig");
     builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("LocalSQLConnectionString")!);
-}
 else
 {
-    configuration = builder.Configuration.GetSection("ProductionJwtConfig");
     builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("AzureSQLConnectionString")!);
+    var blobServiceClient = new BlobServiceClient(builder.Configuration.GetConnectionString("StorageAccountConnectionString"));
+    var containerClient = blobServiceClient.GetBlobContainerClient(builder.Configuration.GetValue<string>("ImagesContainerName")); // created by me service also should be added as a singleton
+    builder.Services.AddSingleton(provider => containerClient);
 }
 
+var configuration = builder.Configuration.GetSection("DefaultJwtConfig");
 builder.Services.Configure<JwtConfiguration>(configuration);
 builder.Services.AddAuthenticationConfigurations(configuration.Get<JwtConfiguration>()!);
 builder.Services.AddMappers();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices();
+builder.Services.AddInfrastructureServices(builder.Environment.IsDevelopment());
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!,
+    options.AddPolicy(builder.Configuration.GetSection("Policies:DefaultPolicy:Name").Value!,
         policyBuilder =>
         {
-            policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:LocalPolicy:Origin").Value!)
+            var origin = builder.Configuration.GetSection("Policies:DefaultPolicy:Origin").Value!;
+            policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:DefaultPolicy:Origin").Value!)
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                    .AllowCredentials();
         });
-    options.AddPolicy(builder.Configuration.GetSection("Policies:ProductionPolicy:Name").Value!,
-       policyBuilder =>
-       {
-           policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:ProductionPolicy:Origin").Value!)
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials();
-       });
 });
 
 builder.Services.AddAuthorizationBuilder()
@@ -67,16 +60,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
 {
-    app.UseCors(builder.Configuration.GetSection("Policies:LocalPolicy:Name").Value!);
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     await services.SeedData();
 }
-else
-    app.UseCors(builder.Configuration.GetSection("Policies:ProductionPolicy:Name").Value!);
 
+app.UseCors(builder.Configuration.GetSection("Policies:DefaultPolicy:Name").Value!);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
