@@ -84,10 +84,15 @@ internal class ImageContentBlobStorageService : IImageContentService
     public async Task<Result<Guid>> DeleteContentAsync(Guid imageId)
     {
         var blobClient = _containerClient.GetBlobClient($"original/{imageId}");
-
-        if (blobClient.Exists())
-            await blobClient.DeleteAsync();
-
+        await blobClient.DeleteIfExistsAsync();
+        await TriggerAdditionalBlobsDeleting(imageId);
         return imageId;
+    }
+
+    private async Task TriggerAdditionalBlobsDeleting(Guid imageId)
+    {
+        var emptyBlobClient = _containerClient.GetBlobClient($"{imageId}__delete");
+        using var stream = new MemoryStream();
+        await emptyBlobClient.UploadAsync(stream);
     }
 }
