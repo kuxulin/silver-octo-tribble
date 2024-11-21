@@ -64,7 +64,7 @@ resource "azurerm_key_vault_secret" "jwt_symmetric_key" {
   depends_on = [ azurerm_key_vault_access_policy.default ]
 }
 
-resource "azurerm_key_vault_secret" "server_storage_connection_string" {
+resource "azurerm_key_vault_secret" "storage_connection_string" {
   name         = var.storage_connection_name
   value        = var.storage_connection_value
   key_vault_id = azurerm_key_vault.res-1.id
@@ -177,7 +177,7 @@ resource "azurerm_windows_web_app" "server" {
   connection_string {
     name = var.storage_connection_name
     type = "Custom"
-    value = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.server_storage_connection_string.name}/${azurerm_key_vault_secret.server_storage_connection_string.version})"
+    value = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.storage_connection_string.name}/${azurerm_key_vault_secret.storage_connection_string.version})"
   }
 
   identity {
@@ -252,10 +252,10 @@ resource "azurerm_application_insights" "res-57" {
   resource_group_name = var.resource_group_name
 }
 
-resource "azurerm_windows_function_app" "upload_azure_func" {
+resource "azurerm_windows_function_app" "images_azure_funcs" {
   app_settings = {
     AzureWebJobsSecretStorageType          = "files"
-    ImagesContainerName                    = "images"
+    ImagesContainerName                    = var.storage_container_images_name
     WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
   }
   client_certificate_mode                  = "Required"
@@ -270,7 +270,7 @@ resource "azurerm_windows_function_app" "upload_azure_func" {
   connection_string {
     name = var.storage_connection_name
     type = "Custom"
-    value = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.server_storage_connection_string.name}/${azurerm_key_vault_secret.server_storage_connection_string.version})"
+    value = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.storage_connection_string.name}/${azurerm_key_vault_secret.storage_connection_string.version})"
   }
 
   site_config {
@@ -284,14 +284,13 @@ resource "azurerm_windows_function_app" "upload_azure_func" {
     }
   }
   depends_on = [
-    
     azurerm_application_insights.res-57
   ]
 }
 
 resource "azurerm_app_service_connection" "azure_upload_func_key_vault" {
-  name               = "azure_upload_func_keyvault"
-  app_service_id     = azurerm_windows_function_app.upload_azure_func.id
+  name               = "images_azure_funcs_keyvault"
+  app_service_id     = azurerm_windows_function_app.images_azure_funcs.id
   target_resource_id = azurerm_key_vault.res-1.id
   client_type = "dotnet"
   authentication {
