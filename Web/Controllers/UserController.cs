@@ -22,7 +22,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = DefinedPolicy.AdminPolicy)]
     public async Task<IActionResult> GetUsers([FromQuery] UserQueryOptions options)
     {
         var result = await _userService.GetUsersAsync(options);
