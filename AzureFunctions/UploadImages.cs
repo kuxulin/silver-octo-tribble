@@ -2,25 +2,22 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Core.Constants;
 using Core.Interfaces.Services;
-using Infrastructure.Services;
 using Microsoft.Azure.WebJobs;
-using SixLabors.ImageSharp;
-using System;
 using System.IO;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace AzureFunctions;
 
-public class UploadFunction
+public class UploadImages
 {
     private readonly IImageTransformingService _imageTransformingService;
 
-    public UploadFunction(IImageTransformingService imageTransformingService)
+    public UploadImages(IImageTransformingService imageTransformingService)
     {
         _imageTransformingService = imageTransformingService;
     }
 
+    [FunctionName(nameof(UploadImages))]
     public async Task Run(
     [BlobTrigger("%ImagesContainerName%/original/{imageId}", Connection = "StorageAccountConnectionString")] BlobClient originalBlobClient,
     [Blob("%ImagesContainerName%/thumbnail/{imageId}", FileAccess.Write, Connection = "StorageAccountConnectionString")] BlobClient thumbnailBlobClient,
