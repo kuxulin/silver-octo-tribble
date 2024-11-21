@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{752FC74A-8E8F-45DB-9EAB-9170C9DB74E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureFunctions", "AzureFunctions\AzureFunctions.csproj", "{CF529C92-CE0E-448A-866B-D918D6E085CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureFunctions", "AzureFunctions\AzureFunctions.csproj", "{CEB69173-0B49-4AEF-B47C-FC79C4E64678}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,10 +56,10 @@ Global
 		{752FC74A-8E8F-45DB-9EAB-9170C9DB74E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{752FC74A-8E8F-45DB-9EAB-9170C9DB74E3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{752FC74A-8E8F-45DB-9EAB-9170C9DB74E3}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{CF529C92-CE0E-448A-866B-D918D6E085CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF529C92-CE0E-448A-866B-D918D6E085CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF529C92-CE0E-448A-866B-D918D6E085CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF529C92-CE0E-448A-866B-D918D6E085CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEB69173-0B49-4AEF-B47C-FC79C4E64678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEB69173-0B49-4AEF-B47C-FC79C4E64678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEB69173-0B49-4AEF-B47C-FC79C4E64678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEB69173-0B49-4AEF-B47C-FC79C4E64678}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

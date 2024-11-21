@@ -91,8 +91,8 @@ class UserService : IUserService
         if (users is null || users.Count < ids.Count())
             return DefinedError.AbsentElement;
 
-        await _imageService.DeleteImagesAsync(users.Select(u => u.ImageId));
         await _userRepository.DeleteUsersAsync(users);
+        await _imageService.DeleteImagesAsync(users.Select(u => u.ImageId));
         return true;
     }
 
