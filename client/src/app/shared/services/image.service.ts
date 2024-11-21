@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import Image from '../models/Image';
-import { shareReplay } from 'rxjs';
+import { delay, shareReplay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',

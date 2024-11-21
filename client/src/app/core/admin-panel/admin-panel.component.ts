@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import User from '../../shared/models/User';
 import {
   BehaviorSubject,
+  map,
   Observable,
   shareReplay,
   Subject,
@@ -41,6 +42,7 @@ import { MatCardModule } from '@angular/material/card';
 import UsersMetrics from '../../shared/models/UserMetrics';
 import { Router } from '@angular/router';
 import { AvatarImageComponent } from '../../shared/avatar-image/avatar-image.component';
+import { ImageService } from '../../shared/services/image.service';
 
 @Component({
   selector: 'app-admin-panel',

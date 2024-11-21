@@ -24,7 +24,6 @@ export class AuthHandlerComponent {
   isLogin = true;
   private _destroy$ = new Subject<boolean>();
   errorText = '';
-
   constructor(
     private _authService: AuthService,
     private _router: Router,
@@ -44,8 +43,12 @@ export class AuthHandlerComponent {
 
     let combinedOperation$ = merge(logOut$, methodToExecute$);
     combinedOperation$.pipe(takeUntil(this._destroy$)).subscribe({
-      next: (res) => {
-        if (res) this._router.navigate(['user/', res.id]);
+      next: async (res) => {
+        if (res) {
+          if (!this.isLogin) await new Promise((f) => setTimeout(f, 5000));
+
+          this._router.navigate(['user/', res.id]);
+        }
       },
       error: (response: HttpErrorResponse) => {
         this.errorText = !!response.error.message

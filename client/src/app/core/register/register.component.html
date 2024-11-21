@@ -2,7 +2,7 @@
   <div class="dialog-box">
     <img
       mat-card-image
-      [src]="'data:image/jpeg;base64,' + dto.image.content"
+      [src]="getAppropriateImageSource(dto.image.content, dto.image.type)"
       alt="Provide image"
       (click)="onImageClick()"
     />

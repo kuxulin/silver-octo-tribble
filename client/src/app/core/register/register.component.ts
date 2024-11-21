@@ -12,6 +12,8 @@ import {
   ErrorStateMatcher,
   ShowOnDirtyErrorStateMatcher,
 } from '@angular/material/core';
+import { ImageService } from '../../shared/services/image.service';
+import { DataService } from '../../shared/services/data.service';
 
 @Component({
   selector: 'app-register',
@@ -48,6 +50,11 @@ export class RegisterComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   checkedPassword = '';
 
+  constructor(
+    private _imageService: ImageService,
+    private _dataService: DataService
+  ) {}
+
   onImageClick() {
     this.fileInput.nativeElement.click();
   }
@@ -61,11 +68,13 @@ export class RegisterComponent {
       reader.readAsArrayBuffer(file);
 
       reader.onload = () => {
-        let base64String = reader.result!.toString();
+        let base64String = this._dataService.convertArrayBufferToBase64String(
+          reader.result! as ArrayBuffer
+        );
 
         this.dto.image = {
           name: file.name,
-          content: base64String.split(',')[1],
+          content: base64String,
           type: file.type,
         };
       };
@@ -87,6 +96,10 @@ export class RegisterComponent {
 
   arePasswordsEqual(): boolean {
     return this.dto.password === this.checkedPassword;
+  }
+
+  getAppropriateImageSource(content: string, type: string) {
+    return this._imageService.getAppropriateImageSource(content, type);
   }
 
   isPhoneValid(): boolean {

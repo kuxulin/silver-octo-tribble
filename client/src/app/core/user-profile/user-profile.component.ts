@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { combineLatest, map, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, map, Observable, Subject, takeUntil, tap } from 'rxjs';
 import User from '../../shared/models/User';
 import UserAuthDTO from '../../shared/models/DTOs/UserAuthDTO';
 import { UserService } from '../../shared/services/user.service';
@@ -27,6 +27,7 @@ import PhoneNumberValidator from '../../shared/validators/PhoneNumberValidator';
 import AvailableUserRole from '../../shared/models/enums/AvailableUserRole';
 import Image from '../../shared/models/Image';
 import { ImageService } from '../../shared/services/image.service';
+import { DataService } from '../../shared/services/data.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -48,6 +49,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   user!: User;
   data$!: Observable<{ userAuth: UserAuthDTO; user: User; image: Image }>;
+  image!: Image;
   isBlobGenerating = false;
   private _destroy$ = new Subject<boolean>();
   isTheSameUserMarker = false;
@@ -64,6 +66,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private _authService: AuthService,
     private _userService: UserService,
     private _imageService: ImageService,
+    private _dataService: DataService,
     private _route: ActivatedRoute
   ) {}
 
@@ -95,6 +98,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
               user,
               image,
             };
+          }),
+          tap((res) => {
+            this.image = res.image;
           })
         );
       });
@@ -122,13 +128,16 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       reader.readAsArrayBuffer(file);
 
       reader.onload = () => {
-        let base64String = reader.result!.toString();
+        let base64String = this._dataService.convertArrayBufferToBase64String(
+          reader.result! as ArrayBuffer
+        );
 
-        this.user.image = {
+        this.image = {
           name: file.name,
-          content: base64String.split(',')[1],
+          content: base64String,
           type: file.type,
         };
+
         this.isBlobGenerating = false;
       };
     }
@@ -141,6 +150,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       .updateUser({
         ...this.form.getRawValue(),
         id: this.user.id,
+        imageDto: this.image,
       })
       .subscribe((res) => (this.user = res));
   }
