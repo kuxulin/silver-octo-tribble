@@ -45,20 +45,14 @@ public class AuthService : IAuthService
         if (possibleUser is not null)
             return DefinedError.DuplicateEntity;
 
-        var user = _mapper.Map<User>(dto);
-        await _userManager.CreateAsync(user, dto.Password);
-        var imageDto = dto.Image;
-        imageDto.UserId = user.Id;
         var imageCreationResult = await _imageService.AddImageAsync(dto.Image);
 
         if (!imageCreationResult.IsSuccess)
-        {
-            await _userManager.DeleteAsync(user);
             return imageCreationResult.Error!;
-        }
 
+        var user = _mapper.Map<User>(dto);
         user.ImageId = imageCreationResult.Value;
-        await _userManager.UpdateAsync(user);
+        await _userManager.CreateAsync(user, dto.Password);
         return await GenerateAccessTokenAsync(user);
     }
 
