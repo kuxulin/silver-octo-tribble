@@ -103,6 +103,19 @@ variable default_ip_adress {
   default = "__DefaultIPAdress__"
 }
 
+variable azure_jobs_storage_name {
+  type = string
+  description = "Specifies the connection string for an Azure Storage account that the Functions runtime uses for normal operations."
+  default = "AzureWebJobsStorage"  
+}
+
+variable azure_jobs_storage_value {
+  type = string
+  description = "Specifies the connection string for an Azure Storage account that the Functions runtime uses for normal operations."
+  default = "__AzureWebJobsStorage__"
+  sensitive = true  
+}
+
 variable storage_connection_name {
   type = string
   description = "A name of a account storage connection"

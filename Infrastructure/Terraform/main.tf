@@ -16,7 +16,7 @@ locals  {
 
 resource "azurerm_storage_container" "images" {
   name = var.storage_container_images_name
-  storage_account_name = data.azurerm_storage_account.storage.name
+  storage_account_id = data.azurerm_storage_account.storage.id
 }
 
 resource "azurerm_key_vault" "res-1" {
@@ -41,6 +41,16 @@ resource "azurerm_key_vault_access_policy" "default" {
 resource "azurerm_key_vault_access_policy" "server_policy" {
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_windows_web_app.server.identity[0].principal_id
+  key_vault_id = azurerm_key_vault.res-1.id
+
+  secret_permissions = [
+    "Get", 
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "image_funcs_policy" {
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_windows_function_app.images_azure_funcs.identity[0].principal_id
   key_vault_id = azurerm_key_vault.res-1.id
 
   secret_permissions = [
@@ -257,6 +267,7 @@ resource "azurerm_windows_function_app" "images_azure_funcs" {
     AzureWebJobsSecretStorageType          = "files"
     ImagesContainerName                    = var.storage_container_images_name
     WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
+    "${var.azure_jobs_storage_name}" = var.azure_jobs_storage_value
   }
   client_certificate_mode                  = "Required"
   ftp_publish_basic_authentication_enabled = false
@@ -266,6 +277,10 @@ resource "azurerm_windows_function_app" "images_azure_funcs" {
   service_plan_id                          = azurerm_service_plan.res-45.id
   storage_account_name = data.azurerm_storage_account.storage.name
   webdeploy_publish_basic_authentication_enabled = false
+
+  identity {
+    type = "SystemAssigned"
+  }
 
   connection_string {
     name = var.storage_connection_name
