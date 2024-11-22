@@ -16,7 +16,7 @@ else
 {
     builder.Services.AddDbAndIdentity(builder.Configuration.GetConnectionString("AzureSQLConnectionString")!);
     var blobServiceClient = new BlobServiceClient(builder.Configuration.GetConnectionString("StorageAccountConnectionString"));
-    var containerClient = blobServiceClient.GetBlobContainerClient(builder.Configuration.GetValue<string>("ImagesContainerName")); // created by me service also should be added as a singleton
+    var containerClient = blobServiceClient.GetBlobContainerClient(builder.Configuration.GetValue<string>("ImagesContainerName"));
     builder.Services.AddSingleton(provider => containerClient);
 }
 
@@ -51,8 +51,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
 var app = builder.Build();
-app.UseHttpsRedirection();
 app.UseRouting();
+app.UseCors(builder.Configuration.GetSection("Policies:DefaultPolicy:Name").Value!);
+app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
 {
@@ -67,7 +68,6 @@ if (app.Environment.IsDevelopment())
     await services.SeedData();
 }
 
-app.UseCors(builder.Configuration.GetSection("Policies:DefaultPolicy:Name").Value!);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
