@@ -46,12 +46,12 @@ stages:
           platform: '$(buildPlatform)'
           configuration: '$(buildConfiguration)'
       
-      - task: VSBuild@1
+      - task: DotNetCoreCLI@2
         displayName: 'Build azure funcs'
         inputs:
-          solution: '$(funcsProject)'
-          msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)/AzureFunctions"'
-          platform: '$(buildPlatform)'
+          command: build
+          projects: '$(funcsProject)'
+          arguments: '--output $(Build.ArtifactStagingDirectory)/AzureFunctions'
           configuration: '$(buildConfiguration)'
 
 
