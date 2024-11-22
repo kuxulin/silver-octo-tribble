@@ -264,7 +264,7 @@ resource "azurerm_windows_function_app" "images_azure_funcs" {
   name                                     = var.upload_azure_func_name
   resource_group_name                      = var.resource_group_name
   service_plan_id                          = azurerm_service_plan.res-45.id
-
+  storage_account_name = data.azurerm_storage_account.storage.name
   webdeploy_publish_basic_authentication_enabled = false
 
   connection_string {
