@@ -28,18 +28,18 @@ builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Environment.IsDevelopment());
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(builder.Configuration.GetSection("Policies:DefaultPolicy:Name").Value!,
-        policyBuilder =>
-        {
-            var origin = builder.Configuration.GetSection("Policies:DefaultPolicy:Origin").Value!;
-            policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:DefaultPolicy:Origin").Value!)
-                   .AllowAnyHeader()
-                   .AllowAnyMethod()
-                   .AllowCredentials();
-        });
-});
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(builder.Configuration.GetSection("Policies:DefaultPolicy:Name").Value!,
+//        policyBuilder =>
+//        {
+//            var origin = builder.Configuration.GetSection("Policies:DefaultPolicy:Origin").Value!;
+//            policyBuilder.WithOrigins(builder.Configuration.GetSection("Policies:DefaultPolicy:Origin").Value!)
+//                   .AllowAnyHeader()
+//                   .AllowAnyMethod()
+//                   .AllowCredentials();
+//        });
+//});
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(DefinedPolicy.AdminPolicy, policy => policy.RequireRole(AvailableUserRole.Admin.ToString()))
@@ -52,7 +52,7 @@ builder.Services.AddSwagger();
 
 var app = builder.Build();
 app.UseRouting();
-app.UseCors(builder.Configuration.GetSection("Policies:DefaultPolicy:Name").Value!);
+//app.UseCors(builder.Configuration.GetSection("Policies:DefaultPolicy:Name").Value!);
 app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
