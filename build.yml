@@ -27,6 +27,7 @@ stages:
         terraformDir: 'Infrastructure/Terraform'
         clientDir: 'client'
         scriptsDir: 'Infrastructure/ReleaseScripts'
+        funcsProject: 'AzureFunctions/AzureFunctions.csproj'
 
       steps:
       - task: NuGetToolInstaller@1
@@ -44,7 +45,16 @@ stages:
           msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)/Server"'
           platform: '$(buildPlatform)'
           configuration: '$(buildConfiguration)'
-          
+      
+      - task: VSBuild@1
+        displayName: 'Build azure funcs'
+        inputs:
+          solution: '$(funcsProject)'
+          msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)/AzureFunctions"'
+          platform: '$(buildPlatform)'
+          configuration: '$(buildConfiguration)'
+
+
       - task: CopyFiles@2
         displayName: 'Copy terraform files to artifacts'
         inputs:
