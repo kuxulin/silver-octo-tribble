@@ -82,6 +82,12 @@ resource "azurerm_key_vault_secret" "storage_connection_string" {
   depends_on = [ azurerm_key_vault_access_policy.default ]
 }
 
+resource "azurerm_key_vault_secret" "web_jobs_storage_connection_string" {
+  name =   var.azure_jobs_storage_name
+  value = var.azure_jobs_storage_value
+  key_vault_id = azurerm_key_vault.res-1.id
+}
+
 resource "azurerm_mssql_server" "res-2" {
   administrator_login          = var.admin_username
   administrator_login_password = var.database_admin_password_value
@@ -267,7 +273,7 @@ resource "azurerm_windows_function_app" "images_azure_funcs" {
     AzureWebJobsSecretStorageType          = "files"
     ImagesContainerName                    = var.storage_container_images_name
     WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED = "1"
-    "${var.azure_jobs_storage_name}" = var.azure_jobs_storage_value
+    "${var.azure_jobs_storage_name}" = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault.res-1.vault_uri}secrets/${azurerm_key_vault_secret.web_jobs_storage_connection_string.name}/${azurerm_key_vault_secret.web_jobs_storage_connection_string.version})"
   }
   client_certificate_mode                  = "Required"
   ftp_publish_basic_authentication_enabled = false

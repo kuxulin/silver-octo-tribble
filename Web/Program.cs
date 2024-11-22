@@ -60,7 +60,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
