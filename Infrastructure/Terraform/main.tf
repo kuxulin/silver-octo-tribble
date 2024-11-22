@@ -111,7 +111,7 @@ resource "azurerm_service_plan" "res-45" {
   name                = "ASP-${var.resource_group_name}-90ff"
   os_type             = "Windows"
   resource_group_name = var.resource_group_name
-  sku_name            = "F1"
+  sku_name            = "B1"
 }
 
 resource "azurerm_windows_web_app" "client" {
