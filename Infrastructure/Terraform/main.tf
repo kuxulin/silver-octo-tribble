@@ -16,7 +16,7 @@ locals  {
 
 resource "azurerm_storage_container" "images" {
   name = var.storage_container_images_name
-  storage_account_id = data.azurerm_storage_account.storage.id
+  storage_account_name = data.azurerm_storage_account.storage.name
 }
 
 resource "azurerm_key_vault" "res-1" {
