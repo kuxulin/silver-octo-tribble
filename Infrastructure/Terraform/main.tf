@@ -276,8 +276,6 @@ resource "azurerm_windows_function_app" "images_azure_funcs" {
   site_config {
     application_insights_connection_string = azurerm_application_insights.res-57.connection_string
     ftps_state                             = "FtpsOnly"
-    ip_restriction_default_action          = ""
-    scm_ip_restriction_default_action      = ""
     use_32_bit_worker                      = false
     cors {
       allowed_origins = ["https://portal.azure.com"]
