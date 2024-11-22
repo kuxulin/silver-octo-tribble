@@ -42,7 +42,6 @@ public static class DependencyInjection
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-
             .AddJwtBearer(options =>
             {
                 options.SaveToken = true;
@@ -51,7 +50,7 @@ public static class DependencyInjection
                 {
                     ValidIssuer = configuration.Issuer,
                     ValidAudience = configuration.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Key)), //TODO create asymetric secret
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Key)), 
                     NameClaimType = DefinedClaim.Name,
                     RoleClaimType = DefinedClaim.Role,
                 };
