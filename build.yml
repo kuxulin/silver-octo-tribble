@@ -54,6 +54,14 @@ stages:
           arguments: '--output $(Build.ArtifactStagingDirectory)/AzureFunctions'
           configuration: '$(buildConfiguration)'
 
+      - task: ArchiveFiles@2
+        displayName: Zip Azure funcs
+        inputs:
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/AzureFunctions'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/AzureFunctions'
+          replaceExistingArchive: true
 
       - task: CopyFiles@2
         displayName: 'Copy terraform files to artifacts'
@@ -100,7 +108,6 @@ stages:
           includeRootFolder: false
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/Client/client'
-
           replaceExistingArchive: true
 
       - task: VSBuild@1
