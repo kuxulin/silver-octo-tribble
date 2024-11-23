@@ -208,7 +208,7 @@ public static class DataSeeder
             employees[i].EmployeeId = employee.Id;
             context.Update(employees[i]);
             var image = await context.Images.FirstAsync(i => i.Id == imageId);
-            image.UserId = managers[i].Id;
+            image.UserId = employees[i].Id;
             context.Images.Update(image);
         }
 
