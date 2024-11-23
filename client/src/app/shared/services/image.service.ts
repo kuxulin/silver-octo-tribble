@@ -31,10 +31,9 @@ export class ImageService {
   }
 
   getAppropriateImageSource(content: string, type: string) {
-    var expression = new RegExp(
-      'https?://(www.)?[-a-zA-Z0-9@:%._+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)'
+    let expression = new RegExp(
+      '/https?://(www.)?[-a-zA-Z0-9@:%._+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/i'
     );
-
     if (content.match(expression)) return content;
     else return `data:${type};base64,` + content;
   }
