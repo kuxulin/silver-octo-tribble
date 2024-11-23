@@ -31,17 +31,11 @@ export class ImageService {
   }
 
   getAppropriateImageSource(content: string, type: string) {
-    var urlPattern = new RegExp(
-      '^(https?:\\/\\/)?' + // validate protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // validate domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // validate OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // validate port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // validate query string
-        '(\\#[-a-z\\d_]*)?$',
-      'i'
+    var expression = new RegExp(
+      'https?://(www.)?[-a-zA-Z0-9@:%._+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)'
     );
 
-    if (urlPattern.test(content)) return content;
+    if (content.match(expression)) return content;
     else return `data:${type};base64,` + content;
   }
 }

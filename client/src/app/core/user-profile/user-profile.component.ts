@@ -125,12 +125,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     if (input.files && input.files[0]) {
       let file = input.files[0];
       let reader = new FileReader();
-      reader.readAsArrayBuffer(file);
+      reader.readAsDataURL(file);
 
       reader.onload = () => {
-        let base64String = this._dataService.convertArrayBufferToBase64String(
-          reader.result! as ArrayBuffer
-        );
+        let base64String = (reader.result as string).split(',')[1];
 
         this.image = {
           name: file.name,
