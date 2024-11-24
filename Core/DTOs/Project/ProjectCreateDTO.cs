@@ -6,5 +6,5 @@ public class ProjectCreateDTO : BaseCreateDTO
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
     public IEnumerable<Guid> ManagerIds { get; set; } = null!;
-    public IEnumerable<Guid>? EmployeeIds { get; set; }
+    public IEnumerable<Guid> EmployeeIds { get; set; } = null!;
 }

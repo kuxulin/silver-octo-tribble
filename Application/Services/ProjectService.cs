@@ -104,9 +104,8 @@ class ProjectService : IProjectService
             project.Description = dto.Description;
 
         if (dto.EmployeeIds is not null)
-        {
             await UpdateProjectEmployeesAsync(project, dto);
-        }
+
 
         if (dto.ManagerIds is not null)
             project.Managers = dto.ManagerIds.Select(id => new Manager { Id = id }).ToList();

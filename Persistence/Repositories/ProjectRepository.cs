@@ -25,7 +25,7 @@ internal class ProjectRepository : BaseCRUDRepository<Project, DatabaseContext>,
     public IQueryable<Project> GetProjectsByEmployeeId(Guid id)
     {
         return GetAll().Include(p => p.Employees)
-            .Where(p => p.Employees !=null && p.Employees.Any(e => e.Id == id));
+            .Where(p => p.Employees!.Any(e => e.Id == id));
     }
 
     public async override Task<Project> AddAsync(Project entity, bool isSaved = true)
