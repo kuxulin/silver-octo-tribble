@@ -21,10 +21,13 @@ export class ChangeService {
     if (change.actionType.split(' ').length > 1)
       action = change.actionType.replace(' ', 'd ');
 
+    let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     let res = `${change.creator.userName} ${action} ${title} at ${formatDate(
       change.creationDate,
       'd.MM.yyy, H:mm',
-      'en-US'
+      'en-US',
+      timezone
     )}`;
 
     return res;
@@ -33,46 +36,34 @@ export class ChangeService {
   getChangesFromProject(projectId: string) {
     return this._httpClient
       .get<Change[]>(this._apiUrl + '/project/' + projectId)
-      .pipe(
-        map((changes) =>
-          changes.sort((a, b) => {
-            let r =
-              new Date(b.creationDate).getTime() -
-              new Date(a.creationDate).getTime();
-            return r;
-          })
-        )
-      );
+      .pipe(map((changes) => this.mapChanges(changes)));
   }
 
   getChangesFromManager(managerId: string) {
     return this._httpClient
       .get<Change[]>(this._apiUrl + '/manager/' + managerId)
-      .pipe(
-        map((changes) =>
-          changes.sort((a, b) => {
-            let r =
-              new Date(b.creationDate).getTime() -
-              new Date(a.creationDate).getTime();
-            return r;
-          })
-        )
-      );
+      .pipe(map((changes) => this.mapChanges(changes)));
   }
 
   getChangesFromEmployee(employeeId: string) {
     return this._httpClient
       .get<Change[]>(this._apiUrl + '/employee/' + employeeId)
-      .pipe(
-        map((changes) =>
-          changes.sort((a, b) => {
-            let r =
-              new Date(b.creationDate).getTime() -
-              new Date(a.creationDate).getTime();
-            return r;
-          })
-        )
-      );
+      .pipe(map((changes) => this.mapChanges(changes)));
+  }
+
+  private mapChanges(changes: Change[]) {
+    changes.sort((a, b) => {
+      let r =
+        new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
+      return r;
+    });
+
+    changes.forEach((change) => {
+      change.creationDate = new Date(change.creationDate.toString() + 'Z');
+      return change;
+    });
+
+    return changes;
   }
 
   makeChangeRead(changeIds: string[]) {
