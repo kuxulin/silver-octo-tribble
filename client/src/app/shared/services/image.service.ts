@@ -32,7 +32,7 @@ export class ImageService {
 
   getAppropriateImageSource(content: string, type: string) {
     let expression = new RegExp(
-      '/https?://(www.)?[-a-zA-Z0-9@:%._+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/i'
+      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
     );
     if (content.match(expression)) return content;
     else return `data:${type};base64,` + content;
