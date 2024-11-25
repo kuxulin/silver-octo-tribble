@@ -1,9 +1,5 @@
 ﻿using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Core.Constants;
-using Core.Interfaces.Services;
 using Microsoft.Azure.WebJobs;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -17,8 +13,8 @@ public class DeleteImages
     [Blob("%ImagesContainerName%/thumbnail/{imageId}", FileAccess.Write, Connection = "StorageAccountConnectionString")] BlobClient thumbnailBlobClient,
     [Blob("%ImagesContainerName%/profile/{imageId}", FileAccess.Write, Connection = "StorageAccountConnectionString")] BlobClient profileBlobClient)
     {
-        await originalBlobClient.DeleteAsync();
-        await thumbnailBlobClient.DeleteAsync();
-        await profileBlobClient.DeleteAsync();
+        await originalBlobClient.DeleteIfExistsAsync();
+        await thumbnailBlobClient.DeleteIfExistsAsync();
+        await profileBlobClient.DeleteIfExistsAsync();
     }
 }
