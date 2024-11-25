@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, shareReplay, take, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import UserAuthDTO from '../models/DTOs/UserAuthDTO';
 import { OnlineUsersService } from './online-users.service';
 import { DataService } from './data.service';
+import { SkipLoading } from '../interceptors/loadingInterceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -44,10 +45,11 @@ export class AuthService {
     return this._httpClient
       .post<UserAuthDTO>(
         this._apiUrl + '/register',
+        { ...dto },
         {
-          ...dto,
-        },
-        { withCredentials: true }
+          withCredentials: true,
+          context: new HttpContext().set(SkipLoading, true),
+        }
       )
       .pipe(
         tap((res) => this.setSession(res)),

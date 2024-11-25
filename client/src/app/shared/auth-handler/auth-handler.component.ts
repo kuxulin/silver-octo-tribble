@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../services/data.service';
+import { LoadingService } from '../services/loading.service';
 
 @Component({
   selector: 'app-auth-handler',
@@ -27,10 +28,11 @@ export class AuthHandlerComponent {
   constructor(
     private _authService: AuthService,
     private _router: Router,
-    private _dataService: DataService
+    private _dataService: DataService,
+    private _loadingService: LoadingService
   ) {}
 
-  onSubmitClick() {
+  async onSubmitClick() {
     if (!this.areFieldsValid) return;
 
     let methodToExecute$ = this.isLogin
@@ -45,7 +47,11 @@ export class AuthHandlerComponent {
     combinedOperation$.pipe(takeUntil(this._destroy$)).subscribe({
       next: async (res) => {
         if (res) {
-          if (!this.isLogin) await new Promise((f) => setTimeout(f, 5000));
+          if (!this.isLogin) {
+            this._loadingService.loadingOn();
+            await new Promise((f) => setTimeout(f, 5000));
+            this._loadingService.loadingOff();
+          }
 
           this._router.navigate(['user/', res.id]);
         }

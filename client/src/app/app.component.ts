@@ -4,11 +4,12 @@ import { HeaderMenuComponent } from './core/header-menu/header-menu.component';
 import { AuthService } from './shared/services/auth.service';
 import { OnlineUsersService } from './shared/services/online-users.service';
 import { DataService } from './shared/services/data.service';
+import { LoadingIndicatorComponent } from './shared/loading-indicator/loading-indicator.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderMenuComponent],
+  imports: [RouterOutlet, HeaderMenuComponent, LoadingIndicatorComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

@@ -7,7 +7,7 @@ import { RouterModule } from '@angular/router';
 import LoginRegisterDTO from '../../shared/models/DTOs/LoginRegisterDTO';
 import { AuthHandlerComponent } from '../../shared/auth-handler/auth-handler.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { isPossiblePhoneNumber, isValidNumber } from 'libphonenumber-js';
+import { isValidNumber } from 'libphonenumber-js';
 import {
   ErrorStateMatcher,
   ShowOnDirtyErrorStateMatcher,
@@ -50,10 +50,7 @@ export class RegisterComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   checkedPassword = '';
 
-  constructor(
-    private _imageService: ImageService,
-    private _dataService: DataService
-  ) {}
+  constructor(private _imageService: ImageService) {}
 
   onImageClick() {
     this.fileInput.nativeElement.click();
