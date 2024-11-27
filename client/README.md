@@ -1,27 +1,22 @@
 # Client
 
+This is client application for my [ToDo App](https://github.com/kuxulin/silver-octo-tribble)
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.3.
 
-## Development server
+## Installation
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+### Certificates
 
-## Code scaffolding
+Project requires self signed certificate for appropriate work, create cert.key and cert.crt files and place them into root folder.
+If you don`t know, how to do that, follow instructions in this section.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+In order to use this project locally, you need to have [openssl](https://openssl-library.org/source/)
 
-## Build
+1. Open OpenSSL Command Prompt
+2. Run this command
+   `openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes -keyout cert.key -out cert.crt -subj /CN=<print name here> -addext "subjectAltName=DNS:localhost,IP:10.0.0.1"`
+   It will create two files in openssl console folder. Paste them into your root folder
+3. To avoid warning from browser, install .crt file to Trusted Root Certification Authorities folder
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Run `npm i` to install all required dependencies
+Run `ng serve` for a dev server. Navigate to `https://localhost:4200/`. The application will automatically reload if you change any of the source files.
